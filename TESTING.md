@@ -37,8 +37,8 @@ To connect with netcat, type in terminal:
 To manually type and send raw IRC messages to test:
 
 ```
-	NICK testuser
-	USER testuser 0 * :Real Name
-	JOIN #testchannel
-	PRIVMSG #testchannel :Hello, world!
+NICK testuser
+USER testuser 0 * :Real Name
+JOIN #testchannel
+PRIVMSG #testchannel :Hello, world!
 ```
