@@ -13,7 +13,7 @@ Since IRSSI is a fully-featured IRC client, hence it will allow us to test how o
 
 To connect to our server:
 
-```/connect localhost <port> <password>```
+> ```/connect localhost <port> <password>```
 
 To join a channel:
 
