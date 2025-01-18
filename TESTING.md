@@ -45,8 +45,8 @@ PRIVMSG #testchannel :Hello, world!
 
 ```mermaid
 graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
+    socket()-->bind();
+    bind()-->listen();
+    listen()-->accept();
     C-->D;
 ```
