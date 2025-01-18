@@ -42,11 +42,3 @@ USER testuser 0 * :Real Name
 JOIN #testchannel
 PRIVMSG #testchannel :Hello, world!
 ```
-
-```mermaid
-graph TD;
-    socket()-->bind();
-    bind()-->listen();
-    listen()-->accept();
-    C-->D;
-```
