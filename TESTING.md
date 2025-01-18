@@ -16,7 +16,7 @@ To connect to our server:
 
 To join a channel:
 
-	```/join #channel```
+> /join #channel
 
 If IRSSI works with our server, it’s a good indication that our implementation adheres to the IRC protocol specifications (RFC 2812).
 
