@@ -17,7 +17,7 @@ To connect to our server:
 
 To join a channel:
 
-```/join #channel```
+- ```/join #channel```
 
 If IRSSI works with our server, it’s a good indication that our implementation adheres to the IRC protocol specifications (RFC 2812).
 
@@ -32,10 +32,10 @@ It’s a great tool for low-level testing and debugging, especially during devel
 
 To connect with netcat, type in terminal:
 
-```nc -C localhost 6667```
+- ```nc -C localhost 6667```
 
 To manually type and send raw IRC messages to test:
-```
+- ```
 NICK testuser
 USER testuser 0 * :Real Name
 JOIN #testchannel
