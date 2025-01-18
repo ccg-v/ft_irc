@@ -42,3 +42,11 @@ USER testuser 0 * :Real Name
 JOIN #testchannel
 PRIVMSG #testchannel :Hello, world!
 ```
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
