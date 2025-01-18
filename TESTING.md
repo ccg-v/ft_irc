@@ -13,13 +13,11 @@ Since IRSSI is a fully-featured IRC client, hence it will allow us to test how o
 
 To connect to our server:
 
-> ```/connect localhost <port> <password>```
+- ```/connect localhost <port> <password>```
 
 To join a channel:
 
-```c++
-/join #channel
-```
+```/join #channel```
 
 If IRSSI works with our server, it’s a good indication that our implementation adheres to the IRC protocol specifications (RFC 2812).
 
@@ -37,7 +35,7 @@ To connect with netcat, type in terminal:
 ```nc -C localhost 6667```
 
 To manually type and send raw IRC messages to test:
->```
+```
 NICK testuser
 USER testuser 0 * :Real Name
 JOIN #testchannel
