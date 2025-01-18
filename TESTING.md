@@ -12,8 +12,7 @@ Next we can either IRSSI or Netcat as client:
 Since IRSSI is a fully-featured IRC client, hence it will allow us to test how our server handles real-world IRC client behavior. It supports standard IRC commands like `/join`, `/part`, `/nick`, and `/msg`.
 
 To connect to our server:
-
-	`/connect localhost <port> <password>`
+`/connect localhost <port> <password>`
 
 To join a channel:
 
