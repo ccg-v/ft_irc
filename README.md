@@ -3,7 +3,7 @@
 ## What is a socket
 
 - It's a way to communicate two processes using standard UNIX file descriptors.
-- When the system routine `socket` is called, it returns the socket descriptor, and we communicate through it using the specialized `send()` and `recv`. We could just the normal `read()` and `write()` to communicate through the socket but `send()` and `recv()` offer much more control over the data transmission.
+- When the system routine `socket` is called, it returns the socket descriptor, and we communicate through it using the specialized `send()` and `recv`. We could just use the normal `read()` and `write()` to communicate through the socket but `send()` and `recv()` offer much more control over the data transmission.
 - There are all kinds of sockets, but we will only deal with *Internet Sockets*.
 
 ## Types of Internet Sockets
@@ -11,7 +11,7 @@
 Two main types:
 1. **Stream Sockets** (or 'SOCK_STREAM')
 	- They are reliable two-way connected communication streams. 
-	- Items sent will arrive error-free, and in the ssame order they were sent. This high level of data transmission quality is achieved thanks to the protocol they use: the **"Transmission Control Protocol"** or simply **TCP**[^1] (see RFC 793).
+	- Items sent will arrive error-free, and in the same order they were sent. This high level of data transmission quality is achieved thanks to the protocol they use: the **"Transmission Control Protocol"** or simply **TCP**[^1] (see RFC 793).
 2. **Datagram Sockets** (`SOCK_DGRAM` or 'connectionless sockets')
 	- They are not reliable: if you send a datagram, it may arrive out of order or simply do not arrive. The protocol they use is **"User Datagram Protocol"** or **UDP*.
 	- Unlike stream sockets, datagram sockets don't need an open connection. A packet is built, an IP headers is slapped on it with destination information, and it is sent out. No connection needed.
