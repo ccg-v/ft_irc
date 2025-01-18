@@ -34,7 +34,6 @@ To connect with netcat, type in terminal:
 	```nc -C localhost 6667```
 
 To manually type and send raw IRC messages to test:
-
 	```
 	NICK testuser
 	USER testuser 0 * :Real Name
