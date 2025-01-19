@@ -10,7 +10,7 @@ We must start running our own server locally, providing as arguments the port an
 Next we can either IRSSI or Netcat as client:
 
 ## 1. IRSSI as a Client
-Since IRSSI is a fully-featured IRC client, hence it will allow us to test how our server handles real-world IRC client behavior. It supports standard IRC commands like `/join`, `/part`, `/nick`, and `/msg`.
+Since IRSSI is a fully-featured IRC client, it will allow us to test how our server handles real-world IRC client behavior. It supports standard IRC commands like `/join`, `/part`, `/nick`, and `/msg`.
 
 To connect to our server:
 
@@ -41,7 +41,7 @@ Without the -C flag, netcat may use only \n (LF) as the line-ending delimiter, w
 
 Once connected, we must first authenticate:
 
-- ```PASS pass```
+- ```PASS <password>```
 
 and then register:
 
@@ -52,8 +52,8 @@ USER <user_name> 0 * :Real Name
 
 Once registration is finished, we can join/create a channel:
 
-```JOIN #<channel_name>```
+- ```JOIN #<channel_name>```
 
 And broadcast messages:
 
-```PRIVMSG #<channel_name> :Hello, world!```
+- ```PRIVMSG #<channel_name> :Hello, world!```
