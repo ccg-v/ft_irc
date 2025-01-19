@@ -50,9 +50,8 @@ Checking for Complete Messages:
 Processing Commands:
 
 - Once a complete command is found, it is extracted from `_buffer` and processed.
-- Any remaining data after the `\r\n` is left in `_buffer` for further processing.
-        
-Example:
+- Any remaining data after the `\r\n` is left in `_buffer` for further processing. 
+- Example:
 
 ```c++
 size_t pos = _buffer.find("\r\n");
@@ -69,7 +68,31 @@ In a nutshell, the `_buffer` helps:
 - Handling concatenated commands: When a client sends multiple commands in one packet, `_buffer`can split them correctly.
 - Preventing errors: Without a `_buffer`, partial messages might be discarded or cause parsing errors.
 
-### Where to set the `_buffer`
+### Why set a `_buffer`'s size
+
+Setting a maximum buffer size prevents the server from using too much memory if a client sends a large or malformed message.
+
+In IRC, the maximum line length is defined by the protocol:
+
+- Per **RFC 2812** (IRC protocol standard), the **maximum length of a message**, including the `\r\n`, is **512 characters**.
+- This includes the command, parameters, and any prefixes.
+
+How to enforce the buffer size:
+
+- Use a `std::string` (which dynamically grows) but validate its size when appending data.
+- If the buffer size exceeds a predefined limit (e.g., 512 characters for IRC), you can:
+
+    * Disconnect the client (common in IRC servers).
+    * Log the event or send an error response (e.g., `ERR_INPUTTOOLONG`).
+
+```c++
+if (_buffer.size() > MAX_BUFFER_SIZE) {
+    sendError("ERR_INPUTTOOLONG");
+    disconnect();
+}
+```
+
+### Where to set the `_buffer`: Server or Client?
 
 | Aspect | Client Sets the Size | Server Sets the Size |
 | --- | --- | --- |
@@ -77,3 +100,50 @@ In a nutshell, the `_buffer` helps:
 | Flexibility | Each client can potentially have unique limits (not common in IRC). | All clients share the same global limit. |
 | Complexity | Simpler design; clients handle their own issues. | Server manages buffer limits for all clients. |
 | Centralization | Decentralized; limits are hardcoded per client. | Centralized; easier to modify system-wide. |
+
+Example of implementation of `_buffer` in Client:
+
+```c++
+class Client {
+private:
+    std::string _buffer;
+    static const size_t MAX_BUFFER_SIZE = 512; // Protocol limit
+
+public:
+    void appendToBuffer(const std::string& data) {
+        _buffer += data;
+        if (_buffer.size() > MAX_BUFFER_SIZE) {
+            std::cerr << "Buffer overflow for client: " << /* client ID */ std::endl;
+            // Handle overflow (e.g., clear buffer, send error, disconnect client)
+        }
+    }
+};
+```
+
+Example of implementation of `_buffer` in Server:
+
+```c++
+class Server {
+private:
+    static const size_t MAX_BUFFER_SIZE = 512; // Protocol limit
+
+public:
+    void appendToClientBuffer(Client& client, const std::string& data) {
+        client.appendToBuffer(data, MAX_BUFFER_SIZE);
+    }
+};
+
+class Client {
+private:
+    std::string _buffer;
+
+public:
+    void appendToBuffer(const std::string& data, size_t maxBufferSize) {
+        _buffer += data;
+        if (_buffer.size() > maxBufferSize) {
+            std::cerr << "Buffer overflow for client: " << /* client ID */ std::endl;
+            // Handle overflow (e.g., clear buffer, send error, disconnect client)
+        }
+    }
+};
+```
