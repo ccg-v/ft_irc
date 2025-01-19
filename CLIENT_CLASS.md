@@ -71,8 +71,8 @@ In a nutshell, the `_buffer` helps:
 
 ### Where to set the `_buffer`
 
-| Aspect | Client | Sets the Size | Server Sets the Size |
-| --- | --- | --- | --- |
+| Aspect | Client Sets the Size | Server Sets the Size |
+| --- | --- | --- |
 | Responsibility | Buffer logic is localized to the client. | Server enforces a global policy. |
 | Flexibility | Each client can potentially have unique limits (not common in IRC). | All clients share the same global limit. |
 | Complexity | Simpler design; clients handle their own issues. | Server manages buffer limits for all clients. |
