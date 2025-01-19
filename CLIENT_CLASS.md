@@ -26,7 +26,7 @@ In IRC protocol, **authentication** and **registration** are distinct steps.
 
 The user will not be able to send messages or join channels until he is properly registered.
 
-## Attribute: _buffer
+## `_buffer` attribute
 
 A `_buffer` attribute in the Client class is needed to temporarily store incomplete or incoming data from the client socket until it can be processed.
 Data sent by clients over a network is received in chunks. A single `recv()` call might not always receive a complete command or message, especially if the message is large or the network is slow. `_buffer` allows the server to store incomplete data until the full message or command is received.
@@ -44,13 +44,13 @@ Receiving Data:
 
 Checking for Complete Messages:
 
-	- The server checks _buffer for any complete commands by looking for `\r\n`.
-	- Example: `if '\r\n' in _buffer`
+- The server checks _buffer for any complete commands by looking for `\r\n`.
+- Example: `if '\r\n' in _buffer`
 
 Processing Commands:
 
-	- Once a complete command is found, it is extracted from _buffer and processed.
-	- Any remaining data after the \r\n is left in _buffer for further processing.
+- Once a complete command is found, it is extracted from _buffer and processed.
+- Any remaining data after the \r\n is left in _buffer for further processing.
         
 Example:
 
