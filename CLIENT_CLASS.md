@@ -1,4 +1,4 @@
-# ABOUT CLIENT CLASS
+# About Client class
 
 Even though the subject specifically says that we mustn’t develop a client, still a Client class is necessary because the server needs to maintain and manage details about all connected clients:
 
@@ -16,7 +16,7 @@ The class will act like a struct to encapsulate all this information. Server nee
 - To update the client's state (when they join a channel, change their nick, disconnect...)
 - ...
 
-## AUTHENTICATION vs. REGISTRATION
+## Authentication vs. Registration
 
 In IRC protocol, **authentication** and **registration** are distinct steps.
 

@@ -35,9 +35,9 @@ To connect with netcat, type in terminal:
 
 - ```nc -C localhost <port>```
 
-The `-C` flag enables CRLF (Carriage Return Line Feed) line endings when sending data.
-It ensures that every line you send ends with `\r\n` (CRLF), which complies with the IRC protocol requirement for message termination.
-Without the -C flag, netcat may use only \n (LF) as the line-ending delimiter, which could lead to protocol errors when communicating with servers that strictly require CRLF, such as IRC (Internet Relay Chat) or HTTP.
+> The `-C` flag enables CRLF (Carriage Return Line Feed) line endings when sending data.
+> It ensures that every line you send ends with `\r\n` (CRLF), which complies with the IRC protocol requirement for message termination.
+> Without the -C flag, netcat may use only \n (LF) as the line-ending delimiter, which could lead to protocol errors when communicating with servers that strictly require CRLF, such as IRC (Internet Relay Chat) or HTTP.
 
 Once connected, we must first authenticate:
 
@@ -54,6 +54,6 @@ Once registration is finished, we can join/create a channel:
 
 - ```JOIN #<channel_name>```
 
-And broadcast messages:
+and broadcast messages:
 
 - ```PRIVMSG #<channel_name> :Hello, world!```
