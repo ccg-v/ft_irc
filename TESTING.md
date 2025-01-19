@@ -47,7 +47,7 @@ and then register:
 
 ```
 NICK <nick_name>
-USER <user_name> 0 * :Real Name
+USER <user_name> 0 * :<real_name>
 ```
 
 Once registration is finished, we can join/create a channel:

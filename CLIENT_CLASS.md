@@ -16,6 +16,16 @@ The class will act like a struct to encapsulate all this information. Server nee
 - To update the client's state (when they join a channel, change their nick, disconnect...)
 - ...
 
+## Attributes needed
+- `_socketFd`: Integer type, will store the descriptor of the socket
+- `_nickname`: String type, will store the nickname provided by the user during registration
+- `_username`: String type, will store the nickname provided by the user during registration
+- `_realname`: String type, will store the nickname provided by the user during registration
+- '_isAuthenticated': Boolean type, will store the user's authentication status
+- '_isRegistered': Boolean type, will store the user's registration status
+- '_channelsJoined': A map container storing the name of the channels the user has joined (string type, it's the map key) and a boolean to know if it's a channel's administrator or not
+- '_buffer': String type, allows the server to store incomplete data until the full message or command is received.
+
 ## Authentication vs. Registration
 
 In IRC protocol, **authentication** and **registration** are distinct steps.
