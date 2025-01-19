@@ -30,7 +30,7 @@ The user will not be able to send messages or join channels until he is properly
 
 A `_buffer` attribute in the Client class is needed to temporarily store incomplete or incoming data from the client socket until it can be processed.
 Data sent by clients over a network is received in chunks. A single `recv()` call might not always receive a complete command or message, especially if the message is large or the network is slow. `_buffer` allows the server to store incomplete data until the full message or command is received.
-In IRC, commands are separated by line endings `(\r\n)`. A client might send multiple commands in a single transmission, or a command might span multiple transmissions. The `_buffer` allows the server to:
+IRC messages are line-based and use `\r\n` as the delimiter. A client might send multiple commands in a single transmission, or a command might span multiple transmissions. The `_buffer` allows the server to:
 
 - Accumulate data until it encounters a full line (ending with `\r\n`).
 - Split the data into multiple commands if multiple `\r\n`-terminated lines are received at once.
@@ -49,8 +49,8 @@ Checking for Complete Messages:
 
 Processing Commands:
 
-- Once a complete command is found, it is extracted from _buffer and processed.
-- Any remaining data after the \r\n is left in _buffer for further processing.
+- Once a complete command is found, it is extracted from `_buffer` and processed.
+- Any remaining data after the `\r\n` is left in `_buffer` for further processing.
         
 Example:
 
@@ -62,3 +62,18 @@ if (pos != std::string::npos) {
     processCommand(command);
 }
 ```
+
+In a nutshell, the `_buffer` helps:
+
+- Reassembling fragmented messages: It ensures commands like `PRIVMSG` are fully received.
+- Handling concatenated commands: When a client sends multiple commands in one packet, `_buffer`can split them correctly.
+- Preventing errors: Without a `_buffer`, partial messages might be discarded or cause parsing errors.
+
+### Where to set the `_buffer`
+
+| Aspect | Client | Sets the Size | Server Sets the Size |
+| --- | --- | --- | --- |
+| Responsibility | Buffer logic is localized to the client. | Server enforces a global policy. |
+| Flexibility | Each client can potentially have unique limits (not common in IRC). | All clients share the same global limit. |
+| Complexity | Simpler design; clients handle their own issues. | Server manages buffer limits for all clients. |
+| Centralization | Decentralized; limits are hardcoded per client. | Centralized; easier to modify system-wide. |
