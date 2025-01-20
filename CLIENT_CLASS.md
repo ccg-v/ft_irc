@@ -20,10 +20,12 @@ The class will act like a struct to encapsulate all this information. Server nee
 
 ## Attributes needed
 - `_socketFd`
+
 	Integer type. It will store the descriptor of the socket.
 
 - `_nickname`
-	String type. It will store the nickname provided by the user during registration (i. e. when a client sends the NICK command).
+
+String type. It will store the nickname provided by the user during registration (i. e. when a client sends the NICK command).
 
 - `_username`
 	String type. It will store the username provided by the user during registration (i.e. when a client sends the USER command). Also known as *"ident"*, the username is part of the user's `hostmask`, which identifies the user on the network. The hostmask generally looks like this:
