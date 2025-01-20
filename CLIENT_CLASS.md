@@ -15,16 +15,51 @@ The class will act like a struct to encapsulate all this information. Server nee
 - To identify every client by their name or socket
 - To update the client's state (when they join a channel, change their nick, disconnect...)
 - ...
+  
+--------------------------------------------------------------------------------------------
 
 ## Attributes needed
-- `_socketFd`: Integer type, will store the descriptor of the socket
-- `_nickname`: String type, will store the nickname provided by the user during registration
-- `_username`: String type, will store the nickname provided by the user during registration
-- `_realname`: String type, will store the nickname provided by the user during registration
-- '_isAuthenticated': Boolean type, will store the user's authentication status
-- '_isRegistered': Boolean type, will store the user's registration status
-- '_channelsJoined': A map container storing the name of the channels the user has joined (string type, it's the map key) and a boolean to know if it's a channel's administrator or not
-- '_buffer': String type, allows the server to store incomplete data until the full message or command is received.
+- `_socketFd`
+	Integer type. It will store the descriptor of the socket.
+
+- `_nickname`
+	String type. It will store the nickname provided by the user during registration (i. e. when a client sends the NICK command).
+
+- `_username`
+	String type. It will store the username provided by the user during registration (i.e. when a client sends the USER command). Also known as *"ident"*, the username is part of the user's `hostmask`, which identifies the user on the network. The hostmask generally looks like this:
+
+	`<nickname>!<username>@<hostname>`
+
+	For example:
+
+	`chuckie68!charles@irc.example.com`
+
+- `_realname`
+	String type. It will store the nickname provided by the user during registration.
+	The realname is a more human-readable field intended to provide additional information about the user. It is purely informational and does not have a functional role in identifying or authenticating the user. The realname is visible to others when they query information about the user (e.g., through the `WHOIS` command).
+	Like the `username`, the realname is also provided in the `USER` command:
+
+	`USER <username> <hostname> <servername> <realname>`
+
+	For example:
+
+	`USER charles * * :Charles Doe`
+
+	The * * fields are placeholders for hostname and servername, which are often ignored by modern servers.
+
+- '_isAuthenticated'
+	Boolean type, will store the user's authentication status.
+
+- '_isRegistered'
+	Boolean type, will store the user's registration status
+
+- '_channelsJoined'
+	A map container storing the name of the channels the user has joined (string type, it's the map key) and a boolean to know if it's a channel's administrator or not
+
+- '_buffer'
+	String type, allows the server to store incomplete data until the full message or command is received.
+
+-------------------------------------------------------
 
 ## Authentication vs. Registration
 
@@ -35,6 +70,8 @@ In IRC protocol, **authentication** and **registration** are distinct steps.
 2. Next, user must complete **registration** by providing a `nickname` and a `username` (the real name)
 
 The user will not be able to send messages or join channels until he is properly registered.
+
+-------------------------------------------------------
 
 ## `_buffer` attribute
 
