@@ -43,27 +43,27 @@ The class will act like a struct to encapsulate all this information. Server nee
 	The realname is a more human-readable field intended to provide additional information about the user. It is purely informational and does not have a functional role in identifying or authenticating the user. The realname is visible to others when they query information about the user (e.g., through the `WHOIS` command).
 	Like the `username`, the realname is also provided in the `USER` command:
 
-	`USER <username> <hostname> <servername> <realname>`
+	- `USER <username> <hostname> <servername> <realname>`
 
 	For example:
 
-	`USER charles * * :Charles Doe`
+	- `USER charles * * :Charles Doe`
 
 	The * * fields are placeholders for hostname and servername, which are often ignored by modern servers.
 
-- '_isAuthenticated'
+- `_isAuthenticated`
 
 	Boolean type, will store the user's authentication status.
 
-- '_isRegistered'
+- `_isRegistered`
 
 	Boolean type, will store the user's registration status
 
-- '_channelsJoined'
+- `_channelsJoined`
 
 	A map container storing the name of the channels the user has joined (string type, it's the map key) and a boolean to know if it's a channel's administrator or not
 
-- '_buffer'
+- `_buffer`
 
 	String type, allows the server to store incomplete data until the full message or command is received.
 
