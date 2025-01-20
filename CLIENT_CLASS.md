@@ -31,11 +31,11 @@ The class will act like a struct to encapsulate all this information. Server nee
 
 	String type. It will store the username provided by the user during registration (i.e. when a client sends the USER command). Also known as *"ident"*, the username is part of the user's `hostmask`, which identifies the user on the network. The hostmask generally looks like this:
 
-	`<nickname>!<username>@<hostname>`
+	- `<nickname>!<username>@<hostname>`
 
 	For example:
 
-	`chuckie68!charles@irc.example.com`
+	- `chuckie68!charles@irc.example.com`
 
 - `_realname`
 
@@ -53,19 +53,19 @@ The class will act like a struct to encapsulate all this information. Server nee
 
 - `_isAuthenticated`
 
-	Boolean type, will store the user's authentication status.
+	Boolean type. It will store the user's authentication status.
 
 - `_isRegistered`
 
-	Boolean type, will store the user's registration status
+	Boolean type. It will store the user's registration status.
 
 - `_channelsJoined`
 
-	A map container storing the name of the channels the user has joined (string type, it's the map key) and a boolean to know if it's a channel's administrator or not
+	A map container storing the name of the channels the user has joined (string type, it's the map key) and a boolean to know whetere the user is a channel's administrator.
 
 - `_buffer`
 
-	String type, allows the server to store incomplete data until the full message or command is received.
+	String type. Allows the server to store incomplete data until the full message or command is received.
 
 -------------------------------------------------------
 
