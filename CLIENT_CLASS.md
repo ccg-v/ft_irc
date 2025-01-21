@@ -37,11 +37,17 @@ The class will act like a struct to encapsulate all this information. Server nee
 
 	- `chuckie68!charles@irc.example.com`
 
+	The `username` is provided in the `USER` command.
+
+	> [RFC 2812 1.2.1]
+	> Each user is distinguished from other users by a unique nickname having a maximum length of nine (9) characters.
+    > While the maximum length is limited to nine characters, clients SHOULD accept longer strings as they may become used in future evolutions of the protocol.
+
 - `_realname`
 
 	String type. It will store the nickname provided by the user during registration.
 	The realname is a more human-readable field intended to provide additional information about the user. It is purely informational and does not have a functional role in identifying or authenticating the user. The realname is visible to others when they query information about the user (e.g., through the `WHOIS` command).
-	Like the `username`, the realname is also provided in the `USER` command:
+	Like the `username`, the `realname` is also provided in the `USER` command:
 
 	- `USER <username> <hostname> <servername> <realname>`
 
