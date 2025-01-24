@@ -89,15 +89,14 @@ can use later
 	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
 [^1]: How Many addrinfo Structs Are Typically Returned?
-
     - **Single Address, Single Protocol**:
         If the hostname resolves to one IP address and you specify only one protocol (e.g., SOCK_STREAM for TCP), the list will typically have one entry.
 
-    - Single Address, Multiple Protocols:
+    - **Single Address, Multiple Protocols**:
         If the hostname resolves to one IP and you don’t filter protocols, the list may include multiple entries (e.g., one for TCP and one for UDP).
 
-    - Multiple Addresses, Single Protocol:
+    - **Multiple Addresses, Single Protocol**:
         If the hostname resolves to multiple IPs (e.g., multiple A or AAAA records) and you specify one protocol, you’ll get one addrinfo per IP address.
 
-    - Multiple Addresses, Multiple Protocols:
+    - **Multiple Addresses, Multiple Protocols**:
         If the hostname resolves to multiple IPs and you don’t filter protocols, you’ll get one addrinfo per combination of IP address and protocol.
