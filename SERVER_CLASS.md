@@ -81,22 +81,19 @@ int getaddrinfo(const char *node,
 2. Returned values:
 
 	If `getaddrinfo()` returns an error, we can print it out using the function `gai_strerror()`. 
-	If everything works properly `servinfo` will point to a linked list[^1] of struct `addrinfos`, each of which contains a struct `sockaddr` of some kind that we
+	If everything works properly `servinfo` will point to a linked list of struct `addrinfos`[^1], each of which contains a struct `sockaddr` of some kind that we
 can use later
 
 3. Clean exit:
 
 	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
-[^1]: How Many addrinfo Structs Are Typically Returned?
-    - **Single Address, Single Protocol**:
+[^1]: How many `addrinfo` Structs Are Typically Returned?
+	- **Single Address, Single Protocol**:
         If the hostname resolves to one IP address and you specify only one protocol (e.g., SOCK_STREAM for TCP), the list will typically have one entry.
-
     - **Single Address, Multiple Protocols**:
         If the hostname resolves to one IP and you don’t filter protocols, the list may include multiple entries (e.g., one for TCP and one for UDP).
-
     - **Multiple Addresses, Single Protocol**:
         If the hostname resolves to multiple IPs (e.g., multiple A or AAAA records) and you specify one protocol, you’ll get one addrinfo per IP address.
-
     - **Multiple Addresses, Multiple Protocols**:
         If the hostname resolves to multiple IPs and you don’t filter protocols, you’ll get one addrinfo per combination of IP address and protocol.
