@@ -3,16 +3,6 @@
 Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
 
 <details>
-<summary>test</summary>
-> [!TIP]
-> this is the tip
-</details>
-
-> !!!
-> this is the tip
-> !!!
-
-<details>
 
 <summary><h2> getaddrinfo(), sockaddr() </h2></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
@@ -27,7 +17,6 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 	* Servers use `getaddrinfo()` to configure the address to bind and listen on. It is used to prepare a socket for listening on a specific IP address and port. 
 	* Servers usually specify the local address (e.g., NULL for any address, or a specific IP like 127.0.0.1) and the port number to bind to.
 
->[!TIP]
 > If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
 >
 >```c++
@@ -50,9 +39,7 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >
 >listen(server_socket, 5);
 >```
-
->[!NOTE]
->What *ft_irc* subject says:
+>What does *ft_irc* subject say?
 >
 >_"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
 
