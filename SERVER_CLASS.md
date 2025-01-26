@@ -8,6 +8,9 @@ Servers are uniquely identified by their name, which has a maximum length of six
 > this is the tip
 </details>
 
+> [!TIP]
+> this is the tip
+
 <details>
 
 <summary><h2> getaddrinfo(), sockaddr() </h2></summary>
