@@ -38,7 +38,6 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >
 >listen(server_socket, 5);
 >```
-
 >[!NOTE]
 >What *ft_irc* subject says:
 >
