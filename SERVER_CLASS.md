@@ -51,9 +51,9 @@ The function prototype is:
 #include <netdb.h>
 
 int getaddrinfo(const char *node,
-			const char *service,
-			const struct addrinfo *hints,
-			struct addrinfo **res);
+		const char *service,
+		const struct addrinfo *hints,
+		struct addrinfo **res);
 ```
 
 1. Parameters:
