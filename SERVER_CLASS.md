@@ -138,11 +138,35 @@ can use later
 
 int socket(int domain, int type, int protocol);
 ```
+
 **1. Parameters**
 
+The arguments allow you to say what kind of socket you want (IPv4 or IPv6, stream
+or datagram, and TCP or UDP).
 
+You can either hardcode those values:
+
+ - `domain` is `PF_INET` or `PF_INET6`,
+ - `type` is `SOCK_STREAM` or `SOCK_DGRAM`,
+ - and `protocol` can be set to `0` to choose the proper protocol for the given type. Instead, you can call `getprotobyname()` to look up the protocol you want, *“tcp”* or *“udp”*.
+
+Or use the values from the results of the call to `getaddrinfo()`, and feed them into socket() directly like this:
+
+```c++
+struct addrinfo hints, *res;
+
+// do the lookup
+// [pretend we already filled out the "hints" struct]
+getaddrinfo("www.example.com", "http", &hints, &res);
+
+// do error-checking on getaddrinfo(), and walk the "res" linked list
+// looking for valid entries instead of just assuming the first one is good
+
+int fdSocket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+```
 
 **2. Returned value**
 
+Returns a socket descriptor that you can use in later system calls, or -1 on error.
 
 </details>
