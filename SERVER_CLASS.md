@@ -15,7 +15,28 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 	* Servers use `getaddrinfo()` to configure the address to bind and listen on. It is used to prepare a socket for listening on a specific IP address and port. 
 	* Servers usually specify the local address (e.g., NULL for any address, or a specific IP like 127.0.0.1) and the port number to bind to.
 
-If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
+> If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
+
+```c++
+struct sockaddr_in server_addr;
+int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+if (server_socket < 0) {
+    perror("socket");
+    exit(1);
+}
+
+server_addr.sin_family = AF_INET;
+server_addr.sin_port = htons(8080); // Port 8080
+server_addr.sin_addr.s_addr = INADDR_ANY; // Bind to any local address
+
+if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+    perror("bind");
+    exit(1);
+}
+
+listen(server_socket, 5);
+```
 
 > ft_irc subject says:
 >
@@ -47,8 +68,8 @@ int getaddrinfo(const char *node,
 
 - `hints`:
 
-	Points to a `struct addrinfo` that you’ve already filled out with relevant information ('man getaddrinfo' to see the contents of a `addrinfo` struct).
-	Here’s a sample call if you’re a server who wants to listen on your host’s IP address, port 3490.
+	Points to a `struct addrinfo` that you've already filled out with relevant information ('man getaddrinfo' to see the contents of a `addrinfo` struct).
+	Here's a sample call if you're a server who wants to listen on your host's IP address, port 3490.
 
 	```c++
 	int status;
