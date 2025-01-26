@@ -38,10 +38,11 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >
 >listen(server_socket, 5);
 >```
+
+>[!NOTE]
+>What *ft_irc* subject says:
 >
-> >[!NOTE]
-> >What *ft_irc* subject says:
->>_"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
+>_"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
 
 The function prototype is:
 
