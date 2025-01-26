@@ -4,7 +4,7 @@ Servers are uniquely identified by their name, which has a maximum length of six
 
 <details>
 
-<summary><h3> 1. Preparing to launch: </h3> <h2> getaddrinfo(), sockaddr() </h2></summary>
+<summary><h3>1. Preparing to launch:</h3>  <h2>getaddrinfo(), sockaddr()</h2></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
@@ -130,7 +130,7 @@ can use later
 
 <details>
 
-<summary><h2> 2. Getting the file descriptor: socket() </h2></summary>
+<summary><h3>2. Getting the file descriptor:</h3>  <h2>socket()</h2></summary>
 
 ```c++
 #include <sys/types.h>
