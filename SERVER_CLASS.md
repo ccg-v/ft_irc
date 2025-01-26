@@ -3,7 +3,8 @@
 Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
 
 <details>
-<summary> ## getaddrinfo()/sockaddr() </summary>
+
+<summary><h2> getaddrinfo()/sockaddr() </h2></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
