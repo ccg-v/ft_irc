@@ -15,6 +15,7 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 	* Servers use `getaddrinfo()` to configure the address to bind and listen on. It is used to prepare a socket for listening on a specific IP address and port. 
 	* Servers usually specify the local address (e.g., NULL for any address, or a specific IP like 127.0.0.1) and the port number to bind to.
 
+>[!TIP]
 > If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
 >
 >```c++
@@ -38,9 +39,9 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >listen(server_socket, 5);
 >```
 >
-> ft_irc subject says:
->
-> _"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
+> >[!NOTE]
+> >What *ft_irc* subject says:
+>>_"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
 
 The function prototype is:
 
