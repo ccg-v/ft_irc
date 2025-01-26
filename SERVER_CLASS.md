@@ -130,7 +130,7 @@ can use later
 
 <details>
 
-<summary>2. <h2>socket()</h2><h3>: Getting the file descriptor</h3></summary>
+<summary><h3>2.</h3> <h2>socket()</h2><h3>: Getting the file descriptor</h3></summary>
 
 ```c++
 #include <sys/types.h>
