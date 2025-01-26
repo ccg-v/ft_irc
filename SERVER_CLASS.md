@@ -102,8 +102,8 @@ int getaddrinfo(const char *node,
 	
 2. Returned values:
 
-	If `getaddrinfo()` returns an error, we can print it out using the function `gai_strerror()`. 
-	If everything works properly `servinfo` will point to a linked list of struct `addrinfos`[^1], each of which contains a struct `sockaddr` of some kind that we
+- If `getaddrinfo()` returns an error, we can print it out using the function `gai_strerror()`. 
+- If everything works properly `servinfo` will point to a linked list of struct `addrinfos`[^1], each of which contains a struct `sockaddr` of some kind that we
 can use later
 
 3. Clean exit:
