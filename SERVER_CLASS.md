@@ -16,7 +16,7 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 	* Servers usually specify the local address (e.g., NULL for any address, or a specific IP like 127.0.0.1) and the port number to bind to.
 
 > If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
-
+>
 >```c++
 >struct sockaddr_in server_addr;
 >int server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -29,15 +29,15 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >server_addr.sin_family = AF_INET;
 >server_addr.sin_port = htons(8080); // Port 8080
 >server_addr.sin_addr.s_addr = INADDR_ANY; // Bind to any local address
-
+>
 >if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
 >    perror("bind");
 >    exit(1);
 >}
-
+>
 >listen(server_socket, 5);
 >```
-
+>
 > ft_irc subject says:
 >
 > _"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
