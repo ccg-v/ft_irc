@@ -18,8 +18,8 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 > If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
 
 >```c++
-struct sockaddr_in server_addr;
-int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+>struct sockaddr_in server_addr;
+>int server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
 if (server_socket < 0) {
     perror("socket");
