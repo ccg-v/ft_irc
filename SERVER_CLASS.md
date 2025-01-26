@@ -4,8 +4,8 @@ Servers are uniquely identified by their name, which has a maximum length of six
 
 <details>
 <summary>test</summary>
->[!TIP]
->this is the tip
+> [!TIP]
+> this is the tip
 </details>
 
 <details>
