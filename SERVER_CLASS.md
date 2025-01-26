@@ -20,22 +20,22 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >```c++
 >struct sockaddr_in server_addr;
 >int server_socket = socket(AF_INET, SOCK_STREAM, 0);
+>
+>if (server_socket < 0) {
+>    perror("socket");
+>    exit(1);
+>}
+>
+>server_addr.sin_family = AF_INET;
+>server_addr.sin_port = htons(8080); // Port 8080
+>server_addr.sin_addr.s_addr = INADDR_ANY; // Bind to any local address
 
-if (server_socket < 0) {
-    perror("socket");
-    exit(1);
-}
+>if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+>    perror("bind");
+>    exit(1);
+>}
 
-server_addr.sin_family = AF_INET;
-server_addr.sin_port = htons(8080); // Port 8080
-server_addr.sin_addr.s_addr = INADDR_ANY; // Bind to any local address
-
-if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-    perror("bind");
-    exit(1);
-}
-
-listen(server_socket, 5);
+>listen(server_socket, 5);
 >```
 
 > ft_irc subject says:
