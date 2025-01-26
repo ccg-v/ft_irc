@@ -2,7 +2,8 @@
 
 Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
 
-# getaddrinfo()
+<details>
+<summary> ## getaddrinfo()/sockaddr() </summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
@@ -38,6 +39,7 @@ The `getaddrinfo()` function can be used by both clients and servers in networki
 >
 >listen(server_socket, 5);
 >```
+
 >[!NOTE]
 >What *ft_irc* subject says:
 >
@@ -125,3 +127,5 @@ can use later
 	- A client attempts to connect to example.com. DNS resolves it to multiple IPs: 192.168.1.1, 192.168.1.2, and 192.168.1.3. If 192.168.1.1 is unreachable, the client can try the next IP in the list.
 	- Modern clients often support both IPv4 and IPv6. Resolving a hostname to both an IPv4 address (A record) and an IPv6 address (AAAA record) allows the client to choose based on its capabilities and network.
 	- In any case, for small-scale applications or services running on a single server, a hostname often resolves to just one IP address.
+
+</details>
