@@ -36,7 +36,7 @@ if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 
 }
 
 listen(server_socket, 5);
-```
+>```
 
 > ft_irc subject says:
 >
