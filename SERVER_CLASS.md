@@ -4,7 +4,7 @@ Servers are uniquely identified by their name, which has a maximum length of six
 
 <details>
 
-<summary><h2> getaddrinfo(), sockaddr() </h2></summary>
+<summary><h2> 1. Preparing to launch: getaddrinfo(), sockaddr() </h2></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
@@ -126,4 +126,19 @@ can use later
 	- Modern clients often support both IPv4 and IPv6. Resolving a hostname to both an IPv4 address (A record) and an IPv6 address (AAAA record) allows the client to choose based on its capabilities and network.
 	- In any case, for small-scale applications or services running on a single server, a hostname often resolves to just one IP address.
 
+</details>
+
+<details>
+
+<summary><h2> 2. Getting the file descriptor: socket() </h2></summary>
+
+```c++
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+```
+<h3>1. Parameters: </h3>
+
+**2. Returned value**
 </details>
