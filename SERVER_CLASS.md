@@ -4,7 +4,7 @@ Servers are uniquely identified by their name, which has a maximum length of six
 
 <details>
 
-<summary><h2> 1. Preparing to launch: getaddrinfo(), sockaddr() </h2></summary>
+<summary><h2> 1. Preparing to launch:</h2><h3> getaddrinfo(), sockaddr() </h3></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
@@ -56,7 +56,7 @@ int getaddrinfo(const char *node,
 		struct addrinfo **res);
 ```
 
-1. Parameters:
+**1.1. Parameters**
 
 - `node`:
 
@@ -100,13 +100,13 @@ int getaddrinfo(const char *node,
 		status = getaddrinfo("www.example.net", "3490", &hints, &servinfo);
 		```
 	
-2. Returned values:
+**2. Returned values**
 
 - If `getaddrinfo()` returns an error, we can print it out using the function `gai_strerror()`. 
 - If everything works properly `servinfo` will point to a linked list of struct `addrinfos`[^1], each of which contains a struct `sockaddr` of some kind that we
 can use later
 
-3. Clean exit:
+**3. Clean exit**
 
 	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
@@ -138,7 +138,9 @@ can use later
 
 int socket(int domain, int type, int protocol);
 ```
-<h3>1. Parameters: </h3>
+**1. Parameters**
+
+
 
 **2. Returned value**
 </details>
