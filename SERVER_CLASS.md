@@ -4,7 +4,7 @@ Servers are uniquely identified by their name, which has a maximum length of six
 
 <details>
 
-<summary><h2> 1. Preparing to launch:</h2><h3> getaddrinfo(), sockaddr() </h3></summary>
+<summary><h2> 1. Preparing to launch: </h2><h3> getaddrinfo(), sockaddr() </h3></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
