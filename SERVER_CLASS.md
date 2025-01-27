@@ -244,5 +244,5 @@ if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
 
 ----------
 
-<details>
+
 
