@@ -82,16 +82,28 @@ can use later
 
 **1.3 Clean exit**
 
-> [!TIP]
-> Helpful advice for doing things better or more easily.
+	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
-When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
+[^1]: How many `addrinfo` Structs Are Typically Returned?
+	- **Single Address, Single Protocol**:
+        If the hostname resolves to one IP address and you specify only one protocol (e.g., SOCK_STREAM for TCP), the list will typically have one entry.
+    - **Single Address, Multiple Protocols**:
+        If the hostname resolves to one IP and you don’t filter protocols, the list may include multiple entries (e.g., one for TCP and one for UDP).
+    - **Multiple Addresses, Single Protocol**:
+        If the hostname resolves to multiple IPs (e.g., multiple A or AAAA records) and you specify one protocol, you’ll get one addrinfo per IP address.
+    - **Multiple Addresses, Multiple Protocols**:
+        If the hostname resolves to multiple IPs and you don’t filter protocols, you’ll get one addrinfo per combination of IP address and protocol.
+	
+	Why resolving a server to several addresses (mapping a single hostname to multiple IP addresses)?
 
-**1.4 Hardcoding `sockaddr_in`**
+	- A client attempts to connect to example.com. DNS resolves it to multiple IPs: 192.168.1.1, 192.168.1.2, and 192.168.1.3. If 192.168.1.1 is unreachable, the client can try the next IP in the list.
+	- Modern clients often support both IPv4 and IPv6. Resolving a hostname to both an IPv4 address (A record) and an IPv6 address (AAAA record) allows the client to choose based on its capabilities and network.
+	- In any case, for small-scale applications or services running on a single server, a hostname often resolves to just one IP address.
 
-> [!TIP]
-> If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
+**1.4 Hardcoding `sockaddr()`**
 
+> `#0969DA` If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
+>
 >```c++
 >struct sockaddr_in server_addr;
 >int server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -115,22 +127,6 @@ When everything is done we must free it all up before leaving with a call to `fr
 >What does *ft_irc* subject say?
 >
 >_"Communication between client and server has to be done via TCP/IP (v4 or v6)"._
-
-[^1]: How many `addrinfo` Structs Are Typically Returned?
-	- **Single Address, Single Protocol**:
-        If the hostname resolves to one IP address and you specify only one protocol (e.g., SOCK_STREAM for TCP), the list will typically have one entry.
-    - **Single Address, Multiple Protocols**:
-        If the hostname resolves to one IP and you don’t filter protocols, the list may include multiple entries (e.g., one for TCP and one for UDP).
-    - **Multiple Addresses, Single Protocol**:
-        If the hostname resolves to multiple IPs (e.g., multiple A or AAAA records) and you specify one protocol, you’ll get one addrinfo per IP address.
-    - **Multiple Addresses, Multiple Protocols**:
-        If the hostname resolves to multiple IPs and you don’t filter protocols, you’ll get one addrinfo per combination of IP address and protocol.
-	
-	Why resolving a server to several addresses (mapping a single hostname to multiple IP addresses)?
-
-	- A client attempts to connect to example.com. DNS resolves it to multiple IPs: 192.168.1.1, 192.168.1.2, and 192.168.1.3. If 192.168.1.1 is unreachable, the client can try the next IP in the list.
-	- Modern clients often support both IPv4 and IPv6. Resolving a hostname to both an IPv4 address (A record) and an IPv6 address (AAAA record) allows the client to choose based on its capabilities and network.
-	- In any case, for small-scale applications or services running on a single server, a hostname often resolves to just one IP address.
 
 </details>
 
