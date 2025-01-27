@@ -1,6 +1,6 @@
 # Servers [RFC 2812 1.1]
 
-`#0969DA` Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
+Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
 
 <details>
 
@@ -130,6 +130,8 @@ can use later
 
 </details>
 
+-----------
+
 <details>
 
 <summary><h3>2.</h3> <h2>socket()</h2><h3>: Getting the file descriptor</h3></summary>
@@ -177,9 +179,11 @@ Returns a socket descriptor that you can use in later system calls, or -1 on err
 
 </details>
 
+<hr></hr>
+
 <details>
 
-<summary><h3>3.</h3> <h2>bind()</h2><h3>: What port am I on</h3></summary>
+<summary><h3>3.</h3> <h2>bind(), setsockopt()</h2><h3>: What port am I on</h3></summary>
 
 Once you have a socket, in order to listen for incoming connections the server needs to associate the socket with a port on your local machine. The port number is used by the kernel to match an incoming packet to a certain process’s socket descriptor.
 
@@ -195,14 +199,50 @@ int bind(int sockfd, struct sockaddr *my_addr, int addrlen);
 - `my_addr` is a pointer to a struct `sockaddr` that contains information about your address, namely, port and IP address. 
 - `addrlen` is the length in bytes of that address.
 
+```c++
+struct addrinfo hints, *res;
+int sockfd;
+
+// first, load up address structs with getaddrinfo():
+memset(&hints, 0, sizeof hints);
+
+hints.ai_family = AF_UNSPEC; // use IPv4 or IPv6, whichever
+hints.ai_socktype = SOCK_STREAM;
+hints.ai_flags = AI_PASSIVE;	// fill in my IP for me
+
+getaddrinfo(NULL, "3490", &hints, &res);
+
+// make a socket:
+sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
+// bind it to the port we passed in to getaddrinfo():
+bind(sockfd, res->ai_addr, res->ai_addrlen);
+```
+
+**3.2 Returned value**
+
+- On  success,  zero is returned. 
+- On error, -1 is returned, and errno is set to indicate the error.
+
+**3.3 `setsockopt()`**
+
+Sometimes you try to rerun a server and bind() fails, claiming *“Address already in use”*. That means a little bit of a socket that was connected is still hanging around in the
+kernel, and it’s hogging the port. You can either wait for it to clear (a minute or so), or add code to your program allowing it to reuse the port:
+
+```c++
+int	yes = 1;
+
+if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
+	perror("setsockopt");
+	exit(-1);
+}
+```
+
+`SO_REUSEADDR` allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. This enables you to get around those *“Address already in use”* error messages when you try to restart your server after a crash.
 
 </details>
 
-What do I do when bind() reports “Address already in use”?
-You have to use setsockopt() with the SO_REUSEADDR option on the listening socket
-Check out the section on bind() and the section on select() for an example
+----------
 
-SO_REUSEADDR allows other sockets to bind() to this port, unless there is an active
-listening socket bound to the port already. This enables you to get around
-those “Address already in use” error messages when you try to restart your
-server after a crash.
+<details>
+
