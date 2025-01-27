@@ -84,7 +84,6 @@ can use later
 
 	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
-
 **1.4 Hardcoding `sockaddr_in`**
 
 > [!TIP]
