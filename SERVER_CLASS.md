@@ -82,7 +82,10 @@ can use later
 
 **1.3 Clean exit**
 
-	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
+> [!TIP]
+> Helpful advice for doing things better or more easily.
+
+When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
 **1.4 Hardcoding `sockaddr_in`**
 
