@@ -84,8 +84,7 @@ can use later
 
 	When everything is done we must free it all up before leaving with a call to `freeaddrinfo()`.
 
------
-
+>[!TIP]
 >**1.4 Hardcoding `sockaddr_in`**
 >
 > If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
