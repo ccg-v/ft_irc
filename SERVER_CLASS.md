@@ -1,6 +1,6 @@
 # Servers [RFC 2812 1.1]
 
-Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
+`#0969DA` Servers are uniquely identified by their name, which has a maximum length of sixty three (63) characters.  See the protocol grammar rules (section 2.3.1) for what may and may not be used in a server name.
 
 <details>
 
@@ -102,7 +102,7 @@ can use later
 
 **1.4 Hardcoding `sockaddr()`**
 
-> `#0969DA` If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
+> If you know exactly what IP address, protocol, and port you want to use, you can directly fill out a struct `sockaddr_in` (for IPv4) or struct `sockaddr_in6` (for IPv6) manually without using getaddrinfo().
 >
 >```c++
 >struct sockaddr_in server_addr;
