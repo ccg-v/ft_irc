@@ -7,8 +7,11 @@
 
 #define BACKLOG 5        // How many pending connections queue will hold
 
-void runServer(int myPort, const std::string &password) {
-    struct addrinfo hints, *servinfo, *p;
+void runServer(int myPort, const std::string &password)
+{
+    struct addrinfo hints;
+	struct addrinfo	*servinfo;
+	struct addrinfo	*tmp;
     int fdSocket;
 
     // Load up address structs with getaddrinfo():
@@ -19,21 +22,26 @@ void runServer(int myPort, const std::string &password) {
 
     // Convert port to string
     std::string portStr = std::to_string(myPort);
-    if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0) {
+    if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)
+	{
         std::cerr << "getaddrinfo: failed\n";
         exit(1);
     }
 
     // Loop through all the results and bind to the first we can
-    for (p = servinfo; p != NULL; p = p->ai_next) {
+	// Use a copy of servinfo pointer to keep reference to the list's head
+    for (tmp = servinfo; tmp != NULL; tmp = p->ai_next)
+	{
         // Create socket
-        if ((fdSocket = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
+        if ((fdSocket = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol)) == -1)
+		{
             std::cerr << "socket: failed\n";
             continue;
         }
 
         // Bind socket
-        if (bind(fdSocket, p->ai_addr, p->ai_addrlen) == -1) {
+        if (bind(fdSocket, tmp->ai_addr, tmp->ai_addrlen) == -1)
+		{
             close(fdSocket);
             std::cerr << "bind: failed\n";
             continue;
@@ -42,15 +50,17 @@ void runServer(int myPort, const std::string &password) {
         break;  // Successfully bound
     }
 
-    if (p == NULL) {
+    if (tmp == NULL)
+	{
         std::cerr << "Failed to bind socket\n";
         exit(2);
     }
 
-    freeaddrinfo(servinfo);  // Done with this structure
+    freeaddrinfo(servinfo);  
 
     // Start listening
-    if (listen(fdSocket, BACKLOG) == -1) {
+    if (listen(fdSocket, BACKLOG) == -1)
+	{
         std::cerr << "listen: failed\n";
         exit(3);
     }
@@ -61,7 +71,9 @@ void runServer(int myPort, const std::string &password) {
     struct sockaddr_storage their_addr;
     socklen_t addr_size = sizeof their_addr;
     int new_fd = accept(fdSocket, (struct sockaddr *)&their_addr, &addr_size);
-    if (new_fd == -1) {
+
+    if (new_fd == -1)
+	{
         std::cerr << "accept: failed\n";
         close(fdSocket);
         exit(4);
@@ -74,7 +86,8 @@ void runServer(int myPort, const std::string &password) {
     close(fdSocket);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     (void)argc;
     (void)argv;
 
