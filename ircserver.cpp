@@ -16,21 +16,21 @@ void runServer(int myPort, const std::string &password)
 
     // Load up address structs with getaddrinfo():
     memset(&hints, 0, sizeof hints);    // Make sure the struct is empty
-    hints.ai_family = AF_UNSPEC;        // Don't care IPv4 or IPv6
+    hints.ai_family = AF_UNSPEC;        // Address family unspecified, could be IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM;    // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;        // Fill in my IP for me
 
     // Convert port to string
     std::string portStr = std::to_string(myPort);
-    if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)
+    if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)	// (1)
 	{
         std::cerr << "getaddrinfo: failed\n";
         exit(1);
     }
 
     // Loop through all the results and bind to the first we can
-	// Use a copy of servinfo pointer to keep reference to the list's head
-    for (tmp = servinfo; tmp != NULL; tmp = p->ai_next)
+	// I use a copy of servinfo pointer to keep reference to the list's head
+    for (tmp = servinfo; tmp != NULL; tmp = tmp->ai_next)
 	{
         // Create socket
         if ((fdSocket = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol)) == -1)
@@ -95,52 +95,16 @@ int main(int argc, char **argv)
     return 0;
 }
 
+/* 
+ *	(1)	The first parameter of getaddrinfo() is the hostname or IP address that
+ *		we want to resolve. The NULL value means that we want to bind to any 
+ *		available network interface on this machine, not to an specific address.
+ *		This is typical when setting up a server, since it should accept 
+ *		connections from multiple interfaces.
+ *		Therefore, if we want to bind to an specific IP address, we must replace
+ *		the NULL with an IP address as a string. If we want only local connections
+ *		(from the same machine) to reach the server (loopback only), we must 
+ *		replace the NULL with the localhost address ("127.0.0.1").
+ */
 
 
-
-// #include <iostream>
-// #include <sys/socket.h>	// socket()
-// #include <sys/types.h>	// getaddrinfo()
-// #include <netdb.h>		// getaddrinfo()
-
-// #define BACKLOG 5		// how many pending connections queue will hold
-
-// void	runServer(int myPort, std::string password)
-// {
-// 	struct addrinfo	hints;
-// 	struct addrinfo	*servinfo;			// will point to the results
-
-// 	// Load up address structs with getaddrinfo():
-// 	memset(&hints, 0, sizeof hints);	// make sure the struct is empty
-// 	hints.ai_family = AF_UNSPEC;		// don't care IPv4 or IPv6
-// 	hints.ai_socktype = SOCK_STREAM;	// TCP stream sockets
-// 	hints.ai_flags = AI_PASSIVE;		// fill in my IP for me
-
-// 	getaddrinfo(NULL, myPort, &hints, &servinfo);
-
-// 	// Create a socket
-// 	int fdSocket = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-
-// 	// Bind it to the port we passed in to getaddrinfo()
-// 	bind(fdSocket, res->ai_addr, res->ai_addrlen);
-
-// 	// Start listening
-// 	listen(fdSocket, BACKLOG);
-
-// 	// now accept an incoming connection:
-// 	struct sockaddr_storage their_addr;
-// 	socklen_t addr_size;
-
-// 	addr_size = sizeof their_addr;
-// 	int new_fd = accept(fdSocket, (struct sockaddr *)&their_addr, &addr_size);
-
-// }
-
-// int	main(int argc, char **argv)
-// {
-// 	(void)argc;
-// 	(void)argv;
-// 	runServer(4242, "pass");
-
-// 	return (0);
-// }
