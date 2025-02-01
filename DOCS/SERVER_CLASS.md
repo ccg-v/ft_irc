@@ -183,7 +183,7 @@ Returns a socket descriptor that you can use in later system calls, or -1 on err
 
 <details>
 
-<summary><h3>3.</h3> <h2>bind(), setsockopt()</h2><h3>: What port am I on</h3></summary>
+<summary><h3>3.</h3> <h2>bind(), setsockopt()</h2></summary>
 
 Once you have a socket, in order to listen for incoming connections the server needs to associate the socket with a port on your local machine. The port number is used by the kernel to match an incoming packet to a certain process’s socket descriptor.
 
@@ -226,23 +226,81 @@ bind(sockfd, res->ai_addr, res->ai_addrlen);
 
 **3.3 `setsockopt()`**
 
-Sometimes you try to rerun a server and bind() fails, claiming *“Address already in use”*. That means a little bit of a socket that was connected is still hanging around in the
-kernel, and it’s hogging the port. You can either wait for it to clear (a minute or so), or add code to your program allowing it to reuse the port:
+Sometimes you try to rerun a server and bind() fails, claiming *“Address already in use”*. That means a little bit of a socket that was connected is still hanging around in the kernel, and it’s hogging the port. You can either wait for it to clear (a minute or so), or add code to your program allowing it to reuse the port.
+
+```c++
+int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
+```
+
+- `sockfd`
+
+	The file descriptor that identifies the socket we are working with.
+
+- `level`
+
+	When manipulating socket options, the level at which the option resides and the name of  the  option  must  be specified. To  manipulate options at the sockets API level, level is specified as `SOL_SOCKET`. Other levels are `IPPROTO_TCP` (fof TCP-specific options) and `IPPROTO_IP` (for IPv4-specific options).
+
+- `optname`
+
+	Optname and any specified options are passed uninterpreted to the appropriate protocol module for interpretation.
+	`SO_REUSEADDR` allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. This enables you to get around those *“Address already in use”* error messages when you try to restart your server after a crash.
+	On Linux, `SO_REUSEPORT` enables multiple processes to bind to the same port and receive incoming connections evenly distributed by the kernel. It is often used together with `SO_REUSEADDR`, when the plan is running multiple instances of the server on the same machine.
+
+- `optval`
+
+	A pointer to the buffer where the value of the chosen option is specified.
+
+- `optlen` 
+
+	Size, in bytes, to the buffer pointed by previous parameter, `optval`  
+
+ On success, zero is returned. On error, -1 is returned, and errno is set to indicate the error.
+
+Example:
 
 ```c++
 int	yes = 1;
 
-if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
+if (setsockopt(fdSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
 	perror("setsockopt");
 	exit(-1);
 }
 ```
 
-`SO_REUSEADDR` allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. This enables you to get around those *“Address already in use”* error messages when you try to restart your server after a crash.
+</details>
+
+---
+
+<details>
+
+<summary><h3>4.</h3> <h2>listen()</h2><h3>: Waiting for someone to call</h3></summary>
+
+```c++
+int listen(int sockfd, int backlog);
+```
+
+**4.1 Parameters**
+
+- `sockfd`
+
+	The socket file descriptor.
+
+- `backlog`
+
+	* Maximum number of connections allowed on the incoming queue
+	* Most systems silently limit this number to about 20; you can probably get away with setting it to 5 or 10.
+
+**4.2 Returned value**
+
+- On success, zero is returned. 
+- On error, -1 is returned, and errno is set to indicate the error.
 
 </details>
 
-----------
+---
 
+<details>
 
+<summary><h3>5.</h3><h2>accept()</h2></summary>
 
+</details>

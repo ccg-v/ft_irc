@@ -7,7 +7,7 @@
 
 #define BACKLOG 5        // How many pending connections queue will hold
 
-void runServer(int myPort, const std::string &password)
+void runServer(const std::string myPort, const std::string &password)
 {
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -16,44 +16,53 @@ void runServer(int myPort, const std::string &password)
 
     // Load up address structs with getaddrinfo():
     memset(&hints, 0, sizeof hints);    // Make sure the struct is empty
-    hints.ai_family = AF_UNSPEC;        // Address family unspecified, could be IPv4 or IPv6
+    hints.ai_family = AF_UNSPEC;        // Address family unspecified (accept either IPv4 or IPv6)
     hints.ai_socktype = SOCK_STREAM;    // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;        // Fill in my IP for me
 
-    // Convert port to string
-    std::string portStr = std::to_string(myPort);
-    if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)	// (1)
+    // std::string portStr = std::to_string(myPort);	// Convert port to string
+    // if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)	// (1)
+	// {
+    //     std::cerr << "[SERVER]: getaddrinfo failed" << std::endl;
+    //     exit(-1);
+    // }
+
+    if (getaddrinfo(NULL, myPort.c_str(), &hints, &servinfo) != 0)	// (1)
 	{
-        std::cerr << "getaddrinfo: failed\n";
-        exit(1);
+        std::cerr << "[SERVER]: getaddrinfo failed" << std::endl;
+        exit(-1);
     }
 
-    // Loop through all the results and bind to the first we can
+    // Loop through ALL the results and bind to the first we can
 	// I use a copy of servinfo pointer to keep reference to the list's head
     for (tmp = servinfo; tmp != NULL; tmp = tmp->ai_next)
 	{
         // Create socket
         if ((fdSocket = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol)) == -1)
 		{
-            std::cerr << "socket: failed\n";
+            std::cerr << "[SERVER]: Socket creation failed" << std::endl;
             continue;
-        }
+        } else {
+			std::cerr << "[SERVER]: Socket created succesfully " << std::endl;
+		}
 
         // Bind socket
         if (bind(fdSocket, tmp->ai_addr, tmp->ai_addrlen) == -1)
 		{
             close(fdSocket);
-            std::cerr << "bind: failed\n";
+            std::cerr << "[SERVER]: Socket binding failed" << std::endl;
             continue;
-        }
+        } else {
+			std::cerr << "[SERVER]: Socket bound succesfully" << std::endl;
+		}
 
         break;  // Successfully bound
     }
 
     if (tmp == NULL)
 	{
-        std::cerr << "Failed to bind socket\n";
-        exit(2);
+        std::cerr << "[SERVER]: Socket binding failed" << std::endl;
+        exit(-1);
     }
 
     freeaddrinfo(servinfo);  
@@ -61,29 +70,29 @@ void runServer(int myPort, const std::string &password)
     // Start listening
     if (listen(fdSocket, BACKLOG) == -1)
 	{
-        std::cerr << "listen: failed\n";
-        exit(3);
+        std::cerr << "[SERVER]: Socket failed listening" << std::endl;
+        exit(-1);
     }
 
-    std::cout << "Server is listening on port " << myPort << "\n";
+    std::cout << "[SERVER]: Listening on port " << myPort << "..." << std::endl;
 
     // Accept an incoming connection
     struct sockaddr_storage their_addr;
-    socklen_t addr_size = sizeof their_addr;
+    socklen_t addr_size = sizeof(their_addr);
     int new_fd = accept(fdSocket, (struct sockaddr *)&their_addr, &addr_size);
 
     if (new_fd == -1)
 	{
-        std::cerr << "accept: failed\n";
+        std::cerr << "[SERVER]: Accept failed";
         close(fdSocket);
-        exit(4);
+        exit(-1);
     }
 
-    std::cout << "New connection accepted!\n";
+    std::cout << "[SERVER]: New connection accepted!" << std::endl;
 
     // Close sockets
-    close(new_fd);
-    close(fdSocket);
+    // close(new_fd);
+    // close(fdSocket);
 }
 
 int main(int argc, char **argv)
@@ -91,7 +100,7 @@ int main(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    runServer(4242, "pass");
+    runServer("4242", "pass");
     return 0;
 }
 
