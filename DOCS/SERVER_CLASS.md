@@ -134,7 +134,7 @@ can use later
 
 <details>
 
-<summary><h3>2.</h3> <h2>socket()</h2><h3>: Getting the file descriptor</h3></summary>
+<summary><h3>2.</h3> <h2>socket()</h2></summary>
 
 ```c++
 #include <sys/types.h>
@@ -240,7 +240,6 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
 - `level`
 
 	- When manipulating socket options, the level at which the option resides and the name of  the  option  must  be specified. 
-	
 	- To  manipulate options at the sockets API level, level is specified as `SOL_SOCKET`.
 	- Other levels are `IPPROTO_TCP` (fof TCP-specific options) and `IPPROTO_IP` (for IPv4-specific options).
 
@@ -263,7 +262,7 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
 - On success, zero is returned.
 - On error, -1 is returned, and `errno` is set to indicate the error.
 
-Example:
+**3.3.3 Example**
 
 ```c++
 int	yes = 1;
@@ -280,7 +279,7 @@ if (setsockopt(fdSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
 
 <details>
 
-<summary><h3>4.</h3> <h2>listen()</h2><h3>: Waiting for someone to call</h3></summary>
+<summary><h3>4.</h3> <h2>listen()</h2></summary>
 
 ```c++
 int listen(int sockfd, int backlog);
@@ -341,5 +340,12 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 - On error, -1 is returned, `errno` is set to indicate the error, and `addrlen` is left unchanged.
 
+</details>
+
+---
+
+<details>
+
+<summary><h3>5.</h3> <h2>send() and recv()</h2></summary>
 
 </details>

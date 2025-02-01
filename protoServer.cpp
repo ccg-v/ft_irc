@@ -21,12 +21,6 @@ void runServer(const std::string myPort, const std::string &password)
     hints.ai_flags = AI_PASSIVE;        // Fill in my IP for me
 
     // std::string portStr = std::to_string(myPort);	// Convert port to string
-    // if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)	// (1)
-	// {
-    //     std::cerr << "[SERVER]: getaddrinfo failed" << std::endl;
-    //     exit(-1);
-    // }
-
     if (getaddrinfo(NULL, myPort.c_str(), &hints, &servinfo) != 0)	// (1)
 	{
         std::cerr << "[SERVER]: getaddrinfo failed" << std::endl;
@@ -46,6 +40,15 @@ void runServer(const std::string myPort, const std::string &password)
 			std::cerr << "[SERVER]: Socket created succesfully " << std::endl;
 		}
 
+		int opt = 1;
+
+		if (setsockopt(fdSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+		{
+			std::cerr << "[SERVER]: setsockopt(SO_REUSEADDR) failed" << std::endl;
+			close(fdSocket);
+			continue;
+		}
+
         // Bind socket
         if (bind(fdSocket, tmp->ai_addr, tmp->ai_addrlen) == -1)
 		{
@@ -56,7 +59,7 @@ void runServer(const std::string myPort, const std::string &password)
 			std::cerr << "[SERVER]: Socket bound succesfully" << std::endl;
 		}
 
-        break;  // Successfully bound
+        break;  // Socket has been successfully bound
     }
 
     if (tmp == NULL)
@@ -79,11 +82,11 @@ void runServer(const std::string myPort, const std::string &password)
     // Accept an incoming connection
     struct sockaddr_storage their_addr;
     socklen_t addr_size = sizeof(their_addr);
-    int new_fd = accept(fdSocket, (struct sockaddr *)&their_addr, &addr_size);
+    int fdConnection = accept(fdSocket, (struct sockaddr *)&their_addr, &addr_size);
 
-    if (new_fd == -1)
+    if (fdConnection == -1)
 	{
-        std::cerr << "[SERVER]: Accept failed";
+        std::cerr << "[SERVER]: Accept failed" << std::endl;
         close(fdSocket);
         exit(-1);
     }
@@ -91,10 +94,17 @@ void runServer(const std::string myPort, const std::string &password)
     std::cout << "[SERVER]: New connection accepted!" << std::endl;
 
     // Close sockets
-    // close(new_fd);
-    // close(fdSocket);
+    close(fdConnection);
+    close(fdSocket);
 }
 
+
+/* 
+	Main TO_DO tasks:
+		- Check that argc == 2;
+		- Check that argv[0] is a valid port number (must be between 1024 and 65535)
+		- Check password requirements, if there's any
+*/
 int main(int argc, char **argv)
 {
     (void)argc;
