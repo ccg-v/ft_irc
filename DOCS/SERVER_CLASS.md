@@ -224,13 +224,14 @@ bind(sockfd, res->ai_addr, res->ai_addrlen);
 - On  success, zero is returned. 
 - On error, -1 is returned, and `errno` is set to indicate the error.
 
-**3.3** <h3>3.3 setsockopt()</h3>
+<h3>3.3 setsockopt()</h3>
 
 Sometimes you try to rerun a server and bind() fails, claiming *“Address already in use”*. That means a little bit of a socket that was connected is still hanging around in the kernel, and it’s hogging the port. You can either wait for it to clear (a minute or so), or add code to your program allowing it to reuse the port.
 
 ```c++
 int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
 ```
+**3.3.1 Parameters**
 
 - `sockfd`
 
@@ -238,9 +239,10 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
 
 - `level`
 
-	When manipulating socket options, the level at which the option resides and the name of  the  option  must  be specified. 
+	- When manipulating socket options, the level at which the option resides and the name of  the  option  must  be specified. 
 	
-	To  manipulate options at the sockets API level, level is specified as `SOL_SOCKET`. Other levels are `IPPROTO_TCP` (fof TCP-specific options) and `IPPROTO_IP` (for IPv4-specific options).
+	- To  manipulate options at the sockets API level, level is specified as `SOL_SOCKET`.
+	- Other levels are `IPPROTO_TCP` (fof TCP-specific options) and `IPPROTO_IP` (for IPv4-specific options).
 
 - `optname`
 
@@ -256,7 +258,10 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
 
 	Size, in bytes, to the buffer pointed by previous parameter, `optval`  
 
- On success, zero is returned. On error, -1 is returned, and errno is set to indicate the error.
+**3.3.2 Return values**
+
+- On success, zero is returned.
+- On error, -1 is returned, and `errno` is set to indicate the error.
 
 Example:
 
