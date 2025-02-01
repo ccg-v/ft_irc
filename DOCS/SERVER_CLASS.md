@@ -221,10 +221,10 @@ bind(sockfd, res->ai_addr, res->ai_addrlen);
 
 **3.2 Returned value**
 
-- On  success,  zero is returned. 
-- On error, -1 is returned, and errno is set to indicate the error.
+- On  success, zero is returned. 
+- On error, -1 is returned, and `errno` is set to indicate the error.
 
-**3.3 `setsockopt()`**
+**3.3 setsockopt()**
 
 Sometimes you try to rerun a server and bind() fails, claiming *“Address already in use”*. That means a little bit of a socket that was connected is still hanging around in the kernel, and it’s hogging the port. You can either wait for it to clear (a minute or so), or add code to your program allowing it to reuse the port.
 
@@ -238,13 +238,15 @@ int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t
 
 - `level`
 
-	When manipulating socket options, the level at which the option resides and the name of  the  option  must  be specified. To  manipulate options at the sockets API level, level is specified as `SOL_SOCKET`. Other levels are `IPPROTO_TCP` (fof TCP-specific options) and `IPPROTO_IP` (for IPv4-specific options).
+	When manipulating socket options, the level at which the option resides and the name of  the  option  must  be specified. 
+	
+	To  manipulate options at the sockets API level, level is specified as `SOL_SOCKET`. Other levels are `IPPROTO_TCP` (fof TCP-specific options) and `IPPROTO_IP` (for IPv4-specific options).
 
 - `optname`
 
-	Optname and any specified options are passed uninterpreted to the appropriate protocol module for interpretation.
-	`SO_REUSEADDR` allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. This enables you to get around those *“Address already in use”* error messages when you try to restart your server after a crash.
-	On Linux, `SO_REUSEPORT` enables multiple processes to bind to the same port and receive incoming connections evenly distributed by the kernel. It is often used together with `SO_REUSEADDR`, when the plan is running multiple instances of the server on the same machine.
+	- Optname and any specified options are passed uninterpreted to the appropriate protocol module for interpretation.
+	- `SO_REUSEADDR` allows other sockets to bind() to this port, unless there is an active listening socket bound to the port already. This enables you to get around those *“Address already in use”* error messages when you try to restart your server after a crash.
+	- On Linux, `SO_REUSEPORT` enables multiple processes to bind to the same port and receive incoming connections evenly distributed by the kernel. It is often used together with `SO_REUSEADDR`, when the plan is running multiple instances of the server on the same machine.
 
 - `optval`
 
@@ -293,7 +295,8 @@ int listen(int sockfd, int backlog);
 **4.2 Returned value**
 
 - On success, zero is returned. 
-- On error, -1 is returned, and errno is set to indicate the error.
+
+- On error, -1 is returned, and `errno` is set to indicate the error.
 
 </details>
 
@@ -301,6 +304,37 @@ int listen(int sockfd, int backlog);
 
 <details>
 
-<summary><h3>5.</h3><h2>accept()</h2></summary>
+<summary><h3>5.</h3> <h2>accept()</h2></summary>
+
+`accept()` returns a brand new file descriptor to identify the established connection. The original one is still listening for more new connections,
+and the newly created one is finally ready to `send()` and `recv()`.
+
+```c++
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+```
+
+**5.1 Parameters**
+
+- `sockfd`
+
+	The `listen()`ing socket descriptor.
+
+- `addr`
+
+	Pointer to a local struct `sockaddr_storage`, where the information about the incoming connection will be stored.
+
+- `addrlen`
+
+	Local integer variable that should be set to sizeof(struct `sockaddr_storage`) before its address is passed to `accept()`.
+
+**5.2 Returned value**
+
+- On success, returns a file  descriptor  for  the  accepted socket (a nonnegative integer). 
+
+- On error, -1 is returned, `errno` is set to indicate the error, and `addrlen` is left unchanged.
+
 
 </details>
