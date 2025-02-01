@@ -224,7 +224,7 @@ bind(sockfd, res->ai_addr, res->ai_addrlen);
 - On  success, zero is returned. 
 - On error, -1 is returned, and `errno` is set to indicate the error.
 
-**3.3** <h2>setsockopt()</h2>
+**3.3** <h3>3.3 setsockopt()</h3>
 
 Sometimes you try to rerun a server and bind() fails, claiming *“Address already in use”*. That means a little bit of a socket that was connected is still hanging around in the kernel, and it’s hogging the port. You can either wait for it to clear (a minute or so), or add code to your program allowing it to reuse the port.
 
