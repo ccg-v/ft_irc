@@ -4,7 +4,7 @@ Servers are uniquely identified by their name, which has a maximum length of six
 
 <details>
 
-<summary><h3>1.</h3> <h2>getaddrinfo(), sockaddr()</h2><h3>:  Preparing to launch</h3></summary>
+<summary><h3>1.</h3> <h2>getaddrinfo(), sockaddr()</h2></summary>
 The `getaddrinfo()` function can be used by both clients and servers in networking, but its purpose slightly differs depending on the context:
 
 - **Clients**: 
@@ -346,6 +346,102 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 <details>
 
-<summary><h3>5.</h3> <h2>send() and recv()</h2></summary>
+<summary><h3>6.</h3> <h2>send() and recv()</h2></summary>
+
+<h3>6.1 send</h3>
+
+```c++
+int send(int sockfd, const void *msg, int len, int flags);
+```
+
+**6.1.1 Parameters**
+
+- `sockfd` 
+	It's the socket descriptor you want to send data to (whether it’s the one returned by socket() or the one you got with accept()). 
+
+- `msg`
+	A pointer to the data you want to send.
+	
+- `len`
+	The length of that data in bytes. 
+
+- `flags`
+	Just set flags to 0 (?).
+
+**6.1.2 Returned value**
+
+- `send()` returns the number of bytes actually sent out. If the value returned doesn’t match the value in `len`, it’s up to you to send the rest of the string.
+
+- On error -1 is returned, and `errno` is set to the error number.
+
+<h3>6.2 recv</h3>
+
+```c++
+int recv(int sockfd, void *buf, int len, int flags);
+```
+
+**6.2.1 Parameters**
+
+- `sockfd`
+	Socket descriptor to read from.
+
+- `buf`
+	Buffer to read the information into.
+
+- `len`
+	Maximum length of the buffer.
+	
+- `flags`
+	Just set flags to 0 (?).
+
+**6.2.2 Returned value**
+
+- `recv()` returns the number of bytes actually read into the buffer.
+
+- **`recv()` will return 0 if the remote side has closed the connection on**.
+
+- On error -1 is returned, and `errno` is set to the error number.
+
+</details>
+
+---
+
+<details>
+
+<summary><h3>7.</h3> <h2>fcntl(), poll()</h2></summary>
+
+<h3>7.1 fcntl()</h3>
+
+```c++
+#include <fcntl.h>
+
+fcntl(sockfd, F_SETFL, O_NONBLOCK);
+```
+
+When a socket descriptor is created with `socket()`, by default the kernel sets it to blocking. This means every time a blocking command (like `accept()`, `recv()` or `send()`) is called, the program will stay _frozen_ or _asleep_ on that system call until some data is received.
+
+`fcntl()` makes a single socket non-blocking, preventing any blocking system call from freezing the entire process if no data is available.
+
+If the program tries to read from a non-blocking socket and there’s no data there, `recv` will return -1 and `errno` will be set to `EAGAIN` or `EWOULDBLOCK`.
+
+You can use only `fcntl()` to set sockets as non-blocking and manually “poll” them by repeatedly calling `recv()` to check if data has arrived. However, this approach (_polling by looping_) is inefficient because it leads to busy-waiting, which wastes CPU cycles.
+
+<h3>7.2 poll()</h3>
+
+🔹 poll() (Multiplexing)
+
+    Monitors multiple sockets at once.
+    Waits until at least one socket is ready for an operation (read, write, error, etc.).
+    Used to efficiently handle multiple clients simultaneously without needing multiple threads.
+    Does not make sockets non-blocking but rather lets you check which sockets are ready.
+
+✅ poll() manages multiple sockets to determine which ones need attention (ready for read/write/etc.).
+
+Instead of constantly checking each socket, poll() sleeps until at least one socket is ready.
+This means:
+
+    The CPU is not busy-waiting.
+    The server only wakes up when necessary.
+    You still use fcntl() to prevent blocking, but you let poll() efficiently handle multiple sockets.
 
 </details>
