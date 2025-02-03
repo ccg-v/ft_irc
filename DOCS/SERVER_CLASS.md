@@ -456,7 +456,14 @@ We will create a `pollfd` struct for every socket we want to monitor, storing in
 - `POLLOUT`: Alert me when I can send() data to this socket without blocking.
 - `POLLHUP`: Alert me when the remote closed the connection.
 
+Once we have the array of struct `pollfd`s in order, we pass it to poll(), along with the size of the array, as well as a timeout value in milliseconds (we can specify a negative timeout to wait
+forever).
 
+``` c++
+#include <poll.h>
+
+int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+```
 
 To sum up, a multi-client server should combine `fcntl()` to prevent blocking with `poll()` to handle multiple sockets efficiently.
 
