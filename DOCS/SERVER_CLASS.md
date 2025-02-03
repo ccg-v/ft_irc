@@ -440,13 +440,15 @@ You can use only `fcntl()` to set sockets as non-blocking and manually â€œpollâ€
 
 Instead of constantly checking each socket, `poll()` does that dirty work for us and sleeps the server until at least one socket is ready for an operation (read, write, error, etc.). This means the server only wakes up when necessary and the CPU is not busy-waiting.
 
-The general gameplan is to keep an **array of struct `pollfd`s** with information about which socket descriptors we want to monitor, and what kind of events we want to monitor for.
+A multi-client server should combine `fcntl()` to prevent blocking with `poll()` to handle multiple sockets efficiently.
+
+The general gameplan is to keep an **array of struct `pollfd`s** with information about which socket descriptors we want to monitor, and what kind of events we want to monitor for:
 
 ``` c++
 struct pollfd {
-	int fd;			// the socket descriptor
-	short events;	// bitmap of events we're interested in
-	short revents;	// when poll() returns, bitmap of events that occurred
+	int fd;			// The socket descriptor
+	short events;	// (input parameter) Bitmask of events we're interested in
+	short revents;	// (output parameter) When poll() returns, bitmask of events that occurred
 };
 ```
 
@@ -456,8 +458,7 @@ We will create a `pollfd` struct for every socket we want to monitor, storing in
 - `POLLOUT`: Alert me when I can send() data to this socket without blocking.
 - `POLLHUP`: Alert me when the remote closed the connection.
 
-Once we have the array of struct `pollfd`s in order, we pass it to poll(), along with the size of the array, as well as a timeout value in milliseconds (we can specify a negative timeout to wait
-forever).
+Once we have the array of struct `pollfd`s in order, we pass it to `poll()`, along with the size of the array `nfds`, as well as a `timeout` value in milliseconds. **We can specify a negative timeout to wait forever**.
 
 ``` c++
 #include <poll.h>
@@ -465,6 +466,8 @@ forever).
 int poll(struct pollfd fds[], nfds_t nfds, int timeout);
 ```
 
-To sum up, a multi-client server should combine `fcntl()` to prevent blocking with `poll()` to handle multiple sockets efficiently.
+On success, `poll()` returns a nonnegative value which is the number of elements in the `pollfds` whose revents fields have been set to a nonzero value (indicating an event or an error).  A return value of zero indicates that the system call timed out before any file descriptors became ready.
+
+On error, -1 is returned, and errno is set to indicate the error.
 
 </details>
