@@ -357,15 +357,19 @@ int send(int sockfd, const void *msg, int len, int flags);
 **6.1.1 Parameters**
 
 - `sockfd` 
+
 	It's the socket descriptor you want to send data to (whether it’s the one returned by socket() or the one you got with accept()). 
 
 - `msg`
+
 	A pointer to the data you want to send.
 	
 - `len`
+
 	The length of that data in bytes. 
 
 - `flags`
+
 	Just set flags to 0 (?).
 
 **6.1.2 Returned value**
@@ -383,22 +387,26 @@ int recv(int sockfd, void *buf, int len, int flags);
 **6.2.1 Parameters**
 
 - `sockfd`
+
 	Socket descriptor to read from.
 
 - `buf`
+
 	Buffer to read the information into.
 
 - `len`
+
 	Maximum length of the buffer.
 	
 - `flags`
+
 	Just set flags to 0 (?).
 
 **6.2.2 Returned value**
 
 - `recv()` returns the number of bytes actually read into the buffer.
 
-- **`recv()` will return 0 if the remote side has closed the connection on**.
+- **`recv()` will return 0 if the remote side (client) has closed the connection gracefully (sent a FIN signal)**.
 
 - On error -1 is returned, and `errno` is set to the error number.
 
@@ -424,24 +432,32 @@ When a socket descriptor is created with `socket()`, by default the kernel sets 
 
 If the program tries to read from a non-blocking socket and there’s no data there, `recv` will return -1 and `errno` will be set to `EAGAIN` or `EWOULDBLOCK`.
 
-You can use only `fcntl()` to set sockets as non-blocking and manually “poll” them by repeatedly calling `recv()` to check if data has arrived. However, this approach (_polling by looping_) is inefficient because it leads to busy-waiting, which wastes CPU cycles.
+You can use only `fcntl()` to set sockets as non-blocking and manually “poll” them by repeatedly calling `recv()` in a loop to check if data has arrived. However, this approach (_polling by looping_) is inefficient because it leads to busy-waiting, which wastes CPU cycles.
 
 <h3>7.2 poll()</h3>
 
-🔹 poll() (Multiplexing)
+`poll()` monitors multiple sockets (_multiplexing_) at once to determine which ones need attention (ready for read/write/etc.) without needing multiple threads. It does not make sockets non-blocking but rather lets you check which sockets are ready.
 
-    Monitors multiple sockets at once.
-    Waits until at least one socket is ready for an operation (read, write, error, etc.).
-    Used to efficiently handle multiple clients simultaneously without needing multiple threads.
-    Does not make sockets non-blocking but rather lets you check which sockets are ready.
+Instead of constantly checking each socket, `poll()` does that dirty work for us and sleeps the server until at least one socket is ready for an operation (read, write, error, etc.). This means the server only wakes up when necessary and the CPU is not busy-waiting.
 
-✅ poll() manages multiple sockets to determine which ones need attention (ready for read/write/etc.).
+The general gameplan is to keep an **array of struct `pollfd`s** with information about which socket descriptors we want to monitor, and what kind of events we want to monitor for.
 
-Instead of constantly checking each socket, poll() sleeps until at least one socket is ready.
-This means:
+``` c++
+struct pollfd {
+	int fd;			// the socket descriptor
+	short events;	// bitmap of events we're interested in
+	short revents;	// when poll() returns, bitmap of events that occurred
+};
+```
 
-    The CPU is not busy-waiting.
-    The server only wakes up when necessary.
-    You still use fcntl() to prevent blocking, but you let poll() efficiently handle multiple sockets.
+We will create a `pollfd` struct for every socket we want to monitor, storing in `fd` the socket descriptor and in `events` the type of event we are interested in:
+
+- `POLLIN`:  Alert me when data is ready to recv() on this socket.
+- `POLLOUT`: Alert me when I can send() data to this socket without blocking.
+- `POLLHUP`: Alert me when the remote closed the connection.
+
+
+
+To sum up, a multi-client server should combine `fcntl()` to prevent blocking with `poll()` to handle multiple sockets efficiently.
 
 </details>
