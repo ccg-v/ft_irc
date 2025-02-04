@@ -153,20 +153,20 @@ void runServer(const std::string myPort, const std::string &password)
                 else // Current is a client socket -> Receive incoming data
                 {
                     int bytes_received = recv(poll_fds[i].fd, buffer, BUFFER_SIZE, 0);
-                    if (bytes_received <= 0)
+                    if (bytes_received <= 0) 
                     {
                         std::cerr << "[SERVER]: Connection closed or error" << std::endl;
                         close(poll_fds[i].fd);
-                        poll_fds.erase(poll_fds.begin() + i);
+                        poll_fds.erase(poll_fds.begin() + i); // erase method expects an iterator
                         --i;
                     }
-                    else
+                    else 
                     {
                         buffer[bytes_received] = '\0'; // Null-terminate the string
                         std::cout << "[SERVER]: Received: " << buffer << std::endl;
 
-                        // Echo message back to client
-                        send(poll_fds[i].fd, buffer, bytes_received, 0);
+                        // Echo message back to client 
+                        send(poll_fds[i].fd, buffer, bytes_received, 0); // [4]
                     }
                 }
             }
@@ -235,3 +235,8 @@ int main(int argc, char **argv)
  *			would not match).
  */
 
+/*
+ *	[4] This is a simple echo server behavior, where whatever the client sends is 
+ *		returned exactly as it was received. The number of bytes sent is the same
+ *		as the number of bytes received.
+ */
