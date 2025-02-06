@@ -6,10 +6,24 @@
 #include <unistd.h>     // close()
 #include <fcntl.h>      // fcntl()
 #include <poll.h>       // poll()
-#include <vector>		// vector()
+#include <vector>		// std::vector
+#include <map>			// std::map
+#include <cstring>  	// strncmp()
 
 #define BACKLOG 5        // How many pending connections queue will hold
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
+
+struct Client
+{
+    int fd;
+    std::string nickname;
+    bool hasNick;
+    bool hasUser;
+
+	Client() : hasNick(false), hasUser(false) {}
+};
+
+std::map<int, Client> clients;
 
 void runServer(const std::string myPort, const std::string &password)
 {
@@ -83,22 +97,6 @@ void runServer(const std::string myPort, const std::string &password)
 
     std::cout << "[SERVER]: Listening on port " << myPort << "..." << std::endl;
 
-	/*
-    // Accept an incoming connection
-    struct sockaddr_storage clientAddr;
-    socklen_t addr_size = sizeof(clientAddr);
-    int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &addr_size);
-
-    if (clientSocket == -1)
-	{
-        std::cerr << "[SERVER]: Accept failed" << std::endl;
-        close(serverSocket);
-        exit(-1);
-    }
-
-    std::cout << "[SERVER]: New connection accepted!" << std::endl;
-	*/
-
     // Set the listening socket to non-blocking mode
     fcntl(serverSocket, F_SETFL, O_NONBLOCK);
 
@@ -153,6 +151,7 @@ void runServer(const std::string myPort, const std::string &password)
                 else // Current is a client socket -> Receive incoming data
                 {
                     int bytes_received = recv(poll_fds[i].fd, buffer, BUFFER_SIZE, 0);
+
                     if (bytes_received <= 0) 
                     {
                         std::cerr << "[SERVER]: Connection closed or error" << std::endl;
@@ -162,6 +161,22 @@ void runServer(const std::string myPort, const std::string &password)
                     }
                     else 
                     {
+
+if (strncmp(buffer, "NICK ", 5) == 0) {
+    clients[new_pfd[i].fd].nickname = std::string(buffer + 5); // Extract nickname
+    clients[new_pfd[i].fd].hasNick = true;
+} 
+else if (strncmp(buffer, "USER ", 5) == 0) {
+    clients[new_pfd[i].fd].hasUser = true;
+}
+
+// If both NICK and USER were received, send the welcome messages
+if (clients[clientSocket].hasNick && clients[new_pfd[i].fd].hasUser) {
+    std::string nick = clients[new_pfd[i].fd].nickname;
+    send(clientSocket, (":server 001 " + nick + " :Welcome to IRC!\r\n").c_str(), ...);
+    send(clientSocket, (":server 002 " + nick + " :Your host is localhost\r\n").c_str(), ...);
+}
+
                         buffer[bytes_received] = '\0'; // Null-terminate the string
                         std::cout << "[SERVER]: Received: " << buffer << std::endl;
 
