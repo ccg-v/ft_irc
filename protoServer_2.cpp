@@ -27,34 +27,32 @@ struct Client
 
 std::map<int, Client> clients;
 
-void processClientMessage(int client_fd, std::string buffer) {
-    std::istringstream stream(buffer);
-    std::string line;
+// void processClientMessage(int client_fd, std::string buffer) {
+//     std::istringstream stream(buffer);
+//     std::string line;
 
-    while (std::getline(stream, line)) {
-        if (line.find("\r") != std::string::npos) {
-            line.erase(line.find("\r"));
-        }
+//     while (std::getline(stream, line)) {
+//         if (line.find("\r") != std::string::npos) {
+//             line.erase(line.find("\r"));
+//         }
 
-        std::cout << "[SERVER_ECHO]: Received: " << line << std::endl;
+//         std::cout << "[SERVER_ECHO]: Received: " << line << std::endl;
 
-        if (strncmp(line.c_str(), "NICK", 5) == 0) {
-            clients[client_fd].nickname = line.substr(5);
-            clients[client_fd].hasNick = true;
-        } 
-        else if (strncmp(line.c_str(), "USER", 5) == 0) {
-            clients[client_fd].hasUser = true;
-        }
+//         if (strncmp(line.c_str(), "NICK", 5) == 0) {
+//             clients[client_fd].nickname = line.substr(5);
+//             clients[client_fd].hasNick = true;
+//         } 
+//         else if (strncmp(line.c_str(), "USER", 5) == 0) {
+//             clients[client_fd].hasUser = true;
+//         }
 
-        if (clients[client_fd].hasNick && clients[client_fd].hasUser) {
-            std::string nick = clients[client_fd].nickname;
-            send(client_fd, (":server 001 " + nick + " :Welcome to IRC!\r\n").c_str(), 40, 0);
-            send(client_fd, (":server 002 " + nick + " :Your host is localhost\r\n").c_str(), 40, 0);
-        }
-    }
-}
-
-
+//         if (clients[client_fd].hasNick && clients[client_fd].hasUser) {
+//             std::string nick = clients[client_fd].nickname;
+//             send(client_fd, (":server 001 " + nick + " :Welcome to IRC!\r\n").c_str(), 40, 0);
+//             send(client_fd, (":server 002 " + nick + " :Your host is localhost\r\n").c_str(), 40, 0);
+//         }
+//     }
+// }
 
 void runServer(const std::string myPort, const std::string &password)
 {
@@ -167,16 +165,16 @@ void runServer(const std::string myPort, const std::string &password)
                         continue;
                     }
 
-					// Send initial greeting so client knows it's connected
-					std::string initial_notice = ":server NOTICE * :Welcome! Please send NICK and USER to register.\r\n";
-					send(clientSocket, initial_notice.c_str(), initial_notice.size(), 0);
+					// // Send initial greeting so client knows it's connected
+					// std::string initial_notice = ":server NOTICE * :Welcome! Please send NICK and USER to register.\r\n";
+					// send(clientSocket, initial_notice.c_str(), initial_notice.size(), 0);
 
-				    // Send CAP LS (clients expect this)
-					std::string cap_reply = ":server CAP * LS :multi-prefix userhost-in-names\r\n";
-					send(clientSocket, cap_reply.c_str(), cap_reply.size(), 0);
+				    // // Send CAP LS (clients expect this)
+					// std::string cap_reply = ":server CAP * LS :multi-prefix userhost-in-names\r\n";
+					// send(clientSocket, cap_reply.c_str(), cap_reply.size(), 0);
 
-					cap_reply = ":server CAP * ACK :multi-prefix\r\n";
-					send(clientSocket, cap_reply.c_str(), cap_reply.size(), 0);
+					// cap_reply = ":server CAP * ACK :multi-prefix\r\n";
+					// send(clientSocket, cap_reply.c_str(), cap_reply.size(), 0);
 
                     std::cout << "[SERVER]: New connection accepted!" << std::endl;
 
@@ -203,15 +201,13 @@ void runServer(const std::string myPort, const std::string &password)
                     }
                     else 
                     {
-
-
                         buffer[bytes_received] = '\0'; // Null-terminate the string
 
-						processClientMessage(poll_fds[i].fd, buffer);
+						// processClientMessage(poll_fds[i].fd, buffer);
 
-						// std::cout << "[SERVER_ECHO]: Received: " << buffer << std::endl;
-                        // // Echo message back to client 
-                        // send(poll_fds[i].fd, buffer, bytes_received, 0); // [4]
+						std::cout << "[SERVER_ECHO]: Received: " << buffer << std::endl;
+                        // Echo message back to client 
+                        send(poll_fds[i].fd, buffer, bytes_received, 0); // [4]
                     }
                 }
             }
