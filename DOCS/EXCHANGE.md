@@ -56,75 +56,77 @@ USER myUsername 0 * :My Real Name
 
 **✅ Server forwards the message to John:**
 
-:myNick PRIVMSG John :Hello there!
+```:myNick PRIVMSG John :Hello there!```
 
-    The server relays the message without modification.
+- The server relays the message without modification.
 
-🔹 Message to a channel
+**🔹 Message to a channel**
 
-PRIVMSG #channel :Hey everyone!
+```PRIVMSG #channel :Hey everyone!```
 
-✅ Server forwards it to all users in the channel
+**✅ Server forwards it to all users in the channel**
 
-:myNick PRIVMSG #channel :Hey everyone!
+```:myNick PRIVMSG #channel :Hey everyone!```
 
-4️⃣ Operator Commands (Kick, Invite, Topic, Mode)
-🔹 Kick a user
+## 4️⃣ Operator Commands (Kick, Invite, Topic, Mode)
 
-KICK #channel GuestUser :Reason
+**🔹 Kick a user**
 
-✅ Server notifies all users in #channel
+```KICK #channel GuestUser :Reason```
 
-:myNick KICK #channel GuestUser :Reason
+**✅ Server notifies all users in #channel**
 
-🔹 Invite a user to a channel
+```:myNick KICK #channel GuestUser :Reason```
 
-INVITE GuestUser #channel
+**🔹 Invite a user to a channel**
 
-✅ Server notifies the invited user
+```INVITE GuestUser #channel```
 
-:myNick INVITE GuestUser #channel
+**✅ Server notifies the invited user**
 
-🔹 Change topic
+```:myNick INVITE GuestUser #channel```
 
-TOPIC #channel :New Topic!
+**🔹 Change topic**
 
-✅ Server updates the topic
+```TOPIC #channel :New Topic!```
 
-:myNick TOPIC #channel :New Topic!
+**✅ Server updates the topic**
 
-🔹 Change channel mode
+```:myNick TOPIC #channel :New Topic!```
 
-MODE #channel +i
+**🔹 Change channel mode**
 
-✅ Server confirms mode change
+```MODE #channel +i```
 
-:myNick MODE #channel +i
+**✅ Server confirms mode change**
 
-5️⃣ Client Disconnect
-🔹 Client sends:
+```:myNick MODE #channel +i```
 
-QUIT :Goodbye!
+## 5️⃣ Client Disconnect
 
-✅ Server notifies all users in their channels
+**🔹 Client sends:**
 
-:myNick QUIT :Goodbye!
+```QUIT :Goodbye!```
 
-    The server should remove the client from all channels and free resources.
+**✅ Server notifies all users in their channels**
 
-Summary
+```:myNick QUIT :Goodbye!```
 
-📌 Your server will receive:
+- The server should remove the client from all channels and free resources.
 
-    Authentication commands (PASS, NICK, USER)
-    Channel actions (JOIN, PART, TOPIC, MODE, KICK, INVITE)
-    Messaging commands (PRIVMSG, NOTICE)
-    Client disconnect (QUIT)
+## Summary
 
-📌 Your server should respond with:
+📌 The server will receive:
 
-    Numeric replies (001, 002, 353, etc.) for system messages
-    Prefixed messages (:Nick PRIVMSG #channel :text) for relayed messages
-    Mode and operator commands responses (:Nick MODE #channel +o)
+- Authentication commands (PASS, NICK, USER)
+- Channel actions (JOIN, PART, TOPIC, MODE, KICK, INVITE)
+- Messaging commands (PRIVMSG, NOTICE)
+- Client disconnect (QUIT)
 
-🚀 In short: Your server receives clean commands from clients and sends prefixed replies when needed.
+📌 The server should respond with:
+
+- Numeric replies (001, 002, 353, etc.) for system messages
+- Prefixed messages (:Nick PRIVMSG #channel :text) for relayed messages
+- Mode and operator commands responses (:Nick MODE #channel +o)
+
+In short: The server receives clean commands from clients and sends prefixed replies when needed.
