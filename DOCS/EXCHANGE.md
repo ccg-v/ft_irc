@@ -1,4 +1,4 @@
-# EXCHANGE
+# Communication exchange and error messages
 
 The server will receive commands from clients, process them, and send replies. Here's a breakdown of the requests the server will receive and the responses it should send.
 
@@ -176,6 +176,7 @@ If the username fails for another reason (like being blacklisted), you can defin
 ## Other Standard Registration Errors
 
 🔹 **436 ERR_NICKCOLLISION** → If the nickname collides with another user's nickname during registration.
+
 🔹 **451 ERR_NOTREGISTERED** → If the client tries to use commands before completing registration.
 
 
@@ -186,3 +187,20 @@ https://defs.ircdocs.horse/defs/numerics#err-nicknameinuse-433
 More information here: 
 
 https://modern.ircdocs.horse/#cap-message
+
+---
+
+## Compatibility with incorrect software
+
+Servers SHOULD handle single \n character, and MAY handle a single \r character, as if it was a \r\n pair, to support existing clients that might send this. However, clients and servers alike MUST NOT send single \r or \n characters.
+
+Servers and clients SHOULD ignore empty lines.
+
+**Servers SHOULD gracefully handle messages over the 512-bytes limit**. They may:
+
+- Send an error numeric back, preferably `ERR_INPUTTOOLONG (417)`
+- Truncate on the 510th byte (and add \r\n at the end) or, preferably, on the last UTF-8 character or grapheme that fits.
+- Ignore the message or close the connection – but this may be confusing to users of buggy clients.
+
+Finally, clients and servers SHOULD NOT use more than one space (\x20) character as SPACE as defined in the grammar above.
+
