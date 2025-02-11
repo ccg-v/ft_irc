@@ -130,3 +130,59 @@ USER myUsername 0 * :My Real Name
 - Mode and operator commands responses (:Nick MODE #channel +o)
 
 In short: The server receives clean commands from clients and sends prefixed replies when needed.
+
+----
+
+# Server numeric replies
+
+IRC servers follow standard numeric replies for authentication and registration failures. We must use these standard responses so that IRC clients like IRSSI and HexChat properly understand them.
+
+Here are the correct numeric replies for common authentication/registration failures:
+
+## 1️⃣ Wrong Password (PASS command fails)
+
+**Standard Reply:**
+
+```464 * :Password incorrect```
+
+🔹 **464 ERR_PASSWDMISMATCH** → Sent when the provided password is incorrect.
+
+## 2️⃣ Nickname Already in Use (NICK command fails)
+
+**Standard Reply:**
+
+```433 * myNick :Nickname is already in use```
+
+🔹 **433 ERR_NICKNAMEINUSE** → Sent when the chosen nickname is already taken by another user.
+
+## 3️⃣ Invalid Nickname (NICK command fails)
+
+**Standard Reply:**
+
+```432 * badNick :Erroneous nickname```
+
+🔹 **432 ERR_ERRONEUSNICKNAME** → Sent when the provided nickname is not valid (e.g., contains invalid characters).
+
+## 4️⃣ Invalid Username (USER command fails)
+
+🔹 There is no official error code for an invalid username, but some servers use:
+
+```461 * USER :Not enough parameters```
+
+🔹 **461 ERR_NEEDMOREPARAMS** → Used when a command is missing required parameters.
+
+If the username fails for another reason (like being blacklisted), you can define a custom error, but most servers do not enforce strict username rules.
+
+## Other Standard Registration Errors
+
+🔹 **436 ERR_NICKCOLLISION** → If the nickname collides with another user's nickname during registration.
+🔹 **451 ERR_NOTREGISTERED** → If the client tries to use commands before completing registration.
+
+
+Official list of numeric replies (error codes and responses):
+
+https://defs.ircdocs.horse/defs/numerics#err-nicknameinuse-433
+
+More information here: 
+
+https://modern.ircdocs.horse/#cap-message
