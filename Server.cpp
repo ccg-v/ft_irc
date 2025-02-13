@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/11 23:43:30 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/13 01:07:06 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,41 +21,14 @@ struct Client
 	Client() : hasNick(false), hasUser(false) {}
 };
 
-std::map<int, Client> clients;
-
-// void processClientMessage(int client_fd, std::string buffer) {
-//     std::istringstream stream(buffer);
-//     std::string line;
-
-//     while (std::getline(stream, line)) {
-//         if (line.find("\r") != std::string::npos) {
-//             line.erase(line.find("\r"));
-//         }
-
-//         std::cout << "[SERVER_ECHO]: Received: " << line << std::endl;
-
-//         if (strncmp(line.c_str(), "NICK", 5) == 0) {
-//             clients[client_fd].nickname = line.substr(5);
-//             clients[client_fd].hasNick = true;
-//         } 
-//         else if (strncmp(line.c_str(), "USER", 5) == 0) {
-//             clients[client_fd].hasUser = true;
-//         }
-
-//         if (clients[client_fd].hasNick && clients[client_fd].hasUser) {
-//             std::string nick = clients[client_fd].nickname;
-//             send(client_fd, (":server 001 " + nick + " :Welcome to IRC!\r\n").c_str(), 40, 0);
-//             send(client_fd, (":server 002 " + nick + " :Your host is localhost\r\n").c_str(), 40, 0);
-//         }
-//     }
-// }
-
-void runServer(const std::string myPort, const std::string &password)
+Server::Server(const std::string & port, const std::string & password)
 {
+	_port = port;
+	_password = password;
+
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
 	struct addrinfo	*tmp;
-    int serverSocket;
 
     // Load up address structs with getaddrinfo():
     memset(&hints, 0, sizeof hints);    // Make sure the struct is empty
@@ -63,164 +36,165 @@ void runServer(const std::string myPort, const std::string &password)
     hints.ai_socktype = SOCK_STREAM;    // TCP stream sockets
     hints.ai_flags = AI_PASSIVE;        // Fill in my IP for me
 
-    // std::string portStr = std::to_string(myPort);	// Convert port to string
-    if (getaddrinfo(NULL, myPort.c_str(), &hints, &servinfo) != 0)	// [2]
+    if (getaddrinfo(NULL, _port.c_str(), &hints, &servinfo) != 0)	// [2]
 	{
-        std::cerr << "[SERVER]: getaddrinfo failed" << std::endl;
-        exit(-1);
+        throw std::runtime_error("[SERVER]: Error: getaddrinfo() failed");
     }
 
     // Loop through ALL the results and bind to the first we can
 	// I use a copy of servinfo pointer to keep reference to the list's head
+
+	std::string lastError;
+
     for (tmp = servinfo; tmp != NULL; tmp = tmp->ai_next)
 	{
         // Create socket
-        if ((serverSocket = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol)) == -1)
+        if ((this->_serverSocket = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol)) == -1)
 		{
-            std::cerr << "[SERVER]: Socket creation failed" << std::endl;
+            lastError = "socket() failed";
             continue;
-        } else {
-			std::cerr << "[SERVER]: Socket created succesfully " << std::endl;
-		}
+        } 
 
 		int opt = 1;
-
-		if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+		if (setsockopt(this->_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 		{
-			std::cerr << "[SERVER]: setsockopt(SO_REUSEADDR) failed" << std::endl;
-			close(serverSocket);
+			lastError = "setsockopt() failed";
+			close(this->_serverSocket);
 			continue;
 		}
 
         // Bind socket
-        if (bind(serverSocket, tmp->ai_addr, tmp->ai_addrlen) == -1)
+        if (bind(this->_serverSocket, tmp->ai_addr, tmp->ai_addrlen) == -1)
 		{
-            close(serverSocket);
-            std::cerr << "[SERVER]: Socket binding failed" << std::endl;
+            lastError = "bind() failed";
+            close(this->_serverSocket);
             continue;
-        } else {
-			std::cerr << "[SERVER]: Socket bound succesfully" << std::endl;
-		}
+        }
 
         break;  // Socket has been successfully bound
     }
 
     if (tmp == NULL)
-	{
-        std::cerr << "[SERVER]: Socket binding failed" << std::endl;
-        exit(-1);
-    }
+        throw std::runtime_error("[SERVER]: Error: " + lastError);
 
     freeaddrinfo(servinfo);  
 
     // Start listening
-    if (listen(serverSocket, BACKLOG) == -1)
+    if (listen(this->_serverSocket, BACKLOG) == -1)
 	{
-        std::cerr << "[SERVER]: Socket failed listening" << std::endl;
-        exit(-1);
+		close(this->_serverSocket);
+        throw std::runtime_error("[SERVER]: Error: listen() failed");
     }
 
     std::cout << "[SERVER]: Listening on port " << myPort << "..." << std::endl;
 
     // Set the listening socket to non-blocking mode
-    fcntl(serverSocket, F_SETFL, O_NONBLOCK);
-
+	if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) == -1)
+	{
+		close(this->_serverSocket);
+		throw std::runtime_error("[SERVER]: Error: server's fcntl() failed");
+	}
+	
     // Polling setup
-    std::vector<struct pollfd> poll_fds;
     struct pollfd pfd;
 	
-    pfd.fd = serverSocket;
+    pfd.fd = this->_serverSocket;
     pfd.events = POLLIN;
     pfd.revents = 0;
 	
-    poll_fds.push_back(pfd); // Add the listening socket first
+    _pollFds.push_back(pfd); // Add the listening socket first
 
+}
+
+void	Server::closeSockets()
+{
+    // Close all sockets before exiting
+    for (size_t i = 0; i < this->_pollFds.size(); ++i)
+    {
+        close(this->_pollFds[i].fd);
+    }
+}
+
+void	Server::acceptClient()
+{
+	struct sockaddr_storage clientAddr;
+	socklen_t 				addr_size;
+	int 					clientSocket;
+
+	addr_size = sizeof(clientAddr);
+	clientSocket = accept(this->_serverSocket, (struct sockaddr *)&clientAddr, &addr_size);
+
+	if (clientSocket == -1)
+	{
+    	closeSockets();
+        throw std::runtime_error("[SERVER]: Error: accept() failed");
+	}
+
+	std::cout << "[SERVER]: New connection accepted!" << std::endl;
+
+	// Set the new socket to non-blocking
+	if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
+	{
+		closeSockets();
+		throw std::runtime_error("[SERVER]: Error: client's fcntl() failed");
+	}
+
+	// Create a new struct `pollfd` and push it to `this->_pollFds` vector of structs
+	struct pollfd pfd;
+	pfd.fd = clientSocket;
+	pfd.events = POLLIN;
+	pfd.revents = 0;
+	this->_pollFds.push_back(pfd);
+
+}
+
+
+void	startPoll()
+{
+	std::string	lastError;
 	char buffer[BUFFER_SIZE];
 
     while (true)
     {
-        int poll_count = poll(&poll_fds[0], poll_fds.size(), -1);
-        if (poll_count == -1)
+        if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
         {
-            std::cerr << "[SERVER]: Polling error" << std::endl;
+            lastError =  "[SERVER]: Error: poll() failed";
             break;
         }
-        for (size_t i = 0; i < poll_fds.size(); ++i)
+        for (size_t i = 0; i < _pollFds.size(); ++i)
         {
-            if (poll_fds[i].revents & POLLIN) // Check for data to read in current socket [3]
+            if (_pollFds[i].revents & POLLIN) // Check for data to read in current socket [3]
             {
-                if (poll_fds[i].fd == serverSocket) // Current is the listening socket -> New connection requested
+                if (_pollFds[i].fd == this->_serverSocket) // Current is the listening socket -> New connection requested
                 {
-                    struct sockaddr_storage clientAddr;
-                    socklen_t addr_size = sizeof(clientAddr);
-                    int clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &addr_size);
-
-                    if (clientSocket == -1)
-                    {
-                        std::cerr << "[SERVER]: Accept failed" << std::endl;
-                        continue;
-                    }
-
-					// // Send initial greeting so client knows it's connected
-					// std::string initial_notice = ":server NOTICE * :Welcome! Please send NICK and USER to register.\r\n";
-					// send(clientSocket, initial_notice.c_str(), initial_notice.size(), 0);
-
-				    // // Send CAP LS (clients expect this)
-					// std::string cap_reply = ":server CAP * LS :multi-prefix userhost-in-names\r\n";
-					// send(clientSocket, cap_reply.c_str(), cap_reply.size(), 0);
-
-					// cap_reply = ":server CAP * ACK :multi-prefix\r\n";
-					// send(clientSocket, cap_reply.c_str(), cap_reply.size(), 0);
-
-                    std::cout << "[SERVER]: New connection accepted!" << std::endl;
-
-                    // Set the new socket to non-blocking
-                    fcntl(clientSocket, F_SETFL, O_NONBLOCK);
-
-					// Create a new struct `pollfd` and push it to `poll_fds` vector of structs
-                    struct pollfd new_pfd;
-                    new_pfd.fd = clientSocket;
-                    new_pfd.events = POLLIN;
-                    new_pfd.revents = 0;
-                    poll_fds.push_back(new_pfd);
+					acceptClient();
                 }
                 else // Current is a client socket -> Receive incoming data
                 {
-                    int bytes_received = recv(poll_fds[i].fd, buffer, BUFFER_SIZE, 0);
+                    int bytes_received = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0);
 
                     if (bytes_received <= 0) 
                     {
                         std::cerr << "[SERVER]: Connection closed or error" << std::endl;
-                        close(poll_fds[i].fd);
-                        poll_fds.erase(poll_fds.begin() + i); // erase method expects an iterator
+                        close(this->_pollFds[i].fd);
+                        this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
                         --i;
                     }
                     else 
                     {
                         buffer[bytes_received] = '\0'; // Null-terminate the string
 
-						// processClientMessage(poll_fds[i].fd, buffer);
+						// processClientMessage(this->_pollFds[i].fd, buffer);
 
 						std::cout << "[SERVER_ECHO]: Received: " << buffer << std::endl;
                         // Echo message back to client 
-                        send(poll_fds[i].fd, buffer, bytes_received, 0); // [4]
+                        send(this->_pollFds[i].fd, buffer, bytes_received, 0); // [4]
                     }
                 }
             }
         }
     }
 	
-/*
-    // Close sockets
-    close(clientSocket);
-    close(serverSocket);
-*/
-
-    // Close all sockets before exiting
-    for (size_t i = 0; i < poll_fds.size(); ++i)
-    {
-        close(poll_fds[i].fd);
-    }
 }
 
 
@@ -230,14 +204,15 @@ void runServer(const std::string myPort, const std::string &password)
 		- Check that argv[0] is a valid port number (must be between 1024 and 65535)
 		- Check password requirements, if there's any
 */
-int main(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
 
-    runServer("8080", "pass");
-    return 0;
-}
+// int main(int argc, char **argv)
+// {
+//     (void)argc;
+//     (void)argv;
+
+//     runServer("8080", "pass");
+//     return 0;
+// }
 
 /*	[1] Protocols RFC 1459 and RFC 2812, section 2.3:
  *
@@ -267,7 +242,7 @@ int main(int argc, char **argv)
  *			checks if the POLLIN bit is set inside `revents`.
  *		- There is not a direc, safe, non-bitwise way to check if `revents` is 
  *			POLLIN. We could check it with:
- *					if (poll_fds[i].revents == POLLIN)
+ *					if (this->_pollFds[i].revents == POLLIN)
  *			but this would fail if other flags are set (e.g., `POLLIN | POLLHUP` 
  *			would not match).
  */

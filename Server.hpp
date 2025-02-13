@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/12 00:32:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/13 01:05:46 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,17 +30,27 @@ class	Server
 {
 	public:
 
-		Server(std::string & port, std::string & password);	// Parameterized constructor
-		~Server();											// Default destructor
+		Server(const std::string & port, const std::string & password);	// Parameterized constructor
+		~Server();														// Default destructor
+
+		void	startPoll();
 
 	private:
 
-		std::string	_port;
-		std::string _password;
+		std::string					_port;
+		std::string 				_password;
+		int							_serverSocket;
+    	std::vector<struct pollfd> 	_pollFds;  		// Polling sockets
+    	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
 
 		Server(const Server & source);				// Copy constructor [1]
 		Server & operator= (const Server & source);	// Copy assignment operator [1]
 
+		/* --- Rest of private methods  ------------------------------------- */
+
+		void	acceptClient();
+		void	receiveData(int i);
+		void	closeSockets();
 }
 
 /*
