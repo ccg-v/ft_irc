@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/13 10:12:34 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/13 14:34:21 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@ struct Client
 	Client() : hasNick(false), hasUser(false) {}
 };
 
+/* --- Public Coplien's functions ------------------------------------------- */
+
+// Parameterized constructor
 Server::Server(const std::string & port, const std::string & password)
 {
 	_port = port;
@@ -108,6 +111,40 @@ Server::Server(const std::string & port, const std::string & password)
 
 }
 
+// Default destructor
+Server::~Server() {};
+
+/* --- Other class methods -------------------------------------------------- */
+
+void	Server::startPoll()
+{
+	std::string	lastError;
+	char buffer[BUFFER_SIZE];
+
+    while (true)
+    {
+        if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
+        {
+            throw std::runtime_error("[SERVER]: Error: poll()) failed");
+        }
+        for (size_t i = 0; i < _pollFds.size(); ++i)
+        {
+            if (_pollFds[i].revents & POLLIN) // Check for data to read in current socket [3]
+            {
+                if (_pollFds[i].fd == this->_serverSocket) // Current is the listening socket -> New connection requested
+                {
+					acceptClient();
+                }
+                else // Current is a client socket -> Receive incoming data
+                {
+					receiveRawData(i); // Remember we are passing 'i' by reference
+                }
+            }
+        }
+    }
+	closeSockets();
+}
+
 void	Server::acceptClient()
 {
 	struct sockaddr_storage clientAddr;
@@ -140,60 +177,54 @@ void	Server::acceptClient()
 
 }
 
-void	Server::receiveRawData(int i)
+void	Server::receiveRawData(int & i) // Pass 'i' by reference!!
 {
-	char buffer[BUFFER_SIZE];
-	int bytesRead; 
+	char	buffer[BUFFER_SIZE];
+	size_t	bytesRead;
 
-	if ((bytesRead = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0)) == -1) 
+	memset(buffer, 0, sizeof(buffer));
+	bytesReceived = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0)
+
+	if (bytesReceived <= 0)
 	{
 		std::cerr << "[SERVER]: Connection closed or error" << std::endl;
 		close(this->_pollFds[i].fd);
 		this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
 		--i;
+		return;
 	}
-	else 
+
+	Client & currentClient = this->_clients[this->_pollFds[i].fd];
+	std::string & clientBuffer = currentClient.getBuffer(); // REFERENCE!!
+
+    // Append received data to client's buffer
+    clientBuffer.append(buffer, bytesRead);
+
+	// Extract full messages, leaving incomplete ones in clientBuffer
+	// We send a REFERENCE!!, not a copy, to ensure clientBuffer will reflect changes
+	// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
+	std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
+
+	// Process each full message
+	for (int m = 0; m < fullMessages.size(); m++)
 	{
-		buffer[bytesRead] = '\0'; // Null-terminate the string
-
-		// processClientMessage(this->_pollFds[i].fd, buffer);
-
-		std::cout << "[SERVER_ECHO]: Received: " << buffer << std::endl;
-		// Echo message back to client 
-		send(this->_pollFds[i].fd, buffer, bytesRead, 0); // [4]
-	}
+		std::cout << "Now it's time for splitMessage() into command [parameters] [:trailing]" << std::cerr;
+		// splitMessage(i, fullMessages[m]);
+	}	
 }
 
-void	Server::startPoll()
+std::vector<std::string> Server::splitBuffer(std::string & buffer)
 {
-	std::string	lastError;
-	char buffer[BUFFER_SIZE];
+    std::vector<std::string> fullMessages;
+    size_t pos = 0;
 
-    while (true)
-    {
-        if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
-        {
-            throw std::runtime_error("[SERVER]: Error: poll()) failed");
-        }
-        for (size_t i = 0; i < _pollFds.size(); ++i)
-        {
-            if (_pollFds[i].revents & POLLIN) // Check for data to read in current socket [3]
-            {
-                if (_pollFds[i].fd == this->_serverSocket) // Current is the listening socket -> New connection requested
-                {
-					acceptClient();
-                }
-                else // Current is a client socket -> Receive incoming data
-                {
-					receiveRawData(i);
-                }
-            }
-        }
+    while ((pos = buffer.find("\r\n")) != std::string::npos)
+	{
+        fullMessages.push_back(buffer.substr(0, pos + 2));  // Extract full message
+        buffer.erase(0, pos + 2);  // Remove processed part from buffer
     }
-	closeSockets();
+    return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
-
-Server::~Server() {};
 
 void	Server::closeSockets()
 {
@@ -241,3 +272,13 @@ void	Server::closeSockets()
  *		returned exactly as it was received. The number of bytes sent is the same
  *		as the number of bytes received.
  */
+
+ /*
+  * [5] 	std::string(buffer, bytesRead);
+  *
+  *		'buffer' is a char array (C style string). This line Constructs a new 
+  *		std::string by copying exactly bytesRead characters from buffer, even if 
+  *		it contains nullcharacters ('\0').
+  *		Unlike std::string(buffer), which stops at the first '\0', this constructor
+  *		ensures that all bytesRead characters are included in the string.
+  */

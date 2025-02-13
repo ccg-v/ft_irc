@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/13 09:58:43 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/13 14:31:03 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class	Server
 		/* --- Rest of private methods  ------------------------------------- */
 
 		void	acceptClient();
-		void	receiveRawData(int i);
+		void	receiveRawData(int & i);
 		void	closeSockets();
 };
 
