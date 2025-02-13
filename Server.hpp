@@ -6,9 +6,12 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/13 01:05:46 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/13 09:58:43 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef SERVER_HPP
+# define SERVER_HPP
 
 #include <iostream>
 #include <cstring>      // memset()
@@ -23,8 +26,8 @@
 #include <cstring>  	// strncmp()
 #include <sstream>		// std::istringstream
 
-#define BACKLOG 5        // Max number of pending connections queue will hold
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
+#define BACKLOG 5        // Max number of pending connections queue will hold
 
 class	Server
 {
@@ -41,7 +44,7 @@ class	Server
 		std::string 				_password;
 		int							_serverSocket;
     	std::vector<struct pollfd> 	_pollFds;  		// Polling sockets
-    	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
+    	// std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
 
 		Server(const Server & source);				// Copy constructor [1]
 		Server & operator= (const Server & source);	// Copy assignment operator [1]
@@ -49,9 +52,11 @@ class	Server
 		/* --- Rest of private methods  ------------------------------------- */
 
 		void	acceptClient();
-		void	receiveData(int i);
+		void	receiveRawData(int i);
 		void	closeSockets();
-}
+};
+
+#endif
 
 /*
  *	[1]	An IRC server should not allow copies. A server typically manages sockets,

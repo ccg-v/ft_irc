@@ -6,9 +6,11 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/13 01:07:06 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/13 10:12:34 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "Server.hpp"
 
 struct Client
 {
@@ -75,7 +77,7 @@ Server::Server(const std::string & port, const std::string & password)
     }
 
     if (tmp == NULL)
-        throw std::runtime_error("[SERVER]: Error: " + lastError);
+        throw std::runtime_error("[SERVER]: All socket binding attempts failed: " + lastError);
 
     freeaddrinfo(servinfo);  
 
@@ -86,7 +88,7 @@ Server::Server(const std::string & port, const std::string & password)
         throw std::runtime_error("[SERVER]: Error: listen() failed");
     }
 
-    std::cout << "[SERVER]: Listening on port " << myPort << "..." << std::endl;
+    std::cout << "[SERVER]: Listening on port " << _port << "..." << std::endl;
 
     // Set the listening socket to non-blocking mode
 	if (fcntl(this->_serverSocket, F_SETFL, O_NONBLOCK) == -1)
@@ -106,15 +108,6 @@ Server::Server(const std::string & port, const std::string & password)
 
 }
 
-void	Server::closeSockets()
-{
-    // Close all sockets before exiting
-    for (size_t i = 0; i < this->_pollFds.size(); ++i)
-    {
-        close(this->_pollFds[i].fd);
-    }
-}
-
 void	Server::acceptClient()
 {
 	struct sockaddr_storage clientAddr;
@@ -122,9 +115,8 @@ void	Server::acceptClient()
 	int 					clientSocket;
 
 	addr_size = sizeof(clientAddr);
-	clientSocket = accept(this->_serverSocket, (struct sockaddr *)&clientAddr, &addr_size);
 
-	if (clientSocket == -1)
+	if ((clientSocket = accept(this->_serverSocket, (struct sockaddr *)&clientAddr, &addr_size)) == -1)
 	{
     	closeSockets();
         throw std::runtime_error("[SERVER]: Error: accept() failed");
@@ -148,8 +140,31 @@ void	Server::acceptClient()
 
 }
 
+void	Server::receiveRawData(int i)
+{
+	char buffer[BUFFER_SIZE];
+	int bytesRead; 
 
-void	startPoll()
+	if ((bytesRead = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0)) == -1) 
+	{
+		std::cerr << "[SERVER]: Connection closed or error" << std::endl;
+		close(this->_pollFds[i].fd);
+		this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
+		--i;
+	}
+	else 
+	{
+		buffer[bytesRead] = '\0'; // Null-terminate the string
+
+		// processClientMessage(this->_pollFds[i].fd, buffer);
+
+		std::cout << "[SERVER_ECHO]: Received: " << buffer << std::endl;
+		// Echo message back to client 
+		send(this->_pollFds[i].fd, buffer, bytesRead, 0); // [4]
+	}
+}
+
+void	Server::startPoll()
 {
 	std::string	lastError;
 	char buffer[BUFFER_SIZE];
@@ -158,8 +173,7 @@ void	startPoll()
     {
         if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
         {
-            lastError =  "[SERVER]: Error: poll() failed";
-            break;
+            throw std::runtime_error("[SERVER]: Error: poll()) failed");
         }
         for (size_t i = 0; i < _pollFds.size(); ++i)
         {
@@ -171,48 +185,23 @@ void	startPoll()
                 }
                 else // Current is a client socket -> Receive incoming data
                 {
-                    int bytes_received = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0);
-
-                    if (bytes_received <= 0) 
-                    {
-                        std::cerr << "[SERVER]: Connection closed or error" << std::endl;
-                        close(this->_pollFds[i].fd);
-                        this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
-                        --i;
-                    }
-                    else 
-                    {
-                        buffer[bytes_received] = '\0'; // Null-terminate the string
-
-						// processClientMessage(this->_pollFds[i].fd, buffer);
-
-						std::cout << "[SERVER_ECHO]: Received: " << buffer << std::endl;
-                        // Echo message back to client 
-                        send(this->_pollFds[i].fd, buffer, bytes_received, 0); // [4]
-                    }
+					receiveRawData(i);
                 }
             }
         }
     }
-	
+	closeSockets();
 }
 
+Server::~Server() {};
 
-/* 
-	Main TO_DO tasks:
-		- Check that argc == 2;
-		- Check that argv[0] is a valid port number (must be between 1024 and 65535)
-		- Check password requirements, if there's any
-*/
-
-// int main(int argc, char **argv)
-// {
-//     (void)argc;
-//     (void)argv;
-
-//     runServer("8080", "pass");
-//     return 0;
-// }
+void	Server::closeSockets()
+{
+    for (size_t i = 0; i < this->_pollFds.size(); ++i)
+    {
+        close(this->_pollFds[i].fd);
+    }
+}
 
 /*	[1] Protocols RFC 1459 and RFC 2812, section 2.3:
  *
