@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/13 14:31:03 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/14 22:43:07 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,35 +25,50 @@
 #include <map>			// std::map
 #include <cstring>  	// strncmp()
 #include <sstream>		// std::istringstream
+#include "Client.hpp"
 
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
 #define BACKLOG 5        // Max number of pending connections queue will hold
+
+class	Client;
 
 class	Server
 {
 	public:
 
+		/* --- Public Coplien's functions ----------------------------------- */
+
 		Server(const std::string & port, const std::string & password);	// Parameterized constructor
 		~Server();														// Default destructor
 
-		void	startPoll();
+		/* --- Rest of public methods  -------------------------------------- */
+
+		void						startPoll();
 
 	private:
+
+		/* --- Private attributes ------------------------------------------- */
 
 		std::string					_port;
 		std::string 				_password;
 		int							_serverSocket;
     	std::vector<struct pollfd> 	_pollFds;  		// Polling sockets
-    	// std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
+    	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and pointers to clients
+
+		/* --- Private Coplien's functions ---------------------------------- */
 
 		Server(const Server & source);				// Copy constructor [1]
-		Server & operator= (const Server & source);	// Copy assignment operator [1]
+		Server & operator=(const Server & source);	// Copy assignment operator [1]
 
 		/* --- Rest of private methods  ------------------------------------- */
 
-		void	acceptClient();
-		void	receiveRawData(int & i);
-		void	closeSockets();
+		void						acceptClient();
+		void						receiveRawData(size_t & i);
+		// int							receiveRawData(int i);
+		// int							receiveRawData(int &i);
+		std::vector<std::string>	splitBuffer(std::string & buffer);
+		void						splitMessage(int i, std::vector<std::string> fullMessages);
+		void						closeSockets();
 };
 
 #endif

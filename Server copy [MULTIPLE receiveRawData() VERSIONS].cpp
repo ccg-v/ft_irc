@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/14 22:53:25 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/14 22:10:32 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,8 +120,8 @@ Server::~Server()
 
 void	Server::startPoll()
 {
-	// std::string	lastError;
-	// char buffer[BUFFER_SIZE];
+	std::string	lastError;
+	char buffer[BUFFER_SIZE];
 
     while (true)
     {
@@ -129,7 +129,7 @@ void	Server::startPoll()
         {
             throw std::runtime_error("[SERVER]: Error: poll()) failed");
         }
-        for (size_t i = 0; i < _pollFds.size(); ++i)
+        for (int i = 0; i < _pollFds.size(); ++i)
         {
             if (_pollFds[i].revents & POLLIN) // Check for data to read in current socket [3]
             {
@@ -181,42 +181,132 @@ void	Server::acceptClient()
 }
 
 // // Mine (compiles but client disconnects)
-void	Server::receiveRawData(size_t & i) // Pass 'i' by reference!!
+// void	Server::receiveRawData(int & i) // Pass 'i' by reference!!
+// {
+// 	char	buffer[BUFFER_SIZE];
+// 	size_t	bytesReceived;
+
+// 	memset(buffer, 0, sizeof(buffer));
+// 	bytesReceived = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0);
+
+// 	if (bytesReceived <= 0)
+// 	{
+// 		std::cerr << "[SERVER]: Connection closed or error" << std::endl;
+// 		close(this->_pollFds[i].fd);
+// 		this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
+// 		--i;
+// 		return;
+// 	}
+
+// 	std::string & clientBuffer = this->_clients[this->_pollFds[i].fd].getBuffer(); // REFERENCE!!
+// std::cout << "[Buffer before append]: " << clientBuffer << std::endl;
+//     // Append received data to client's buffer
+//     clientBuffer.append(buffer, bytesReceived);
+// std::cout << "[Buffer after append]: " << clientBuffer << std::endl;
+// 	// Extract full messages, leaving incomplete ones in clientBuffer
+// 	// We send a REFERENCE!!, not a copy, to ensure clientBuffer will reflect changes
+// 	// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
+// 	std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
+
+// 	// Process each full message
+// 	for (int m = 0; m < fullMessages.size(); m++)
+// 	{
+// 		std::cout << "Now it's time for splitMessage() into command [parameters] [:trailing]" << std::cerr;
+// 		// splitMessage(i, fullMessages[m]);
+// 	}	
+// }
+
+// // dkreise style
+// // int	Server::receiveRawData(int& i) 
+void	Server::receiveRawData(int & i)
 {
-	char	buffer[BUFFER_SIZE];
-	size_t	bytesReceived;
+    char buffer[1024] = {0};
+    memset(buffer, 0, 1024);
+    size_t bytes_read = read(this->_pollFds[i].fd, buffer, 1024);
 
-	memset(buffer, 0, sizeof(buffer));
-	bytesReceived = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0);
+    if (bytes_read <= 0)
+    {
+        close(this->_pollFds[i].fd);
+        this->_pollFds.erase(this->_pollFds.begin() + i);
+        i--;
+    }
+    else
+    {
+        std::string buf(buffer, bytes_read);
+std::cout << "[buffer BEFORE addBuffer]: " << buf << std::endl;
+        this->_clients[this->_pollFds[i].fd].addBuffer(buf);
+std::cout << "[buffer AFTER addBuffer]: " << buf << std::endl;
+        buf = this->_clients[this->_pollFds[i].fd].getBuffer();
+        std::vector<std::string> msgs = splitBuffer(buf);
+        this->_clients[this->_pollFds[i].fd].setBuffer("");
+        int msg_cnt = msgs.size();
 
-	if (bytesReceived <= 0)
-	{
-		std::cerr << "[SERVER]: Connection closed or error" << std::endl;
-		close(this->_pollFds[i].fd);
-		this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
-		--i;
-		return;
-	}
-
-	std::string & clientBuffer = this->_clients[this->_pollFds[i].fd].getBuffer(); // REFERENCE!!
-
-    // Append received data to client's buffer
-    clientBuffer.append(buffer, bytesReceived);
-	
-	// Extract full messages, leaving incomplete ones in clientBuffer
-	// We send a REFERENCE!!, not a copy, to ensure clientBuffer will reflect changes
-	// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
-	std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
-	
-	std::cout << "[DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
-	// Process each full message
-	for (size_t m = 0; m < fullMessages.size(); m++)
-	{
-		std::cout << "[DEBUG]: fullMessages[" << m << "]: " << fullMessages[m] << std::endl;
-		std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::cerr;
-		// splitMessage(i, fullMessages[m]);
-	}	
+        for (int m = 0; m < msg_cnt; m ++)
+        {
+            if (m == msg_cnt - 1 && (buf[buf.size() - 1] != '\n' || buf[buf.size() - 2] != '\r'))
+            {
+                this->_clients[this->_pollFds[i].fd].setBuffer(msgs[m]);
+            }
+            else
+            {
+				std::cout << "Now it's time to splitMessage() into command [parameters] [:trailing]\n" << std::endl;
+				// splitMessage(i, fullMessages[m]);
+            }
+        }
+    }
+	// return (i);
 }
+
+// // Mine with pointers to Client objects
+// int	Server::receiveRawData(int i)
+// {
+// 	char	buffer[BUFFER_SIZE];
+// 	size_t	bytesRead;
+
+// 	memset(buffer, 0, sizeof(buffer));
+// 	int bytesReceived = recv(this->_pollFds[i].fd, buffer, BUFFER_SIZE, 0);
+
+// 	if (bytesReceived <= 0)
+// 	{
+// 		std::cerr << "[SERVER]: Connection closed or error" << std::endl;
+// 		close(this->_pollFds[i].fd);
+// 		this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
+// 		--i;
+// 	}
+// 	else
+// 	{
+// 		Client* clientPtr = this->_clients[this->_pollFds[i].fd];
+
+// 		if (clientPtr == NULL)
+// 		{
+// 			std::cerr << "Error: Client pointer is null!" << std::endl;
+// 			close(this->_pollFds[i].fd);
+// 			this->_pollFds.erase(this->_pollFds.begin() + i);
+// 			--i;
+// 			return (i);
+// 		}
+
+// 		// Declare the reference AFTER checking for NULL
+// 		Client & currentClient = *clientPtr;
+// 		std::string clientBuffer = currentClient.getBuffer();
+
+// 		// Append received data to client's buffer
+// 		clientBuffer.append(buffer, bytesRead);
+
+// 		// Extract full messages, leaving incomplete ones in clientBuffer
+// 		// We send a REFERENCE!!, not a copy, to ensure clientBuffer will reflect changes
+// 		// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
+// 		std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
+
+// 		// Process each full message
+// 		for (int m = 0; m < fullMessages.size(); m++)
+// 		{
+// 			std::cout << "Now it's time to splitMessage() into command [parameters] [:trailing]" << std::endl;
+// 			// splitMessage(i, fullMessages[m]);
+// 		}
+// 	}
+// 	return (i);
+// }
 
 std::vector<std::string> Server::splitBuffer(std::string & buffer)
 {

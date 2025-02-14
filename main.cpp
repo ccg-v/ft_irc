@@ -3,7 +3,9 @@
 		- Check that argc == 2;
 		- Check that argv[0] is a valid port number (must be between 1024 and 65535)
 		- Check password requirements, if there's any
+		- Check wrong running with ./ircserver localhost 8080 
 */
+
 
 #include "Server.hpp"
 
