@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/14 22:53:25 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/14 23:20:23 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,7 @@ void	Server::receiveRawData(size_t & i) // Pass 'i' by reference!!
 	for (size_t m = 0; m < fullMessages.size(); m++)
 	{
 		std::cout << "[DEBUG]: fullMessages[" << m << "]: " << fullMessages[m] << std::endl;
-		std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::cerr;
+		std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
 		// splitMessage(i, fullMessages[m]);
 	}	
 }
