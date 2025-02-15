@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/14 22:43:07 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/15 19:18:53 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,13 @@
 
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
 #define BACKLOG 5        // Max number of pending connections queue will hold
+
+typedef struct s_tokens
+{
+	std::string					command;
+	std::vector<std::string>	parameters;
+	std::string					trailing;
+} 	t_tokens;
 
 class	Client;
 
@@ -68,6 +75,7 @@ class	Server
 		// int							receiveRawData(int &i);
 		std::vector<std::string>	splitBuffer(std::string & buffer);
 		void						splitMessage(int i, std::vector<std::string> fullMessages);
+		void						processMessage(int i, std::string message);
 		void						closeSockets();
 };
 

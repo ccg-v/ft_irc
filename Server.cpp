@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/14 23:20:23 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/15 23:44:24 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,17 +204,17 @@ void	Server::receiveRawData(size_t & i) // Pass 'i' by reference!!
     clientBuffer.append(buffer, bytesReceived);
 	
 	// Extract full messages, leaving incomplete ones in clientBuffer
-	// We send a REFERENCE!!, not a copy, to ensure clientBuffer will reflect changes
+	// We send a REFERENCE!! of clientBuffer, not a copy, to ensure it reflects changes
 	// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
 	std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
 	
-	std::cout << "[DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
+	std::cout << "\n[~DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
 	// Process each full message
 	for (size_t m = 0; m < fullMessages.size(); m++)
 	{
-		std::cout << "[DEBUG]: fullMessages[" << m << "]: " << fullMessages[m] << std::endl;
-		std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
-		// splitMessage(i, fullMessages[m]);
+		std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
+		// std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
+		processMessage(i, fullMessages[m]);
 	}	
 }
 
@@ -230,6 +230,125 @@ std::vector<std::string> Server::splitBuffer(std::string & buffer)
     }
     return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
+
+void Server::processMessage(int i, std::string message)
+{
+    t_tokens msgTokens;
+    (void)i;
+
+    msgTokens = tokenizeMsg(message);
+
+    std::cout << "[~DEBUG]: \t\tcommand = " << msgTokens.command << std::endl;
+
+    for (size_t j = 0; j < msgTokens.parameters.size(); j++)
+    {
+        std::cout << "[~DEBUG]: \t\tparameters[" << j << "] = " << msgTokens.parameters[j] << std::endl;
+    }
+
+    if (!msgTokens.trailing.empty()) {
+        std::cout << "[~DEBUG]: \t\ttrailing = " << msgTokens.trailing << std::endl;
+	}
+
+	if (msgTokens.command == "CAP")
+	{
+		std::string msg = ":localhost CAP * LS :\r\n";
+		send(this->_pollFds[i].fd, msg.c_str(), msg.size(), 0);
+	}
+
+	if (msgTokens.command == "PASS")
+	{
+		if (msgTokents.parameters[0] == this->_password)
+			this->_clients[this->_pollFds[i].fd].setAuthentication(true);
+		else
+			std::string err_passwdmismatch = "*: Password is either not given or wrong\r\n";
+			send(this->_pollFds[i].fd, err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
+	}
+}
+
+t_tokens	tokenizeMsg(const std::string  & message)
+{
+    std::istringstream	iss;
+    std::string 		token;
+	t_tokens			tokenizedMsg;
+
+    iss.str(message);
+
+    // Extract command
+    if (!(iss >> token))
+		return (tokenizedMsg); // Empty message
+
+    tokenizedMsg.command = token;
+
+    // Extract parameters until ":"
+    while (iss >> token)
+	{
+        if (token[0] == ':') // Extract trailing text (here token is storing the colon and the first word)
+		{
+            std::string trailing;
+            std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
+            tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
+            break;
+        }
+        tokenizedMsg.parameters.push_back(token); // Add parameter to vector
+    }
+
+    return tokenizedMsg;
+}
+
+// void	Server::processMessage(int i, std::string message)
+// {
+//     std::istringstream iss;
+//     iss.str(message);
+//     std::string command;
+//     iss >> command;
+
+// 	std::cout << "command received is " << command << std::endl;
+
+// 	if (command == "PASS") 
+// 	{
+// 		if (command.compare(this->_password) == 0) {
+// 			this->_clients[this->_pollFds[i].fd].setAuthentication(true);
+// 			// std::string welcome_msg = ":server 001 " + _clients[client_fd].nickname + " :Welcome to the IRC network!\r\n";
+// 			std::string welcome_msg = ":server 001: * Welcome to the IRC network!\r\n";
+// 			send(this->_pollFds[i].fd, welcome_msg.c_str(), welcome_msg.size(), 0);		
+// 		}
+// 		else
+// 		{
+// 			std::string err_passwdmismatch = "*: Password is either not given or wrong\r\n";
+// 			send(this->_pollFds[i].fd, err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);	
+//         	// throw std::runtime_error("[SERVER]: ");
+// 		}
+// 	}
+
+// 	if (command == "JOIN")
+// 	{
+// 		std::string NoDefaultChannel_msg = ":server 461 <nickname> JOIN :Not enough parameters\r\n";
+// 		send(this->_pollFds[i].fd, NoDefaultChannel_msg.c_str(), NoDefaultChannel_msg.size(), 0);	
+// 	}
+
+// 	// if (command == "NICK")
+// 	// {
+// 	// 	this->_clients[this->_pollFds[i].fd].setNickname("HOOOLA");
+// 	// }
+	
+//     // if (command == "NICK") {
+//     //     std::string nick;
+//     //     iss >> nick;
+//     //     clients[client_fd].nickname = nick;
+//     //     clients[client_fd].hasNick = true;
+//     // } 
+//     // else if (command == "USER") {
+//     //     std::string user;
+//     //     iss >> user;
+//     //     clients[client_fd].username = user;
+//     //     clients[client_fd].hasUser = true;
+//     // }
+    
+//     // if (clients[client_fd].hasNick && clients[client_fd].hasUser) {
+//     //     std::string welcome_msg = ":server 001 " + clients[client_fd].nickname + " :Welcome to the IRC network!\r\n";
+//     //     send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
+//     // }
+// }
 
 void	Server::closeSockets()
 {
@@ -279,11 +398,11 @@ void	Server::closeSockets()
  */
 
  /*
-  * [5] 	std::string(buffer, bytesRead);
+  * [5] 	std::string(buffer, bytesReceived);
   *
-  *		'buffer' is a char array (C style string). This line Constructs a new 
-  *		std::string by copying exactly bytesRead characters from buffer, even if 
-  *		it contains nullcharacters ('\0').
+  *		'buffer' is a char array (C style string). This line constructs a new 
+  *		std::string by copying exactly 'bytesReceived' characters from buffer, even
+  *		if it contains nullcharacters ('\0').
   *		Unlike std::string(buffer), which stops at the first '\0', this constructor
   *		ensures that all bytesRead characters are included in the string.
   */

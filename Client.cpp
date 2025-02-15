@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/14 22:15:28 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/15 18:41:43 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,21 @@ Client::~Client()	// Default destructor
 {
 }
 
-/* --- Other public methods ------------------------------------------------- */
+/* --- Getters and Setters -------------------------------------------------- */
 
 std::string & Client::getBuffer()
 {
 	return(_clientBuffer);
+}
+
+void	Client::setNickname(const std::string & nickname)
+{
+	_nickname = nickname;
+}
+
+void	Client::setAuthentication(bool isAuthenticated)
+{
+	this->_isAuthenticated = isAuthenticated;
 }
 
 // void Client::setBuffer(std::string buffer)

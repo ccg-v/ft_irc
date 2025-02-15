@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/14 22:15:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/15 12:54:35 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@ class	Client
 		
 // void setBuffer(std::string buffer);
 // void addBuffer(std::string & buffer);
+
+		void	setNickname(const std::string & nickname);
+		void	setAuthentication(bool _isAuthenticated);
 
 	private:
 
