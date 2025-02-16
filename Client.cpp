@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 14:28:12 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/16 23:49:06 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Client::Client() : _fd(-1) // Default constructor
 Client::Client(int fd) // Parameterized constructor
 	: _fd(fd),
 	  _isAuthenticated(false), 
-	  _isRegistered(false),
+	//  _isRegistered(false),
 	  _clientBuffer(NULL)
 {
 }
@@ -42,9 +42,19 @@ Client::~Client()	// Default destructor
 
 /* --- Getters and Setters -------------------------------------------------- */
 
+void	Client::setFd(int fd)
+{
+	this->_fd = fd;
+}
+
+int		Client::getFd()
+{
+	return(this->_fd);
+}
+
 std::string & Client::getBuffer()
 {
-	return(_clientBuffer);
+	return(this->_clientBuffer);
 }
 
 void	Client::setNickname(const std::string & nickname)
@@ -55,6 +65,11 @@ void	Client::setNickname(const std::string & nickname)
 std::string	Client::getNickname()
 {
 	return (this->_nickname);
+}
+
+void	Client::setUsername(const std::string & username)
+{
+	this->_username = username;
 }
 
 void	Client::setAuthentication(bool isAuthenticated)

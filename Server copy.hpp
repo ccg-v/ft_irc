@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 21:37:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/16 19:11:30 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,13 +70,13 @@ class	Server
 		/* --- Rest of private methods  ------------------------------------- */
 
 		void						acceptClient();
-		void						receiveRawData(Client &currentClient, size_t &i);
+		void						receiveRawData(size_t & i);
 		// int							receiveRawData(int i);
 		// int							receiveRawData(int &i);
 		std::vector<std::string>	splitBuffer(std::string & buffer);
 		void						splitMessage(int i, std::vector<std::string> fullMessages);
-		void						processMessage(Client &currentClient, int i, std::string message);
-		t_tokens					tokenizeMsg(const std::string & message);
+		void						processMessage(int i, std::string message);
+		t_tokens					tokenizeMsg(const std::string  & message);
 		void						closeSockets();
 };
 

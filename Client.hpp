@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 14:27:49 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/16 23:49:01 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,11 @@ class	Client
 		// void setBuffer(std::string buffer);
 		// void addBuffer(std::string & buffer);
 
+		void		setFd(int fd);
+		int			getFd();
 		void		setNickname(const std::string & nickname);
 		std::string	getNickname();
+		void		setUsername(const std::string & username);
 		void		setAuthentication(bool _isAuthenticated);
 		bool		getAuthentication();
 
@@ -45,7 +48,7 @@ class	Client
 		std::string	_nickname;
 		std::string	_username;
 		bool		_isAuthenticated;
-		bool		_isRegistered;
+	//	bool		_isRegistered;
 		std::string	_clientBuffer;
 
 		/* --- Private Coplien's functions ---------------------------------- */

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 23:53:14 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/16 20:14:27 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,9 @@ Server::~Server()
 
 void	Server::startPoll()
 {
+	// std::string	lastError;
+	// char buffer[BUFFER_SIZE];
+
     while (true)
     {
         if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
@@ -124,10 +127,8 @@ void	Server::startPoll()
                 }
                 else // Current is a client socket -> Receive incoming data
                 {
-					// receiveRawData(i);
-					Client &currentClient = this->_clients[this->_pollFds[i].fd];
-					currentClient.setFd(this->_pollFds[i].fd); // Store the client's fd in our class
-    				receiveRawData(currentClient, i);  // Pass the current client reference
+					// i = receiveRawData(i);
+					receiveRawData(i);
                 }
             }
         }
@@ -167,7 +168,7 @@ void	Server::acceptClient()
 
 }
 
-void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by reference!!
+void	Server::receiveRawData(size_t &i) // Pass 'i' by reference!!
 {
 	char	buffer[BUFFER_SIZE];
 	size_t	bytesReceived;
@@ -184,7 +185,7 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 		return;
 	}
 
-	std::string & clientBuffer = currentClient.getBuffer(); // REFERENCE!!
+	std::string & clientBuffer = this->_clients[this->_pollFds[i].fd].getBuffer(); // REFERENCE!!
 
     // Append received data to client's buffer
     clientBuffer.append(buffer, bytesReceived);
@@ -200,7 +201,7 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 	{
 		std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
 		// std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
-		processMessage(currentClient, i, fullMessages[m]);
+		processMessage(i, fullMessages[m]);
 	}	
 }
 
@@ -217,10 +218,10 @@ std::vector<std::string> Server::splitBuffer(std::string & buffer)
     return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
 
-void Server::processMessage(Client &currentClient, int i, std::string message)
+void Server::processMessage(int i, std::string message)
 {
     t_tokens msgTokens;
-	(void)i;
+    (void)i;
 
     msgTokens = tokenizeMsg(message);
 
@@ -240,44 +241,30 @@ void Server::processMessage(Client &currentClient, int i, std::string message)
 	if (msgTokens.command == "CAP" && msgTokens.parameters[0] != "END")
 	{
 		std::string msg = ":localhost CAP * LS :None\r\n";
-		send(currentClient.getFd(), msg.c_str(), msg.size(), 0);
+		send(this->_pollFds[i].fd, msg.c_str(), msg.size(), 0);
 	}
 
 	if (msgTokens.command == "PASS")
 	{
 		if (msgTokens.parameters[0] == this->_password)
-			currentClient.setAuthentication(true);
+			this->_clients[this->_pollFds[i].fd].setAuthentication(true);
 		else
 		{
 			std::string err_passwdmismatch = "* : Password required\r\n";
-			send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
+			send(this->_pollFds[i].fd, err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
 		}
 	}
 
 	if (msgTokens.command == "NICK")
 	{
-		if(currentClient.getAuthentication() == true) 
+		if(this->_clients[this->_pollFds[i].fd].getAuthentication() == true) 
 		{
-			currentClient.setNickname(msgTokens.parameters[0]);
-			std::cout << "nickname received; client is authenticated; now you are " << msgTokens.parameters[0] << std::endl;
+			this->_clients[this->_pollFds[i].fd].setNickname(msgTokens.parameters[0]);
+			// std::string nickname = this->_clients[this->_pollFds[i].fd].getNickname();
+			std::cout << "nickname received; client is authenticated; now you are " << this->_clients[this->_pollFds[i].fd].getNickname() << std::endl;
 		}
 		else
-		{
-			std::string err_passwdmismatch = msgTokens.parameters[0] + " : Password required\r\n";
-			send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
 			std::cout << "client is not authenticated, I will not store the nickname" << std::endl;
-		}
-	}
-
-	if (msgTokens.command == "USER")
-	{
-		if(currentClient.getAuthentication() == true && !(currentClient.getNickname().empty()))
-		{
-			currentClient.setUsername(msgTokens.parameters[0]);
-			std::cout << "username received, client is authenticated; user is " << msgTokens.parameters[0] << std::endl;
-		}
-		else
-			std::cout << "client is not authenticated, I will not store the USERNAME" << std::endl;
 	}
 }
 
