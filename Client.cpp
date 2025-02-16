@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/15 18:41:43 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/16 14:28:12 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,22 @@ std::string & Client::getBuffer()
 
 void	Client::setNickname(const std::string & nickname)
 {
-	_nickname = nickname;
+	this->_nickname = nickname;
+}
+
+std::string	Client::getNickname()
+{
+	return (this->_nickname);
 }
 
 void	Client::setAuthentication(bool isAuthenticated)
 {
 	this->_isAuthenticated = isAuthenticated;
+}
+
+bool	Client::getAuthentication()
+{
+	return (this->_isAuthenticated);
 }
 
 // void Client::setBuffer(std::string buffer)

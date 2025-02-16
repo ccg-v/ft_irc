@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/15 23:44:24 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/16 14:37:01 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,6 @@ void	Server::acceptClient()
 
 }
 
-// // Mine (compiles but client disconnects)
 void	Server::receiveRawData(size_t & i) // Pass 'i' by reference!!
 {
 	char	buffer[BUFFER_SIZE];
@@ -238,6 +237,7 @@ void Server::processMessage(int i, std::string message)
 
     msgTokens = tokenizeMsg(message);
 
+	/* DEBUG PRINTINGS ------------------------------------------------------ */
     std::cout << "[~DEBUG]: \t\tcommand = " << msgTokens.command << std::endl;
 
     for (size_t j = 0; j < msgTokens.parameters.size(); j++)
@@ -248,24 +248,39 @@ void Server::processMessage(int i, std::string message)
     if (!msgTokens.trailing.empty()) {
         std::cout << "[~DEBUG]: \t\ttrailing = " << msgTokens.trailing << std::endl;
 	}
+	/* ------------------------------------------------------ DEBUG PRINTINGS */
 
-	if (msgTokens.command == "CAP")
+	if (msgTokens.command == "CAP" && msgTokens.parameters[0] != "END")
 	{
-		std::string msg = ":localhost CAP * LS :\r\n";
+		std::string msg = ":localhost CAP * LS :None\r\n";
 		send(this->_pollFds[i].fd, msg.c_str(), msg.size(), 0);
 	}
 
 	if (msgTokens.command == "PASS")
 	{
-		if (msgTokents.parameters[0] == this->_password)
+		if (msgTokens.parameters[0] == this->_password)
 			this->_clients[this->_pollFds[i].fd].setAuthentication(true);
 		else
-			std::string err_passwdmismatch = "*: Password is either not given or wrong\r\n";
+		{
+			std::string err_passwdmismatch = "* : Password required\r\n";
 			send(this->_pollFds[i].fd, err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
+		}
+	}
+
+	if (msgTokens.command == "NICK")
+	{
+		if(this->_clients[this->_pollFds[i].fd].getAuthentication() == true) 
+		{
+			this->_clients[this->_pollFds[i].fd].setNickname(msgTokens.parameters[0]);
+			// std::string nickname = this->_clients[this->_pollFds[i].fd].getNickname();
+			std::cout << "nickname received; client is authenticated; now you are " << this->_clients[this->_pollFds[i].fd].getNickname() << std::endl;
+		}
+		else
+			std::cout << "client is not authenticated, I will not store the nickname" << std::endl;
 	}
 }
 
-t_tokens	tokenizeMsg(const std::string  & message)
+t_tokens	Server::tokenizeMsg(const std::string  & message)
 {
     std::istringstream	iss;
     std::string 		token;
