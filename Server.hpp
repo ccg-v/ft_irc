@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 21:37:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/17 20:11:47 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,8 @@ class	Server
 		Server(const Server & source);				// Copy constructor [1]
 		Server & operator=(const Server & source);	// Copy assignment operator [1]
 
-		/* --- Rest of private methods  ------------------------------------- */
+		/* --- Getters and Setters ------------------------------------------ */
 
-		void						acceptClient();
-		void						receiveRawData(Client &currentClient, size_t &i);
 		// int							receiveRawData(int i);
 		// int							receiveRawData(int &i);
 		std::vector<std::string>	splitBuffer(std::string & buffer);
@@ -78,6 +76,12 @@ class	Server
 		void						processMessage(Client &currentClient, int i, std::string message);
 		t_tokens					tokenizeMsg(const std::string & message);
 		void						closeSockets();
+
+		/* --- Rest of private methods  ------------------------------------- */
+
+		void						acceptClient();
+		void						receiveRawData(Client &currentClient, size_t &i);
+
 };
 
 #endif

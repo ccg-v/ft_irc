@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 23:49:06 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/17 20:23:36 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Client::Client() : _fd(-1) // Default constructor
 Client::Client(int fd) // Parameterized constructor
 	: _fd(fd),
 	  _isAuthenticated(false), 
-	//  _isRegistered(false),
+	  _isRegistered(false),
 	  _clientBuffer(NULL)
 {
 }
@@ -80,6 +80,16 @@ void	Client::setAuthentication(bool isAuthenticated)
 bool	Client::getAuthentication()
 {
 	return (this->_isAuthenticated);
+}
+
+void	Client::setRegistration(bool isRegistered)
+{
+	this->_isRegistered = isRegistered;
+}
+
+bool	Client::getRegistration()
+{
+	return (this->_isRegistered);
 }
 
 // void Client::setBuffer(std::string buffer)

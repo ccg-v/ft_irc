@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/16 23:53:14 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/17 23:51:56 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,36 @@ std::vector<std::string> Server::splitBuffer(std::string & buffer)
     return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
 
+t_tokens	Server::tokenizeMsg(const std::string  & message)
+{
+    std::istringstream	iss;
+    std::string 		token;
+	t_tokens			tokenizedMsg;
+
+    iss.str(message);
+
+    // Extract command
+    if (!(iss >> token))
+		return (tokenizedMsg); // Empty message
+
+    tokenizedMsg.command = token;
+
+    // Extract parameters until ":"
+    while (iss >> token)
+	{
+        if (token[0] == ':') // Extract trailing text (here token is storing the colon and the first word)
+		{
+            std::string trailing;
+            std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
+            tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
+            break;
+        }
+        tokenizedMsg.parameters.push_back(token); // Add parameter to vector
+    }
+
+    return tokenizedMsg;
+}
+
 void Server::processMessage(Client &currentClient, int i, std::string message)
 {
     t_tokens msgTokens;
@@ -259,7 +289,7 @@ void Server::processMessage(Client &currentClient, int i, std::string message)
 		if(currentClient.getAuthentication() == true) 
 		{
 			currentClient.setNickname(msgTokens.parameters[0]);
-			std::cout << "nickname received; client is authenticated; now you are " << msgTokens.parameters[0] << std::endl;
+			std::cout << "\n-> nickname received; client is authenticated; now you are " << msgTokens.parameters[0] << "\n" << std::endl;
 		}
 		else
 		{
@@ -274,97 +304,35 @@ void Server::processMessage(Client &currentClient, int i, std::string message)
 		if(currentClient.getAuthentication() == true && !(currentClient.getNickname().empty()))
 		{
 			currentClient.setUsername(msgTokens.parameters[0]);
-			std::cout << "username received, client is authenticated; user is " << msgTokens.parameters[0] << std::endl;
+			currentClient.setRegistration(true);
+			std::cout << "\n-> username received, client is registered; your username is " << msgTokens.parameters[0] << std::endl;
+
+			std::string rpl_welcome = "001 " + currentClient.getNickname() + " :Welcome to the Internet Relay Network, " + currentClient.getNickname() + "!\r\n";
+			send(currentClient.getFd(), rpl_welcome.c_str(), rpl_welcome.size(), 0);
+			std::string rpl_yourhost = "002 " + currentClient.getNickname() + " :Your host is localhost, running version 1.0\r\n";
+			send(currentClient.getFd(), rpl_yourhost.c_str(), rpl_yourhost.size(), 0);
+			std::string rpl_created = "003 " + currentClient.getNickname() + " :This server was created today\r\n";
+			send(currentClient.getFd(), rpl_created.c_str(), rpl_created.size(), 0);
+			std::string rpl_myinfo = "004 " + currentClient.getNickname() + " localhost 1.0 -availableusermodes- -availablechannelmodes-\r\n";
+			send(currentClient.getFd(), rpl_myinfo.c_str(), rpl_myinfo.size(), 0);	
 		}
 		else
 			std::cout << "client is not authenticated, I will not store the USERNAME" << std::endl;
 	}
+
+	// if (currentClient.getAuthentication() == true && currentClient.getRegistration() == true)
+	// {
+	// 	std::string rpl_welcome = "001 " + currentClient.getNickname() + " :Welcome to the Internet Relay Network, " + currentClient.getNickname() + "!\r\n";
+	// 	send(currentClient.getFd(), rpl_welcome.c_str(), rpl_welcome.size(), 0);
+	// 	std::string rpl_yourhost = "002 " + currentClient.getNickname() + " :Your host is localhost, running version 1.0\r\n";
+	// 	send(currentClient.getFd(), rpl_yourhost.c_str(), rpl_yourhost.size(), 0);
+	// 	std::string rpl_created = "003 " + currentClient.getNickname() + " :This server was created today\r\n";
+	// 	send(currentClient.getFd(), rpl_created.c_str(), rpl_created.size(), 0);
+	// 	std::string rpl_myinfo = "004 " + currentClient.getNickname() + " localhost 1.0 -availableusermodes- -availablechannelmodes-\r\n";
+	// 	send(currentClient.getFd(), rpl_myinfo.c_str(), rpl_myinfo.size(), 0);		
+	// }
+	return;
 }
-
-t_tokens	Server::tokenizeMsg(const std::string  & message)
-{
-    std::istringstream	iss;
-    std::string 		token;
-	t_tokens			tokenizedMsg;
-
-    iss.str(message);
-
-    // Extract command
-    if (!(iss >> token))
-		return (tokenizedMsg); // Empty message
-
-    tokenizedMsg.command = token;
-
-    // Extract parameters until ":"
-    while (iss >> token)
-	{
-        if (token[0] == ':') // Extract trailing text (here token is storing the colon and the first word)
-		{
-            std::string trailing;
-            std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
-            tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
-            break;
-        }
-        tokenizedMsg.parameters.push_back(token); // Add parameter to vector
-    }
-
-    return tokenizedMsg;
-}
-
-// void	Server::processMessage(int i, std::string message)
-// {
-//     std::istringstream iss;
-//     iss.str(message);
-//     std::string command;
-//     iss >> command;
-
-// 	std::cout << "command received is " << command << std::endl;
-
-// 	if (command == "PASS") 
-// 	{
-// 		if (command.compare(this->_password) == 0) {
-// 			this->_clients[this->_pollFds[i].fd].setAuthentication(true);
-// 			// std::string welcome_msg = ":server 001 " + _clients[client_fd].nickname + " :Welcome to the IRC network!\r\n";
-// 			std::string welcome_msg = ":server 001: * Welcome to the IRC network!\r\n";
-// 			send(this->_pollFds[i].fd, welcome_msg.c_str(), welcome_msg.size(), 0);		
-// 		}
-// 		else
-// 		{
-// 			std::string err_passwdmismatch = "*: Password is either not given or wrong\r\n";
-// 			send(this->_pollFds[i].fd, err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);	
-//         	// throw std::runtime_error("[SERVER]: ");
-// 		}
-// 	}
-
-// 	if (command == "JOIN")
-// 	{
-// 		std::string NoDefaultChannel_msg = ":server 461 <nickname> JOIN :Not enough parameters\r\n";
-// 		send(this->_pollFds[i].fd, NoDefaultChannel_msg.c_str(), NoDefaultChannel_msg.size(), 0);	
-// 	}
-
-// 	// if (command == "NICK")
-// 	// {
-// 	// 	this->_clients[this->_pollFds[i].fd].setNickname("HOOOLA");
-// 	// }
-	
-//     // if (command == "NICK") {
-//     //     std::string nick;
-//     //     iss >> nick;
-//     //     clients[client_fd].nickname = nick;
-//     //     clients[client_fd].hasNick = true;
-//     // } 
-//     // else if (command == "USER") {
-//     //     std::string user;
-//     //     iss >> user;
-//     //     clients[client_fd].username = user;
-//     //     clients[client_fd].hasUser = true;
-//     // }
-    
-//     // if (clients[client_fd].hasNick && clients[client_fd].hasUser) {
-//     //     std::string welcome_msg = ":server 001 " + clients[client_fd].nickname + " :Welcome to the IRC network!\r\n";
-//     //     send(client_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
-//     // }
-// }
 
 void	Server::closeSockets()
 {
