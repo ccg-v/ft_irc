@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/17 20:11:47 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:30:35 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ class	Server
 		// int							receiveRawData(int &i);
 		std::vector<std::string>	splitBuffer(std::string & buffer);
 		void						splitMessage(int i, std::vector<std::string> fullMessages);
-		void						processMessage(Client &currentClient, int i, std::string message);
+		void						processMessage(Client &currentClient, std::string message);
 		t_tokens					tokenizeMsg(const std::string & message);
 		void						closeSockets();
 

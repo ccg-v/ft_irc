@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/17 20:23:36 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:33:29 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,25 @@ Client::Client(int fd) // Parameterized constructor
 	: _fd(fd),
 	  _isAuthenticated(false), 
 	  _isRegistered(false),
-	  _clientBuffer(NULL)
+	  _clientBuffer("")
 {
 }
 
-Client::Client(const Client & source) : _fd(source._fd) {}
+Client::Client(const Client & source)
+{
+	_fd = source._fd;
+	_isAuthenticated = source._isAuthenticated;
+	_isRegistered = source._isRegistered;
+	_clientBuffer = source._clientBuffer;
+}
 
-Client& Client::operator=(const Client & source)
+Client & Client::operator=(const Client & source)
 {
     if (this != &source) {
         _fd = source._fd;
+		_isAuthenticated = source._isAuthenticated;
+        _isRegistered = source._isRegistered;
+        _clientBuffer = source._clientBuffer;
     }
     return *this;
 }

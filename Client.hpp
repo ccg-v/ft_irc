@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/17 20:22:50 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:23:05 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,10 @@ class	Client
 		Client(const Client & source);
 		Client & operator=(const Client & source);
 
-		/* --- Other public methods ----------------------------------------- */
+		/* --- Getters and Setters ------------------------------------------ */
 
 		std::string & getBuffer();
 		
-		// void setBuffer(std::string buffer);
-		// void addBuffer(std::string & buffer);
-
 		void		setFd(int fd);
 		int			getFd();
 		void		setNickname(const std::string & nickname);

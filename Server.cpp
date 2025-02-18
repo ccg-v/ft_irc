@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/17 23:51:56 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/18 18:30:26 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,8 @@ void	Server::startPoll()
                 else // Current is a client socket -> Receive incoming data
                 {
 					// receiveRawData(i);
-					Client &currentClient = this->_clients[this->_pollFds[i].fd];
-					currentClient.setFd(this->_pollFds[i].fd); // Store the client's fd in our class
+					Client &currentClient = this->_clients[this->_pollFds[i].fd]; // Reference to client in _clients map
+					// currentClient.setFd(this->_pollFds[i].fd); // Store the client's fd in our class
     				receiveRawData(currentClient, i);  // Pass the current client reference
                 }
             }
@@ -165,6 +165,8 @@ void	Server::acceptClient()
 	pfd.revents = 0;
 	this->_pollFds.push_back(pfd);
 
+	// Instantiate Client object and store it in `_clients` map		
+	this->_clients[clientSocket] = Client(clientSocket);
 }
 
 void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by reference!!
@@ -200,7 +202,7 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 	{
 		std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
 		// std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
-		processMessage(currentClient, i, fullMessages[m]);
+		processMessage(currentClient, fullMessages[m]);
 	}	
 }
 
@@ -217,7 +219,7 @@ std::vector<std::string> Server::splitBuffer(std::string & buffer)
     return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
 
-t_tokens	Server::tokenizeMsg(const std::string  & message)
+t_tokens	Server::tokenizeMsg(const std::string &message)
 {
     std::istringstream	iss;
     std::string 		token;
@@ -247,10 +249,9 @@ t_tokens	Server::tokenizeMsg(const std::string  & message)
     return tokenizedMsg;
 }
 
-void Server::processMessage(Client &currentClient, int i, std::string message)
+void Server::processMessage(Client &currentClient, std::string message)
 {
     t_tokens msgTokens;
-	(void)i;
 
     msgTokens = tokenizeMsg(message);
 
