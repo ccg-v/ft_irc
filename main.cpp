@@ -24,7 +24,7 @@ int	wrongargs(int argc, char **argv)
     }
 	if (p < 1024 || p > 65535)
 	{
-        std::cerr << "Error: Port must be 1014 to 65535" << std::endl;
+        std::cerr << "Error: Port must be 1024 to 65535" << std::endl;
         return (1);
     }
 	return (EXIT_SUCCESS);

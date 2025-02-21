@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/18 18:30:26 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/21 01:54:13 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,11 @@ Server::Server(const std::string &port, const std::string &password)
 {
 	_port = port;
 	_password = password;
+
+	_commandMap["CAP"] = &Server::handleCap;
+    _commandMap["PASS"] = &Server::handlePass;
+    _commandMap["NICK"] = &Server::handleNick;
+    _commandMap["USER"] = &Server::handleUser;
 
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -249,12 +254,15 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
     return tokenizedMsg;
 }
 
+
 void Server::processMessage(Client &currentClient, std::string message)
 {
-    t_tokens msgTokens;
+
+	t_tokens msgTokens;
 
     msgTokens = tokenizeMsg(message);
-
+	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
+	
 	/* DEBUG PRINTINGS ------------------------------------------------------ */
     std::cout << "[~DEBUG]: \t\tcommand = " << msgTokens.command << std::endl;
 
@@ -263,77 +271,77 @@ void Server::processMessage(Client &currentClient, std::string message)
         std::cout << "[~DEBUG]: \t\tparameters[" << j << "] = " << msgTokens.parameters[j] << std::endl;
     }
 
-    if (!msgTokens.trailing.empty()) {
+    if (!msgTokens.trailing.empty())
+	{
         std::cout << "[~DEBUG]: \t\ttrailing = " << msgTokens.trailing << std::endl;
 	}
 	/* ------------------------------------------------------ DEBUG PRINTINGS */
 
-	if (msgTokens.command == "CAP" && msgTokens.parameters[0] != "END")
+	if (it != _commandMap.end())
 	{
-		std::string msg = ":localhost CAP * LS :None\r\n";
-		send(currentClient.getFd(), msg.c_str(), msg.size(), 0);
+		(this->*(it->second))(currentClient, msgTokens);  // Call the correct handler function
 	}
-
-	if (msgTokens.command == "PASS")
+	else
 	{
-		if (msgTokens.parameters[0] == this->_password)
-			currentClient.setAuthentication(true);
-		else
-		{
-			std::string err_passwdmismatch = "* : Password required\r\n";
-			send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
-		}
+		std::cerr << "[SERVER]: Unknown command: " << msgTokens.command << std::endl;
 	}
-
-	if (msgTokens.command == "NICK")
-	{
-		if(currentClient.getAuthentication() == true) 
-		{
-			currentClient.setNickname(msgTokens.parameters[0]);
-			std::cout << "\n-> nickname received; client is authenticated; now you are " << msgTokens.parameters[0] << "\n" << std::endl;
-		}
-		else
-		{
-			std::string err_passwdmismatch = msgTokens.parameters[0] + " : Password required\r\n";
-			send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
-			std::cout << "client is not authenticated, I will not store the nickname" << std::endl;
-		}
-	}
-
-	if (msgTokens.command == "USER")
-	{
-		if(currentClient.getAuthentication() == true && !(currentClient.getNickname().empty()))
-		{
-			currentClient.setUsername(msgTokens.parameters[0]);
-			currentClient.setRegistration(true);
-			std::cout << "\n-> username received, client is registered; your username is " << msgTokens.parameters[0] << std::endl;
-
-			std::string rpl_welcome = "001 " + currentClient.getNickname() + " :Welcome to the Internet Relay Network, " + currentClient.getNickname() + "!\r\n";
-			send(currentClient.getFd(), rpl_welcome.c_str(), rpl_welcome.size(), 0);
-			std::string rpl_yourhost = "002 " + currentClient.getNickname() + " :Your host is localhost, running version 1.0\r\n";
-			send(currentClient.getFd(), rpl_yourhost.c_str(), rpl_yourhost.size(), 0);
-			std::string rpl_created = "003 " + currentClient.getNickname() + " :This server was created today\r\n";
-			send(currentClient.getFd(), rpl_created.c_str(), rpl_created.size(), 0);
-			std::string rpl_myinfo = "004 " + currentClient.getNickname() + " localhost 1.0 -availableusermodes- -availablechannelmodes-\r\n";
-			send(currentClient.getFd(), rpl_myinfo.c_str(), rpl_myinfo.size(), 0);	
-		}
-		else
-			std::cout << "client is not authenticated, I will not store the USERNAME" << std::endl;
-	}
-
-	// if (currentClient.getAuthentication() == true && currentClient.getRegistration() == true)
-	// {
-	// 	std::string rpl_welcome = "001 " + currentClient.getNickname() + " :Welcome to the Internet Relay Network, " + currentClient.getNickname() + "!\r\n";
-	// 	send(currentClient.getFd(), rpl_welcome.c_str(), rpl_welcome.size(), 0);
-	// 	std::string rpl_yourhost = "002 " + currentClient.getNickname() + " :Your host is localhost, running version 1.0\r\n";
-	// 	send(currentClient.getFd(), rpl_yourhost.c_str(), rpl_yourhost.size(), 0);
-	// 	std::string rpl_created = "003 " + currentClient.getNickname() + " :This server was created today\r\n";
-	// 	send(currentClient.getFd(), rpl_created.c_str(), rpl_created.size(), 0);
-	// 	std::string rpl_myinfo = "004 " + currentClient.getNickname() + " localhost 1.0 -availableusermodes- -availablechannelmodes-\r\n";
-	// 	send(currentClient.getFd(), rpl_myinfo.c_str(), rpl_myinfo.size(), 0);		
-	// }
-	return;
 }
+
+// void 	Server::handleCap(Client &currentClient, const t_tokens msgTokens)
+// {
+// 	if (msgTokens.command == "CAP" && msgTokens.parameters[0] != "END")
+// 	{
+// 		std::string msg = ":localhost CAP * LS :None\r\n";
+// 		send(currentClient.getFd(), msg.c_str(), msg.size(), 0);
+// 	}
+// }
+
+// void 	Server::handlePass(Client &currentClient, const t_tokens msgTokens)
+// {
+// 	if (msgTokens.parameters[0] == this->_password)
+// 		currentClient.setAuthentication(true);
+// 	else
+// 	{
+// 		std::string err_passwdmismatch = "* : Password required\r\n";
+// 		send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
+// 	}	
+// }
+
+// void 	Server::handleNick(Client &currentClient, const t_tokens msgTokens)
+// {
+// 	if(currentClient.getAuthentication() == true) 
+// 	{
+// 		currentClient.setNickname(msgTokens.parameters[0]);
+// 		std::cout << "\n-> nickname received; client is authenticated; now you are " << msgTokens.parameters[0] << "\n" << std::endl;
+// 	}
+// 	else
+// 	{
+// 		std::string err_passwdmismatch = msgTokens.parameters[0] + " : Password required\r\n";
+// 		send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
+// 		std::cout << "client is not authenticated, I will not store the nickname" << std::endl;
+// 	}
+// }
+
+// void 	Server::handleUser(Client &currentClient, const t_tokens msgTokens)
+// {
+// 	if(currentClient.getAuthentication() == true && !(currentClient.getNickname().empty()))
+// 	{
+// 		currentClient.setUsername(msgTokens.parameters[0]);
+// 		currentClient.setRegistration(true);
+// 		std::cout << "\n-> username received, client is registered; your username is " << msgTokens.parameters[0] << std::endl;
+
+// 		std::string rpl_welcome = "001 " + currentClient.getNickname() + " :Welcome to the Internet Relay Network, " + currentClient.getNickname() + "!\r\n";
+// 		send(currentClient.getFd(), rpl_welcome.c_str(), rpl_welcome.size(), 0);
+// 		std::string rpl_yourhost = "002 " + currentClient.getNickname() + " :Your host is localhost, running version 1.0\r\n";
+// 		send(currentClient.getFd(), rpl_yourhost.c_str(), rpl_yourhost.size(), 0);
+// 		std::string rpl_created = "003 " + currentClient.getNickname() + " :This server was created today\r\n";
+// 		send(currentClient.getFd(), rpl_created.c_str(), rpl_created.size(), 0);
+// 		std::string rpl_myinfo = "004 " + currentClient.getNickname() + " localhost 1.0 -availableusermodes- -availablechannelmodes-\r\n";
+// 		send(currentClient.getFd(), rpl_myinfo.c_str(), rpl_myinfo.size(), 0);	
+// 	}
+// 	else
+// 		std::cout << "client is not authenticated, I will not store the USERNAME" << std::endl;	
+// }
 
 void	Server::closeSockets()
 {

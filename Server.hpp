@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/18 18:30:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/21 01:33:43 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,28 +60,29 @@ class	Server
 		std::string 				_password;
 		int							_serverSocket;
     	std::vector<struct pollfd> 	_pollFds;  		// Polling sockets
-    	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and pointers to clients
+    	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
 
+		std::map<std::string, void (Server::*)(Client&, t_tokens)> _commandMap; // [2]
+		
 		/* --- Private Coplien's functions ---------------------------------- */
 
 		Server(const Server & source);				// Copy constructor [1]
 		Server & operator=(const Server & source);	// Copy assignment operator [1]
 
-		/* --- Getters and Setters ------------------------------------------ */
-
-		// int							receiveRawData(int i);
-		// int							receiveRawData(int &i);
-		std::vector<std::string>	splitBuffer(std::string & buffer);
-		void						splitMessage(int i, std::vector<std::string> fullMessages);
-		void						processMessage(Client &currentClient, std::string message);
-		t_tokens					tokenizeMsg(const std::string & message);
-		void						closeSockets();
-
 		/* --- Rest of private methods  ------------------------------------- */
 
-		void						acceptClient();
-		void						receiveRawData(Client &currentClient, size_t &i);
-
+		void		acceptClient();
+		void		receiveRawData(Client &currentClient, size_t &i);
+		std::vector<std::string>	splitBuffer(std::string & buffer);
+		t_tokens	tokenizeMsg(const std::string & message);
+		void		processMessage(Client &currentClient, std::string message);
+		
+		void 		handleCap(Client &currentClient, const t_tokens msgTokens);
+		void 		handlePass(Client &currentClient, const t_tokens msgTokens);
+		void 		handleNick(Client &currentClient, const t_tokens msgTokens);
+		void 		handleUser(Client &currentClient, const t_tokens msgTokens);
+		
+		void		closeSockets();
 };
 
 #endif
@@ -91,4 +92,33 @@ class	Server
  *		file descriptors, and client connections, which are unique resources that
  *		should not be duplicated. Making private both the copy constructor and the
  *		copy assignment operator prevents server copying. No need to define them.
+ */
+
+/*
+ *	[2]	We define a map where:
+ *		- The key
+ *
+ *				(std::string)
+ *
+ *			is the command name (e.g., "JOIN", "PRIVMSG", etc.).
+ *
+ *		- The value
+ *
+ *				(void (Server::*)(const std::vector<std::string>&, int))
+ *
+ *			is a pointer to a member function inside Server that handles the command.
+ *			Here we are using the raw function pointer syntax (not a typedef or a
+ *			regular function definition), where parameter names are innecessary.
+ *
+ *			The parentheses are strictly necessary in this case because of C++'s 
+ *			parsing rules for function pointer types.
+ *			void (Server::*)(...) means "a pointer to a member function of Server 
+ *			returning void"
+ *			Without parentheses,
+ *
+ *				void Server::*commandHandler(const std::vector<std::string>&, int);
+ *
+ *			C++ interprets this as a function called commandHandler that returns a
+ *			pointer to a member function (void Server::*), which doesn't make sense 
+ *			in this context
  */

@@ -6,11 +6,11 @@
 #    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/02/14 22:38:58 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/02/21 01:56:12 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRC 		= main.cpp Server.cpp Client.cpp
+SRC 		= main.cpp Server.cpp Client.cpp cap.cpp pass.cpp nick.cpp user.cpp
 OBJ 		= $(SRC:.cpp=.o)
 CC 			= c++
 RM 			= rm -f

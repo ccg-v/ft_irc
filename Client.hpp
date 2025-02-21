@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/18 18:23:05 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/20 20:50:20 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ class	Client
 		void		setNickname(const std::string & nickname);
 		std::string	getNickname();
 		void		setUsername(const std::string & username);
-		void		setAuthentication(bool _isAuthenticated);
+		void		setAuthentication(bool isAuthenticated);
 		bool		getAuthentication();
-		void		setRegistration(bool _isRegistered);
+		void		setRegistration(bool isRegistered);
 		bool		getRegistration();
 
 	private:
