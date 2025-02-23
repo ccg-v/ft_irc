@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/18 18:33:29 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/23 22:55:42 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,16 @@ int		Client::getFd()
 	return(this->_fd);
 }
 
+void	Client::setClientIp(std::string clientIp)
+{
+	this->_clientIp = clientIp;
+}
+
+std::string	Client::getClientIp()
+{
+	return(this->_clientIp);
+}
+
 std::string & Client::getBuffer()
 {
 	return(this->_clientBuffer);
@@ -79,6 +89,11 @@ std::string	Client::getNickname()
 void	Client::setUsername(const std::string & username)
 {
 	this->_username = username;
+}
+
+std::string	Client::getUsername()
+{
+	return (this->_username);
 }
 
 void	Client::setAuthentication(bool isAuthenticated)

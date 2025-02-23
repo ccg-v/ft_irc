@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/21 01:33:43 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/23 22:46:25 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define SERVER_HPP
 
 #include <iostream>
-#include <cstring>      // memset()
+#include <cstring>      // memset(), strcpy()
 #include <cstdlib>      // exit()
 #include <sys/socket.h>	// socket(), bind(), listen(), accept()
 #include <netdb.h>      // getaddrinfo(), freeaddrinfo()
@@ -25,7 +25,9 @@
 #include <map>			// std::map
 #include <cstring>  	// strncmp()
 #include <sstream>		// std::istringstream
+#include <arpa/inet.h>  // inet_ntoa
 #include "Client.hpp"
+#include "Replies.hpp"
 
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
 #define BACKLOG 5        // Max number of pending connections queue will hold
@@ -58,6 +60,8 @@ class	Server
 
 		std::string					_port;
 		std::string 				_password;
+		std::string					_serverName;
+		std::string					_creationTime;
 		int							_serverSocket;
     	std::vector<struct pollfd> 	_pollFds;  		// Polling sockets
     	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
@@ -81,7 +85,8 @@ class	Server
 		void 		handlePass(Client &currentClient, const t_tokens msgTokens);
 		void 		handleNick(Client &currentClient, const t_tokens msgTokens);
 		void 		handleUser(Client &currentClient, const t_tokens msgTokens);
-		
+
+		void		sendMessage(Client &client, const std::string &message);
 		void		closeSockets();
 };
 

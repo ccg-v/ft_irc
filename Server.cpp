@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/21 01:54:13 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/23 22:45:31 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ Server::Server(const std::string &port, const std::string &password)
 {
 	_port = port;
 	_password = password;
+	_serverName = "42ft_irc";
+	_creationTime = getCurrentDate();
 
 	_commandMap["CAP"] = &Server::handleCap;
     _commandMap["PASS"] = &Server::handlePass;
@@ -154,7 +156,7 @@ void	Server::acceptClient()
         throw std::runtime_error("[SERVER]: Error: accept() failed");
 	}
 
-	std::cout << "[SERVER]: New connection accepted!" << std::endl;
+	// std::cout << "[SERVER]: New connection accepted!" << std::endl;
 
 	// Set the new socket to non-blocking
 	if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
@@ -172,6 +174,25 @@ void	Server::acceptClient()
 
 	// Instantiate Client object and store it in `_clients` map		
 	this->_clients[clientSocket] = Client(clientSocket);
+
+    // Get and store the client's addres, to construct the client's maks later [5]
+    char ipStr[INET6_ADDRSTRLEN];
+
+    if (clientAddr.ss_family == AF_INET)
+    {
+        struct sockaddr_in *addr = (struct sockaddr_in*)&clientAddr;
+		strcpy(ipStr, inet_ntoa(addr->sin_addr)); // Copy the IPv4 string
+        std::cout << "[SERVER]: New client connected from IPv4: " << ipStr << std::endl;
+    }
+    else
+    {
+		// struct sockaddr_in6 *addr = (struct sockaddr_in6*)&clientAddr;
+		strcpy(ipStr, "IPv6_client");
+        std::cout << "[SERVER]: New client connected from IPv6" << std::endl;
+    }
+
+	// Store IP in Client object
+	this->_clients[clientSocket].setClientIp(ipStr);
 }
 
 void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by reference!!
@@ -283,6 +304,7 @@ void Server::processMessage(Client &currentClient, std::string message)
 	}
 	else
 	{
+// --> TO-DO: replace error with numeric reply 421: ERR_UNKNOWNCOMMAND
 		std::cerr << "[SERVER]: Unknown command: " << msgTokens.command << std::endl;
 	}
 }
@@ -322,26 +344,10 @@ void Server::processMessage(Client &currentClient, std::string message)
 // 	}
 // }
 
-// void 	Server::handleUser(Client &currentClient, const t_tokens msgTokens)
-// {
-// 	if(currentClient.getAuthentication() == true && !(currentClient.getNickname().empty()))
-// 	{
-// 		currentClient.setUsername(msgTokens.parameters[0]);
-// 		currentClient.setRegistration(true);
-// 		std::cout << "\n-> username received, client is registered; your username is " << msgTokens.parameters[0] << std::endl;
-
-// 		std::string rpl_welcome = "001 " + currentClient.getNickname() + " :Welcome to the Internet Relay Network, " + currentClient.getNickname() + "!\r\n";
-// 		send(currentClient.getFd(), rpl_welcome.c_str(), rpl_welcome.size(), 0);
-// 		std::string rpl_yourhost = "002 " + currentClient.getNickname() + " :Your host is localhost, running version 1.0\r\n";
-// 		send(currentClient.getFd(), rpl_yourhost.c_str(), rpl_yourhost.size(), 0);
-// 		std::string rpl_created = "003 " + currentClient.getNickname() + " :This server was created today\r\n";
-// 		send(currentClient.getFd(), rpl_created.c_str(), rpl_created.size(), 0);
-// 		std::string rpl_myinfo = "004 " + currentClient.getNickname() + " localhost 1.0 -availableusermodes- -availablechannelmodes-\r\n";
-// 		send(currentClient.getFd(), rpl_myinfo.c_str(), rpl_myinfo.size(), 0);	
-// 	}
-// 	else
-// 		std::cout << "client is not authenticated, I will not store the USERNAME" << std::endl;	
-// }
+void	Server::sendMessage(Client &client, const std::string &message)
+{
+	send(client.getFd(), message.c_str(), message.size(), 0);
+}
 
 void	Server::closeSockets()
 {
@@ -398,4 +404,19 @@ void	Server::closeSockets()
   *		if it contains nullcharacters ('\0').
   *		Unlike std::string(buffer), which stops at the first '\0', this constructor
   *		ensures that all bytesRead characters are included in the string.
+  */
+
+ /*
+  *	[6]	The subject allows communication with either IPv4 or IPv6. However, this 
+  *		becomes a tricky situation because we need to use the host to build the
+  *		client's mask:
+  *							<nick>!<user>@host
+  *		The address is stored in binary format in a struct of type `sockaddr_in`
+  *		(IPv4) or `sockaddr_in6` (IPv6). Getting it in a readable form is easy:
+  *		- use `inet_ntoa()` for IPv4;
+  *		- use `inet_ntop()` for IPv6;
+  *		The problem is that `inet_ntop()` is not mentioned in the subject as one
+  *		of the allowed functions.
+  *		A possibility is to manually format the IPv6 address from binary to string
+  *		using `sprintf()`
   */
