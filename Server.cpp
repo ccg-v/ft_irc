@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/23 22:45:31 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/24 15:48:28 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ void	Server::acceptClient()
 	// Instantiate Client object and store it in `_clients` map		
 	this->_clients[clientSocket] = Client(clientSocket);
 
-    // Get and store the client's addres, to construct the client's maks later [5]
+    // Get and store the client's addres, to construct the client's mask later [5]
     char ipStr[INET6_ADDRSTRLEN];
 
     if (clientAddr.ss_family == AF_INET)
@@ -348,6 +348,26 @@ void	Server::sendMessage(Client &client, const std::string &message)
 {
 	send(client.getFd(), message.c_str(), message.size(), 0);
 }
+
+void	Server::removeClient(int clientFd)
+{ 
+	close(clientFd); // Close the client's socket
+
+	this->_clients.erase(clientFd); 	// Remove from _clients map
+
+	// Remove from _pollFds vector
+	for (size_t i = 0; i < _pollFds.size(); ++i)
+	{
+		if (_pollFds[i].fd == clientFd)
+		{
+			_pollFds.erase(_pollFds.begin() + i);
+			break;
+		}
+	}
+
+	std::cout << "[SERVER]: Client " << clientFd << " disconnected and removed." << std::endl;
+}
+
 
 void	Server::closeSockets()
 {

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/23 22:46:25 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/24 00:57:52 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,12 +81,13 @@ class	Server
 		t_tokens	tokenizeMsg(const std::string & message);
 		void		processMessage(Client &currentClient, std::string message);
 		
-		void 		handleCap(Client &currentClient, const t_tokens msgTokens);
-		void 		handlePass(Client &currentClient, const t_tokens msgTokens);
-		void 		handleNick(Client &currentClient, const t_tokens msgTokens);
-		void 		handleUser(Client &currentClient, const t_tokens msgTokens);
+		void 		handleCap(Client &client, const t_tokens msgTokens);
+		void 		handlePass(Client &client, const t_tokens msgTokens);
+		void 		handleNick(Client &client, const t_tokens msgTokens);
+		void 		handleUser(Client &client, const t_tokens msgTokens);
 
 		void		sendMessage(Client &client, const std::string &message);
+		void		removeClient(int clientFd);
 		void		closeSockets();
 };
 

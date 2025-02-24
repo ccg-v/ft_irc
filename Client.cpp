@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/23 22:55:42 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/24 00:49:21 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,16 @@ void	Client::setUsername(const std::string & username)
 std::string	Client::getUsername()
 {
 	return (this->_username);
+}
+
+void	Client::setRealname(const std::string & realname)
+{
+	this->_realname = realname;
+}
+
+std::string	Client::getRealname()
+{
+	return (this->_realname);
 }
 
 void	Client::setAuthentication(bool isAuthenticated)
