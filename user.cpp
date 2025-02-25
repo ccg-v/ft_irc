@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:55:20 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/24 16:10:21 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/25 18:52:22 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
 		return;
 	}
 
-	if (msgTokens.parameters.size() != 3 && msgTokens.trailing.empty())
+	if (msgTokens.parameters.size() != 3 || msgTokens.trailing.empty())
 	{
 		sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msgTokens.command));
 		return;

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/24 15:48:28 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/25 18:30:33 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,41 +308,6 @@ void Server::processMessage(Client &currentClient, std::string message)
 		std::cerr << "[SERVER]: Unknown command: " << msgTokens.command << std::endl;
 	}
 }
-
-// void 	Server::handleCap(Client &currentClient, const t_tokens msgTokens)
-// {
-// 	if (msgTokens.command == "CAP" && msgTokens.parameters[0] != "END")
-// 	{
-// 		std::string msg = ":localhost CAP * LS :None\r\n";
-// 		send(currentClient.getFd(), msg.c_str(), msg.size(), 0);
-// 	}
-// }
-
-// void 	Server::handlePass(Client &currentClient, const t_tokens msgTokens)
-// {
-// 	if (msgTokens.parameters[0] == this->_password)
-// 		currentClient.setAuthentication(true);
-// 	else
-// 	{
-// 		std::string err_passwdmismatch = "* : Password required\r\n";
-// 		send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
-// 	}	
-// }
-
-// void 	Server::handleNick(Client &currentClient, const t_tokens msgTokens)
-// {
-// 	if(currentClient.getAuthentication() == true) 
-// 	{
-// 		currentClient.setNickname(msgTokens.parameters[0]);
-// 		std::cout << "\n-> nickname received; client is authenticated; now you are " << msgTokens.parameters[0] << "\n" << std::endl;
-// 	}
-// 	else
-// 	{
-// 		std::string err_passwdmismatch = msgTokens.parameters[0] + " : Password required\r\n";
-// 		send(currentClient.getFd(), err_passwdmismatch.c_str(), err_passwdmismatch.size(), 0);
-// 		std::cout << "client is not authenticated, I will not store the nickname" << std::endl;
-// 	}
-// }
 
 void	Server::sendMessage(Client &client, const std::string &message)
 {

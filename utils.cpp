@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 20:22:33 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/24 16:58:34 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/25 18:19:04 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
  *	std::localtime() converts a time_t value (which represents seconds since the 
  *	(Unix epoch: January 1, 1970, 00:00:00 UTC) into a tm structure representing 
  *	local time.
- *	After this, `ltm` will contain broken-down time fields:
+ *	After conversion, `ltm` will contain broken-down time fields:
  *
  *		tm_year	|	Years since 1900					|	124 (for 2024)
  *		-------	| -------------------------------------	| -------------------
@@ -44,8 +44,6 @@ std::string getCurrentDate()
 	now = std::time(0);
 	ltm = std::localtime(&now);
 
-    // std::strftime(buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y", ltm);
-	// std::strftime(buffer, sizeof(buffer), "%c", ltm);
 	std::strftime(buffer, sizeof(buffer), "%A, %b %d %Y, %H:%M:%S", ltm);
     return (std::string(buffer));
 }

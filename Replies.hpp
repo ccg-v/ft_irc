@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/24 16:59:40 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/25 20:51:44 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,27 @@
 
 #define ERR_PASSWDMISMATCH(serverName, nick) (":" + serverName + " 464 " + nick + \
 	" :Password not given or incorrect. Please authenticate first.\r\n")
-#define ERR_NEEDMOREPARAMS(serverName, command) (":" + serverName + " 461 " + command + \
-	" :Not enough parameters\r\n")
+
+#define ERR_ALREADYREGISTERED(serverName) (":" + serverName + " 462 " + \
+	" :You may not reregister\r\n")
 
 /* --- NICK command --------------------------------------------------------- */
 
-// # define ERR_NEEDMOREPARAMS
+//	ERR_PASSWDMISMATCH()
+#define ERR_NEEDMOREPARAMS(serverName, command) (":" + serverName + " 461 " + command + \
+	" :Not enough parameters\r\n")
+
+//	ERR_NICKNAMEINUSE()
+//	ERR_ERRONEOUSNICKNAME()
 
 /* --- USER command --------------------------------------------------------- */
 
 //	ERR_PASSWDMISMATCH()
 //	ERR_NEEDMOREPARAMS()
-	
-#define ERR_ALREADYREGISTERED(serverName) (":" + serverName + " 462 " + \
-	" :You may not reregister\r\n")
+
+//	ERR_ALREADYREGISTERED()
+
+// 	?? ERR_INVALIDUSERNAME()
 
 /* --- NOTICES -------------------------------------------------------------- */
 
@@ -40,6 +47,8 @@
 	" :Enter username to complete register\r\n")
 #define NTC_NICKMISSING(serverName, user) (":" + serverName + \
 	" NOTICE * :Enter nickname to complete register\r\n")
+#define NTC_NICKCHANGED(serverName, nick) (":" + serverName + \
+	" NOTICE :Nickname changed to " + nick + "\r\n")
 
 /* --- Handshake after complete register ------------------------------------ */
 
