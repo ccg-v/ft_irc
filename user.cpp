@@ -50,5 +50,4 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
 	sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
 	sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
 	sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));
-
 }

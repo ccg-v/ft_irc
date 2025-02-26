@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/24 00:49:21 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/22 18:21:30 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 /* --- Public Coplien's functions ------------------------------------------- */
 
-Client::Client() : _fd(-1) // Default constructor
+Client::Client() : _fd(-1) // Default constructor - $$$CONFIRMAR SI ENS CAL O NO POSAR AIXO DE L'_fd = -1
 {
 }
 
@@ -22,8 +22,10 @@ Client::Client(int fd) // Parameterized constructor
 	: _fd(fd),
 	  _isAuthenticated(false), 
 	  _isRegistered(false),
-	  _clientBuffer("")
+	  _clientBuffer(""),
+	  _maxChannels(3)
 {
+//	std::cout << "\n[~DEBUG]: client created with sockefd: " << _fd << " and maxChannels: " << _maxChannels << std::endl;
 }
 
 Client::Client(const Client & source)
@@ -34,13 +36,17 @@ Client::Client(const Client & source)
 	_clientBuffer = source._clientBuffer;
 }
 
-Client & Client::operator=(const Client & source)
+Client &Client::operator=(const Client & source)
 {
     if (this != &source) {
         _fd = source._fd;
+		_nickname = source._nickname;
+		_username = source._username;
 		_isAuthenticated = source._isAuthenticated;
-        _isRegistered = source._isRegistered;
-        _clientBuffer = source._clientBuffer;
+		_isRegistered = source._isRegistered;
+		_clientBuffer = source._clientBuffer;
+		_maxChannels = source._maxChannels;
+		_channels = source._channels; 
     }
     return *this;
 }
@@ -71,12 +77,12 @@ std::string	Client::getClientIp()
 	return(this->_clientIp);
 }
 
-std::string & Client::getBuffer()
+std::string	&Client::getBuffer()
 {
 	return(this->_clientBuffer);
 }
 
-void	Client::setNickname(const std::string & nickname)
+void	Client::setNickname(const std::string &nickname)
 {
 	this->_nickname = nickname;
 }
@@ -86,7 +92,7 @@ std::string	Client::getNickname()
 	return (this->_nickname);
 }
 
-void	Client::setUsername(const std::string & username)
+void	Client::setUsername(const std::string &username)
 {
 	this->_username = username;
 }
@@ -116,6 +122,16 @@ bool	Client::getAuthentication()
 	return (this->_isAuthenticated);
 }
 
+int Client::getChannelCnt(void) const
+{
+    return (this->_channels.size());
+}
+
+int Client::getMaxChannels(void) const
+{
+    return (this->_maxChannels);
+}
+
 void	Client::setRegistration(bool isRegistered)
 {
 	this->_isRegistered = isRegistered;
@@ -126,6 +142,28 @@ bool	Client::getRegistration()
 	return (this->_isRegistered);
 }
 
+std::map<std::string, bool>	&Client::getChannels()
+{
+	return (this->_channels);
+}
+
+// OTHER METHODS
+
+void Client::addChannel(std::string &channel, bool isChanOp)
+{
+	std::cout << "[~DEBUG]: addChannel ft" << std::endl;
+    this->_channels[channel] = isChanOp; // [1]
+	// for (std::map<std::string, bool>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
+	// {
+    // 	std::cout << "[~DEBUG]: one channel is: " << it->first << std::endl;
+	// }
+}
+
+// void Client::sendMessage(const std::string &message) const
+// {
+//     std::string msg = message + "\r\n";
+//     send(this->_fd, msg.c_str(), msg.length(), 0);
+// }
 // void Client::setBuffer(std::string buffer)
 // {
 //     this->_clientBuffer = buffer;
@@ -135,3 +173,11 @@ bool	Client::getRegistration()
 // {
 //     this->_clientBuffer += buffer;
 // }
+
+/*	[1] You can add items to a std::map<Key, Value> using these methods:
+	1. Using operator[] (Creates or Updates)
+
+	std::map<std::string, int> myMap;
+	myMap["apple"] = 5;  // Inserts ("apple", 5)
+	myMap["banana"] = 10; // Inserts ("banana", 10)
+*/

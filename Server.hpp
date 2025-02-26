@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/24 00:57:52 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/25 19:24:01 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 #include <sstream>		// std::istringstream
 #include <arpa/inet.h>  // inet_ntoa
 #include "Client.hpp"
+#include "Channel.hpp"
+#include "Errors.hpp"
 #include "Replies.hpp"
 
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
@@ -40,6 +42,7 @@ typedef struct s_tokens
 } 	t_tokens;
 
 class	Client;
+class	Channel;
 
 class	Server
 {
@@ -58,37 +61,47 @@ class	Server
 
 		/* --- Private attributes ------------------------------------------- */
 
-		std::string					_port;
-		std::string 				_password;
-		std::string					_serverName;
-		std::string					_creationTime;
-		int							_serverSocket;
-    	std::vector<struct pollfd> 	_pollFds;  		// Polling sockets
-    	std::map<int, Client> 		_clients;  		// Map of descriptors (key) and clients
+		std::string						_port;
+		std::string 					_password;
+		std::string						_serverName;
+		std::string						_creationTime;
+		int								_serverSocket;
+    	std::vector<struct pollfd> 		_pollFds;  		// Polling sockets
+    	std::map<int, Client> 			_clients;  		// Map of descriptors (key) and clients
+		std::map<std::string, Channel>	_channels; // key in the map is a channel's name
 
 		std::map<std::string, void (Server::*)(Client&, t_tokens)> _commandMap; // [2]
 		
 		/* --- Private Coplien's functions ---------------------------------- */
 
-		Server(const Server & source);				// Copy constructor [1]
-		Server & operator=(const Server & source);	// Copy assignment operator [1]
+		Server(const Server &source);				// Copy constructor [1]
+		Server &operator=(const Server &source);	// Copy assignment operator [1]
 
-		/* --- Rest of private methods  ------------------------------------- */
-
-		void		acceptClient();
-		void		receiveRawData(Client &currentClient, size_t &i);
+		void						acceptClient();
+		void						receiveRawData(Client &currentClient, size_t &i);
 		std::vector<std::string>	splitBuffer(std::string & buffer);
-		t_tokens	tokenizeMsg(const std::string & message);
-		void		processMessage(Client &currentClient, std::string message);
+		void						processMessage(Client &currentClient, std::string message);
+		t_tokens					tokenizeMsg(const std::string  &message);
+		void						sendMessage(Client &client, const std::string &message);
+		void						removeClient(int clientFd);
+		void						closeSockets();
 		
 		void 		handleCap(Client &client, const t_tokens msgTokens);
 		void 		handlePass(Client &client, const t_tokens msgTokens);
 		void 		handleNick(Client &client, const t_tokens msgTokens);
 		void 		handleUser(Client &client, const t_tokens msgTokens);
+		void 		_join(Client &client, const t_tokens msgTokens);
+        // void _kick();
+        // void _invite();
+        // void _topic(int& i, std::vector<std::string> &args);
+        // void _mode();
 
-		void		sendMessage(Client &client, const std::string &message);
-		void		removeClient(int clientFd);
-		void		closeSockets();
+		//* --- Join ---------------------------------- */
+		bool						_chanExists(std::string &);
+		bool 						_validChannelName(std::string &name);
+		std::vector<std::string>	_splitByComma(const std::string &str);
+
+
 };
 
 #endif

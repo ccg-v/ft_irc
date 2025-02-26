@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/25 18:30:33 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/22 20:07:28 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ Server::Server(const std::string &port, const std::string &password)
     _commandMap["PASS"] = &Server::handlePass;
     _commandMap["NICK"] = &Server::handleNick;
     _commandMap["USER"] = &Server::handleUser;
+	_commandMap["JOIN"] = &Server::_join;
 
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -150,7 +151,7 @@ void	Server::acceptClient()
 
 	addr_size = sizeof(clientAddr);
 
-	if ((clientSocket = accept(this->_serverSocket, (struct sockaddr *)&clientAddr, &addr_size)) == -1)
+	if ((clientSocket = accept(this->_serverSocket, (struct sockaddr *) &clientAddr, &addr_size)) == -1)
 	{
     	closeSockets();
         throw std::runtime_error("[SERVER]: Error: accept() failed");
@@ -212,7 +213,7 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 		return;
 	}
 
-	std::string & clientBuffer = currentClient.getBuffer(); // REFERENCE!!
+	std::string &clientBuffer = currentClient.getBuffer(); // REFERENCE!!
 
     // Append received data to client's buffer
     clientBuffer.append(buffer, bytesReceived);
@@ -222,17 +223,17 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 	// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
 	std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
 	
-	std::cout << "\n[~DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
+	//std::cout << "\n[~DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
 	// Process each full message
 	for (size_t m = 0; m < fullMessages.size(); m++)
 	{
-		std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
+		//std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
 		// std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
 		processMessage(currentClient, fullMessages[m]);
 	}	
 }
 
-std::vector<std::string> Server::splitBuffer(std::string & buffer)
+std::vector<std::string> Server::splitBuffer(std::string &buffer)
 {
     std::vector<std::string> fullMessages;
     size_t pos = 0;
@@ -249,7 +250,7 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
 {
     std::istringstream	iss;
     std::string 		token;
-	t_tokens			tokenizedMsg;
+	t_tokens			tokenizedMsg;// = new t_tokens;
 
     iss.str(message);
 
@@ -267,36 +268,32 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
             std::string trailing;
             std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
             tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
-            break;
+            break ;
         }
         tokenizedMsg.parameters.push_back(token); // Add parameter to vector
     }
 
-    return tokenizedMsg;
+    return (tokenizedMsg);
 }
 
 
 void Server::processMessage(Client &currentClient, std::string message)
 {
-
-	t_tokens msgTokens;
-
-    msgTokens = tokenizeMsg(message);
+    t_tokens msgTokens = tokenizeMsg(message);
 	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
-	
-	/* DEBUG PRINTINGS ------------------------------------------------------ */
-    std::cout << "[~DEBUG]: \t\tcommand = " << msgTokens.command << std::endl;
 
-    for (size_t j = 0; j < msgTokens.parameters.size(); j++)
+	/* DEBUG PRINTINGS ------------------------------------------------------ */
+    /*std::cout << "[~DEBUG]: \t\tcommand = " << msgTokens->command << std::endl;
+
+    for (size_t j = 0; j < msgTokens->parameters.size(); j++)
     {
-        std::cout << "[~DEBUG]: \t\tparameters[" << j << "] = " << msgTokens.parameters[j] << std::endl;
+        std::cout << "[~DEBUG]: \t\tparameters[" << j << "] = " << msgTokens->parameters[j] << std::endl;
     }
 
     if (!msgTokens.trailing.empty())
 	{
         std::cout << "[~DEBUG]: \t\ttrailing = " << msgTokens.trailing << std::endl;
-	}
-	/* ------------------------------------------------------ DEBUG PRINTINGS */
+	}*/
 
 	if (it != _commandMap.end())
 	{

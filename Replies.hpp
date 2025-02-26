@@ -41,6 +41,12 @@
 
 // 	?? ERR_INVALIDUSERNAME()
 
+/* --- JOIN command --------------------------------------------------------- */
+
+#define ERR_TOOMANYCHANNELS(serverName, client, channel) (":" + serverName + " 405 " + client + " " + channel + \
+	" :Cannot join channel because you already joined 3 channels.\r\n")
+
+
 /* --- NOTICES -------------------------------------------------------------- */
 
 #define NTC_USERMISSING(serverName, nick) (":" + serverName + " NOTICE" + nick + \
