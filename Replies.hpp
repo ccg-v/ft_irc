@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 21:26:11 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/27 21:59:35 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,5 +67,9 @@
 	" :This server was created on " + this->_creationTime + "\r\n")
 #define RPL_MYINFO(serverName, nick) (":" + serverName + " 004 " + nick + " :" + serverName + \
 	" 1.0 -availableusermodes- -availablechannelmodes-\r\n")
+
+/* --- processMessage() ----------------------------------------------------- */
+#define ERR_UNKNOWNCOMMAND(serverName, command) \
+	(":" + serverName + " 421 " + command + " :Unknown command\r\n")
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 20:28:27 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/27 21:55:47 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,8 @@ void Server::processMessage(Client &currentClient, std::string message)
 	else
 	{
 // --> TO-DO: replace error with numeric reply 421: ERR_UNKNOWNCOMMAND
-		std::cerr << "[SERVER]: Unknown command: " << msgTokens.command << std::endl;
+		// std::cerr << "[SERVER]: Unknown command: " << msgTokens.command << std::endl;
+		sendMessage(currentClient, ERR_UNKNOWNCOMMAND(this->_serverName, msgTokens.command));
 	}
 }
 
