@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+         #
+#    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/02/19 21:41:47 by erosas-c         ###   ########.fr        #
+#    Updated: 2025/02/27 22:50:50 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ RM 			= rm -f
 FLAGS		= -Wall -Wextra -Werror -std=c++98 -pedantic
 
 SRC 		= 	main.cpp Server.cpp Client.cpp Channel.cpp join.cpp cap.cpp pass.cpp \
-				nick.cpp user.cpp utils.cpp
+				nick.cpp user.cpp ping.cpp pong.cpp utils.cpp
 				
 OBJ 		= $(SRC:.cpp=.o)
 

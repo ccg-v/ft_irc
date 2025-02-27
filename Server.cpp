@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 21:55:47 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/27 22:51:37 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ Server::Server(const std::string &port, const std::string &password)
     _commandMap["NICK"] = &Server::handleNick;
     _commandMap["USER"] = &Server::handleUser;
 	_commandMap["JOIN"] = &Server::_join;
-
+	_commandMap["PING"] = &Server::_ping;
+	_commandMap["PONG"] = &Server::_pong;
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
 	struct addrinfo	*tmp;
@@ -304,8 +305,6 @@ void Server::processMessage(Client &currentClient, std::string message)
 	}
 	else
 	{
-// --> TO-DO: replace error with numeric reply 421: ERR_UNKNOWNCOMMAND
-		// std::cerr << "[SERVER]: Unknown command: " << msgTokens.command << std::endl;
 		sendMessage(currentClient, ERR_UNKNOWNCOMMAND(this->_serverName, msgTokens.command));
 	}
 }
