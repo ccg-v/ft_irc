@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/22 20:07:28 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/02/27 20:28:27 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -283,18 +283,21 @@ void Server::processMessage(Client &currentClient, std::string message)
 	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
 
 	/* DEBUG PRINTINGS ------------------------------------------------------ */
-    /*std::cout << "[~DEBUG]: \t\tcommand = " << msgTokens->command << std::endl;
+	std::cout << "[~DEBUG]: " << message;
+    std::cout << "[~DEBUG]: \tcommand = " << msgTokens.command << std::endl;
 
-    for (size_t j = 0; j < msgTokens->parameters.size(); j++)
+    for (size_t j = 0; j < msgTokens.parameters.size(); j++)
     {
-        std::cout << "[~DEBUG]: \t\tparameters[" << j << "] = " << msgTokens->parameters[j] << std::endl;
+        std::cout << "[~DEBUG]: \tparameters[" << j << "] = " << msgTokens.parameters[j] << std::endl;
     }
 
     if (!msgTokens.trailing.empty())
 	{
-        std::cout << "[~DEBUG]: \t\ttrailing = " << msgTokens.trailing << std::endl;
-	}*/
-
+        std::cout << "[~DEBUG]: \ttrailing = " << msgTokens.trailing << std::endl;
+	}
+	std::cout << std::endl;
+	/* ------------------------------------------------------ DEBUG PRINTINGS */
+	
 	if (it != _commandMap.end())
 	{
 		(this->*(it->second))(currentClient, msgTokens);  // Call the correct handler function

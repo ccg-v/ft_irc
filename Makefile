@@ -3,21 +3,24 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
+#    By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/02/23 20:24:56 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/02/19 21:41:47 by erosas-c         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRC 		= main.cpp Server.cpp Client.cpp cap.cpp pass.cpp nick.cpp user.cpp \
-			  utils.cpp
-OBJ 		= $(SRC:.cpp=.o)
+NAME 		= ircserv
+
 CC 			= c++
 RM 			= rm -f
 FLAGS		= -Wall -Wextra -Werror -std=c++98 -pedantic
 
-NAME 		= ircserv
+SRC 		= 	main.cpp Server.cpp Client.cpp Channel.cpp join.cpp cap.cpp pass.cpp \
+				nick.cpp user.cpp utils.cpp
+				
+OBJ 		= $(SRC:.cpp=.o)
+
 all: $(NAME)
 
 $(NAME): $(OBJ)

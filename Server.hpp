@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/25 19:24:01 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/02/27 21:30:59 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,10 @@ class	Server
         // void _invite();
         // void _topic(int& i, std::vector<std::string> &args);
         // void _mode();
+
+		bool	isNickValid(const std::string &nick);
+		bool	isNickTaken(const std::string &nick);
+		bool 	isUserValid(const std::string &username);
 
 		//* --- Join ---------------------------------- */
 		bool						_chanExists(std::string &);

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/25 20:51:44 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/27 21:26:11 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,44 +17,45 @@
 
 /* --- PASS command --------------------------------------------------------- */
 
-#define ERR_PASSWDMISMATCH(serverName, nick) (":" + serverName + " 464 " + nick + \
-	" :Password not given or incorrect. Please authenticate first.\r\n")
-
-#define ERR_ALREADYREGISTERED(serverName) (":" + serverName + " 462 " + \
-	" :You may not reregister\r\n")
+#define ERR_PASSWDMISMATCH(serverName, nick) \
+	(":" + serverName + " 464 " + nick + " :Password not given or incorrect.\r\n")
+#define ERR_ALREADYREGISTERED(serverName) \
+	(":" + serverName + " 462 " + " :You may not reregister\r\n")
 
 /* --- NICK command --------------------------------------------------------- */
 
 //	ERR_PASSWDMISMATCH()
-#define ERR_NEEDMOREPARAMS(serverName, command) (":" + serverName + " 461 " + command + \
-	" :Not enough parameters\r\n")
-
-//	ERR_NICKNAMEINUSE()
-//	ERR_ERRONEOUSNICKNAME()
+#define ERR_NONICKNAMEGIVEN(serverName) \
+	(":" + serverName + " 431" + " :No nickname given\r\n")
+#define ERR_ERRONEUSNICKNAME(serverName, nick) \
+	(":" + serverName + " 432 " + nick + " :Erroneus nickname\r\n")
+#define ERR_NICKNAMEINUSE(serverName, nick, newNick) \
+    (":" + serverName + " 433 " + nick + " " + newNick + " :Nickname is already in use\r\n")
 
 /* --- USER command --------------------------------------------------------- */
 
 //	ERR_PASSWDMISMATCH()
-//	ERR_NEEDMOREPARAMS()
-
 //	ERR_ALREADYREGISTERED()
-
-// 	?? ERR_INVALIDUSERNAME()
+#define ERR_NEEDMOREPARAMS(serverName, command) \
+	(":" + serverName + " 461 " + command + " :Not enough parameters\r\n")
+#define ERR_INVALIDUSERNAME(serverName, user) \
+	(":" + serverName + " " + user + " :Erroneus username\r\n")
 
 /* --- JOIN command --------------------------------------------------------- */
 
-#define ERR_TOOMANYCHANNELS(serverName, client, channel) (":" + serverName + " 405 " + client + " " + channel + \
+#define ERR_TOOMANYCHANNELS(serverName, client, channel) \
+	(":" + serverName + " 405 " + client + " " + channel + \
 	" :Cannot join channel because you already joined 3 channels.\r\n")
-
 
 /* --- NOTICES -------------------------------------------------------------- */
 
-#define NTC_USERMISSING(serverName, nick) (":" + serverName + " NOTICE" + nick + \
-	" :Enter username to complete register\r\n")
-#define NTC_NICKMISSING(serverName, user) (":" + serverName + \
-	" NOTICE * :Enter nickname to complete register\r\n")
-#define NTC_NICKCHANGED(serverName, nick) (":" + serverName + \
-	" NOTICE :Nickname changed to " + nick + "\r\n")
+#define NTC_USERMISSING(serverName, nick) \
+	(":" + serverName + " NOTICE" + nick + " :Enter username to complete register\r\n")
+#define NTC_NICKMISSING(serverName, user) \
+	(":" + serverName + " NOTICE * :Enter nickname to complete register\r\n")
+	
+#define INF_NICKCHANGED(oldNick, user, clientIp, newNick) \
+	(":" + oldNick + "!" + user + "@" + clientIp + " NICK :" + newNick + "\r\n")
 
 /* --- Handshake after complete register ------------------------------------ */
 
