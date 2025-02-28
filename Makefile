@@ -6,7 +6,7 @@
 #    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/02/27 22:50:50 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/02/28 22:06:19 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,17 +20,20 @@ SRC 		= 	main.cpp Server.cpp Client.cpp Channel.cpp join.cpp cap.cpp pass.cpp \
 				nick.cpp user.cpp ping.cpp pong.cpp utils.cpp
 				
 OBJ 		= $(SRC:.cpp=.o)
+DEP			= $(SRC:.cpp=.d)
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) Makefile
 	$(CC) $(FLAGS) $(OBJ) -o $@
 
 %.o: %.cpp
-	$(CC) $(FLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -MMD -MP -c $< -o $@
+
+-include $(DEP)
 
 clean:
-	$(RM) $(OBJ)
+	$(RM) $(OBJ) $(DEP)
 
 fclean: clean
 	$(RM) $(NAME)

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 22:53:27 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/28 22:04:29 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ class	Server
 		bool						_chanExists(std::string &);
 		bool 						_validChannelName(std::string &name);
 		std::vector<std::string>	_splitByComma(const std::string &str);
-
 
 };
 
