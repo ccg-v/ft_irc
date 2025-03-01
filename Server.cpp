@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 22:51:37 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/01 23:36:08 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ Server::Server(const std::string &port, const std::string &password)
 	_commandMap["JOIN"] = &Server::_join;
 	_commandMap["PING"] = &Server::_ping;
 	_commandMap["PONG"] = &Server::_pong;
+	_commandMap["PRIVMSG"] = &Server::_privmsg;
+
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
 	struct addrinfo	*tmp;
@@ -247,6 +249,43 @@ std::vector<std::string> Server::splitBuffer(std::string &buffer)
     return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
 
+// t_tokens	Server::tokenizeMsg(const std::string &message)
+// {
+//     std::istringstream	iss;
+//     std::string 		token;
+// 	t_tokens			tokenizedMsg;// = new t_tokens;
+
+//     iss.str(message);
+
+//     // Extract command
+//     if (!(iss >> token))
+// 		return (tokenizedMsg); // Empty message
+
+//     tokenizedMsg.command = token;
+
+//     // Extract parameters until ":"
+//     while (iss >> token)
+// 	{
+//         if (token[0] == ':') // Extract trailing text (here token is storing the colon and the first word)
+// 		{
+//             std::string trailing;
+//             std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
+//             tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
+//             break ;
+//         }
+// 		if (tokenizedMsg.command == "PRIVMSG" && tokenizedMsg.parameters.size() == 1)
+// 		{
+//             std::string trailing;
+//             std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
+//             tokenizedMsg.trailing = token + trailing; // concatenate first word (colon removed) with resto of trailing			
+// 			break ;
+// 		}
+//         tokenizedMsg.parameters.push_back(token); // Add parameter to vector
+//     }
+
+//     return (tokenizedMsg);
+// }
+
 t_tokens	Server::tokenizeMsg(const std::string &message)
 {
     std::istringstream	iss;
@@ -264,19 +303,20 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
     // Extract parameters until ":"
     while (iss >> token)
 	{
-        if (token[0] == ':') // Extract trailing text (here token is storing the colon and the first word)
+        if (token[0] == ':' || (tokenizedMsg.command == "PRIVMSG" && tokenizedMsg.parameters.size() == 1)) // Extract trailing text (here token is storing the colon and the first word)
 		{
             std::string trailing;
             std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
-            tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
+			if (token[0] == ':')
+            	tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with rest of trailing
+			else
+				tokenizedMsg.trailing = token + trailing; // the same but without substracting first char because there is no colon
             break ;
         }
-        tokenizedMsg.parameters.push_back(token); // Add parameter to vector
-    }
-
+		tokenizedMsg.parameters.push_back(token); // Add parameter to vector
+	}
     return (tokenizedMsg);
 }
-
 
 void Server::processMessage(Client &currentClient, std::string message)
 {
