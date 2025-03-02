@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/01 19:03:40 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/02 17:21:10 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,15 +99,17 @@ class	Server
         // void _topic(int& i, std::vector<std::string> &args);
         // void _mode();
 
-		bool	isNickValid(const std::string &nick);
-		bool	isNickTaken(const std::string &nick);
-		bool 	isUserValid(const std::string &username);
+		bool	_isNickValid(const std::string &nick);
+		bool	_isNickTaken(const std::string &nick);
+		bool 	_isUserValid(const std::string &username);
+
+		void	_sendToChannel(Client &client, const std::string &target, const t_tokens msgTokens);
+		void	_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
 
 		//* --- Join ---------------------------------- */
 		bool						_chanExists(std::string &);
 		bool 						_validChannelName(std::string &name);
 		std::vector<std::string>	_splitByComma(const std::string &str);
-
 };
 
 #endif

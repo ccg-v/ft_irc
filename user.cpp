@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:55:20 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 21:49:18 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/02 13:13:45 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
 	}
 
 	// Validate username
-	if (!isUserValid(msgTokens.parameters[0])) 
+	if (!_isUserValid(msgTokens.parameters[0])) 
 	{
 		sendMessage(client, ERR_INVALIDUSERNAME(this->_serverName, msgTokens.parameters[0]));
 		return;
@@ -73,7 +73,7 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
  *	 - No special characters like @, !, #, *, etc. that may have meanings in IRC
  *	 - No non-printable characters (ascii 1-31, ascii 127)
  */
-bool	Server::isUserValid(const std::string &username) 
+bool	Server::_isUserValid(const std::string &username) 
 {
     if (username.empty() || username.length() > 9)
         return (false);

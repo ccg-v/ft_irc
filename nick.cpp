@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:52:25 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 20:40:19 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/02 13:12:18 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
 	std::string newNick = msgTokens.parameters[0];
 
 	// Validate new nickname
-	if (!isNickValid(newNick))
+	if (!_isNickValid(newNick))
 	{
 		sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, newNick));
 		return;
 	}
 
 	// Check if nickname is already in use
-	if (isNickTaken(newNick))
+	if (_isNickTaken(newNick))
 	{
 		sendMessage(client, ERR_NICKNAMEINUSE(this->_serverName, client.getNickname(), newNick));
 		return;	
@@ -87,7 +87,7 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
  *	(see RFC 2812, Section 2.3.1)
  */
 
-bool Server::isNickValid(const std::string &nick)
+bool Server::_isNickValid(const std::string &nick)
 {
 	if (nick.length() > 9) // Adjust max length per server rules
 		return (false);
@@ -109,7 +109,7 @@ bool Server::isNickValid(const std::string &nick)
 	return (true);
 }
 
-bool	Server::isNickTaken(const std::string &nick)
+bool	Server::_isNickTaken(const std::string &nick)
 {
 	std::map<int, Client>::iterator it;
 

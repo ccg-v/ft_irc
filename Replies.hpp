@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 21:59:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/02 19:22:42 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,23 @@
 
 /* --- JOIN command --------------------------------------------------------- */
 
+#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
 #define ERR_TOOMANYCHANNELS(serverName, client, channel) \
 	(":" + serverName + " 405 " + client + " " + channel + \
 	" :Cannot join channel because you already joined 3 channels.\r\n")
+
+/* --- PRIVMSG command ------------------------------------------------------ */
+
+//	ERR_ERRONEUSNICKNAME()
+#define ERR_NOTREGISTERED(serverName, client) \
+	(":" + serverName + " 451 " + client + " :You have not registered\r\n")
+#define ERR_NOSUCHNICK(serverName, client, nick) \
+	(":" + serverName + " 401 " + client + " :No such nick/channel\r\n")
+#define ERR_NOTEXTTOSEND(serverName, client) \
+	(":" + serverName + " 412 " + client + " :No text to send\r\n")
+#define ERR_NORECIPIENT(serverName, client, command) \
+	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
 
 /* --- NOTICES -------------------------------------------------------------- */
 
@@ -69,6 +83,7 @@
 	" 1.0 -availableusermodes- -availablechannelmodes-\r\n")
 
 /* --- processMessage() ----------------------------------------------------- */
+
 #define ERR_UNKNOWNCOMMAND(serverName, command) \
 	(":" + serverName + " 421 " + command + " :Unknown command\r\n")
 
