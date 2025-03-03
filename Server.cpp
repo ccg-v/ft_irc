@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/02 23:51:36 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 21:33:02 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -282,6 +282,10 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
 		}
         tokenizedMsg.parameters.push_back(token); // Add parameter to vector
     }
+	
+	// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
+	if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
+		tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
 
     return (tokenizedMsg);
 }
@@ -300,7 +304,7 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
 
 //     tokenizedMsg.command = token;
 
-//     // Extract parameters until ":"
+//     // Extract parameters until ":", or after first parameter if command is PRIVMSG
 //     while (iss >> token)
 // 	{
 //         if (token[0] == ':' || (tokenizedMsg.command == "PRIVMSG" && tokenizedMsg.parameters.size() == 1)) // Extract trailing text (here token is storing the colon and the first word)
@@ -315,6 +319,11 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
 //         }
 // 		tokenizedMsg.parameters.push_back(token); // Add parameter to vector
 // 	}
+
+// // std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
+// if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
+// 	tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
+
 //     return (tokenizedMsg);
 // }
 
@@ -324,6 +333,10 @@ void Server::processMessage(Client &currentClient, std::string message)
 	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
 
 	/* DEBUG PRINTINGS ------------------------------------------------------ */
+	for (size_t i = 0; i < msgTokens.trailing.size(); i++)
+		std::cout << std::hex << (int)(unsigned char)msgTokens.trailing[i] << " ";
+	std::cout << std::endl;	
+
 	std::cout << "[~DEBUG]: " << message;
     std::cout << "[~DEBUG]: \tcommand = " << msgTokens.command << std::endl;
 

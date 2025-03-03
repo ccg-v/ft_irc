@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/02 19:55:10 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 22:35:21 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,14 @@ void	Server::_sendToUser(Client &client, const std::string &target, const t_toke
 		if (it->second.getNickname() == target)
 		{
 			std::string senderMask = client.getNickname() + "!" + client.getUsername() + "@" + client.getClientIp();
-			std::string fullMessage = senderMask + " " + msgTokens.command + " " + target + " :" + msgTokens.trailing + "\r\n";
+			std::string fullMessage = ":" + senderMask + " " + msgTokens.command + " " + target + " :" + msgTokens.trailing + "\r\n";
+			// std::string fullMessage = ":" + client.getNickname() + " PRIVMSG " + target + ": " + msgTokens.trailing + "\r\n";
+			std::cout << "Sending message: [" << fullMessage << "]" << std::endl;
+
+			for (size_t i = 0; i < fullMessage.size(); i++)
+    			std::cout << std::hex << (int)(unsigned char)fullMessage[i] << " ";
+			std::cout << std::endl;
+
 			sendMessage(it->second, fullMessage);
 			return;
 		}
