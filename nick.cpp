@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:52:25 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/02 13:12:18 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 23:28:57 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,12 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
 	{
 		sendMessage(client, INF_NICKCHANGED(client.getNickname(), client.getUsername(), client.getClientIp(), newNick));
 		client.setNickname(newNick);
+		client.setHostMask();
 		return;
 	}
 
 	client.setNickname(newNick);
+	client.setHostMask();
 
 	// If the username is missing, notify the client
 	if(client.getUsername().empty())
@@ -71,7 +73,8 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
 	
 	// Complete registration and send welcome messages
 	client.setRegistration(true);
-	sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getUsername(), client.getClientIp()));
+	// sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getUsername(), client.getClientIp()));
+	sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));	
 	sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
 	sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
 	sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));

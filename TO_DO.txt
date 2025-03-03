@@ -1,0 +1,14 @@
+- En lloc de crear el hostmask dinàmicament cada cop que el necessitem (a RPL_WELCOME i PRIVMSG:sendToUser()), desar-lo com a atribut del Client
+	1. Afegir atribut _hostmask
+	2. Afegir _setHostMask() [_updateHostMask()]: ha de crear-se amb el registre, i actualitzar-se cada cop que el nick, el user o la ip canvien
+	3. Afegir _getHostMask()
+
+- Quan un usuari canvia de nick, notificar-ho als canals i a les converses privades
+
+- Quan un client IRSSI es tanca amb /quit, el servidor també es tanca abruptament, imprimint: "basic_string: append"
+
+- Gestionar senyals
+
+- Separar els arxius en carpetes <source>, <headers>, <objects>. Modificar Makefile.
+
+- Leaks

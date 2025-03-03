@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/02 19:22:42 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 23:29:41 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,10 @@
 
 /* --- Handshake after complete register ------------------------------------ */
 
-#define RPL_WELCOME(serverName, nick, user, host) (":" + serverName + " 001 " + nick + \
-	" :Welcome to the Internet Relay Network, " + nick + "!" + user + "@" + host + "\r\n")
+/* #define RPL_WELCOME(serverName, nick, user, host) (":" + serverName + " 001 " + nick + \
+ 	" :Welcome to the Internet Relay Network, " + nick + "!" + user + "@" + host + "\r\n") */
+#define RPL_WELCOME(serverName, nick, hostmask) (":" + serverName + " 001 " + nick + \
+	" :Welcome to the Internet Relay Network, " + hostmask + "\r\n")
 #define RPL_YOURHOST(serverName, nick) (":" + serverName + " 002 " + nick + \
 	" :Your host is " + serverName + ", running version 1.0\r\n")
 #define RPL_CREATED(serverName, nick) (":" + serverName + " 003 " + nick + \

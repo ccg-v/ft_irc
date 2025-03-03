@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:55:20 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/02 13:13:45 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 23:33:48 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
 
 	client.setUsername(msgTokens.parameters[0]);
 	client.setRealname(msgTokens.trailing);
+	client.setHostMask();
 
 	if(client.getNickname().empty())
 	{
@@ -52,7 +53,7 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
 	}
 
 	client.setRegistration(true);
-	sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getUsername(), client.getClientIp()));
+	sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));
 	sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
 	sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
 	sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));

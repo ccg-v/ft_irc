@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 18:04:37 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 23:24:58 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,9 @@ class	Client
 		void						setUsername(const std::string & username);
 		std::string					getUsername();
 		void						setRealname(const std::string & realname);
-		std::string					getRealname();		
+		std::string					getRealname();	
+		void						setHostMask();
+		std::string					getHostMask();
 		void						setAuthentication(bool isAuthenticated);
 		bool						getAuthentication();
 		void						setRegistration(bool isRegistered);
@@ -60,6 +62,7 @@ class	Client
 		std::string					_nickname;
 		std::string					_username;
 		std::string					_realname;
+		std::string					_hostMask;
 		bool						_isAuthenticated;
 		bool						_isRegistered;
 		std::string					_clientBuffer;

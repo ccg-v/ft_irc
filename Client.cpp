@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/27 18:04:47 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/03 23:24:03 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,16 @@ void	Client::setRealname(const std::string & realname)
 std::string	Client::getRealname()
 {
 	return (this->_realname);
+}
+
+void	Client::setHostMask()
+{
+	this->_hostMask = this->getNickname() + "!" + this->getUsername() + "@" + this->getClientIp();
+}
+
+std::string	Client::getHostMask()
+{
+	return (this->_hostMask);
 }
 
 void	Client::setAuthentication(bool isAuthenticated)
