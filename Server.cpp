@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/03 21:33:02 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/04 19:16:50 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Server::Server(const std::string &port, const std::string &password)
 	_commandMap["PING"] = &Server::_ping;
 	_commandMap["PONG"] = &Server::_pong;
 	_commandMap["PRIVMSG"] = &Server::_privmsg;
+	_commandMap["QUIT"] = &Server::_quit;
 
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -351,7 +352,7 @@ void Server::processMessage(Client &currentClient, std::string message)
 	}
 	std::cout << std::endl;
 	/* ------------------------------------------------------ DEBUG PRINTINGS */
-	
+
 	if (it != _commandMap.end())
 	{
 		(this->*(it->second))(currentClient, msgTokens);  // Call the correct handler function

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:52:25 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/03 23:28:57 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:45:11 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
 	}
 
 	// Check if nickname is already in use
-	if (_isNickTaken(newNick))
+	if (_nickExists(newNick))
 	{
 		sendMessage(client, ERR_NICKNAMEINUSE(this->_serverName, client.getNickname(), newNick));
 		return;	
@@ -112,7 +112,7 @@ bool Server::_isNickValid(const std::string &nick)
 	return (true);
 }
 
-bool	Server::_isNickTaken(const std::string &nick)
+bool	Server::_nickExists(const std::string &nick)
 {
 	std::map<int, Client>::iterator it;
 

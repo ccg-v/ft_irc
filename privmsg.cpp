@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/03 23:27:17 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/04 21:01:35 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 				continue ;
 			}
 		}
-		// If it's a valid nickname, we send to user
-		if (_isNickValid(target))
+		// If it's a valid nickname and the nickname exists, we send to user
+		if (_isNickValid(target) && _nickExists(target))
 		{
 			_sendToUser(client, target, msgTokens);
 			continue ;
@@ -63,6 +63,13 @@ void	Server::_sendToChannel(Client &client, const std::string &target, const t_t
 {
 	(void)client;
 	std::cout << "Message should be broadcasted to full " << target << " channel" << std::endl;
+
+	/* ********************************************************************** */
+	/*                                                                        */
+	/*                      ESPAI RESERVAT PER L'ESTER                        */
+	/*                                                                        */
+	/* ********************************************************************** */
+
 	std::cout << msgTokens.trailing << std::endl;
 }
 
@@ -74,21 +81,9 @@ void	Server::_sendToUser(Client &client, const std::string &target, const t_toke
 	{
 		if (it->second.getNickname() == target)
 		{
-			// std::string senderMask = client.getNickname() + "!" + client.getUsername() + "@" + client.getClientIp();
-			// std::string fullMessage = ":" + senderMask + " " + msgTokens.command + " " + target + " :" + msgTokens.trailing + "\r\n";
-
 			std::string fullMessage = ":" + client.getHostMask() + " " + msgTokens.command + " " + target + " :" + msgTokens.trailing + "\r\n";
-
-			// std::string fullMessage = ":" + client.getNickname() + " PRIVMSG " + target + ": " + msgTokens.trailing + "\r\n";
-			// std::cout << "Sending message: [" << fullMessage << "]" << std::endl;
-
-			// for (size_t i = 0; i < fullMessage.size(); i++)
-    		// 	std::cout << std::hex << (int)(unsigned char)fullMessage[i] << " ";
-			// std::cout << std::endl;
-
 			sendMessage(it->second, fullMessage);
 			return;
 		}
 	}
-	sendMessage(client, ERR_NORECIPIENT(this->_serverName, client.getNickname(), msgTokens.command));
 }

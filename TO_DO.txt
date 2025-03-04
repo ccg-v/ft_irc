@@ -7,6 +7,8 @@
 
 - Quan un client IRSSI es tanca amb /quit, el servidor també es tanca abruptament, imprimint: "basic_string: append"
 
+- QUIT també pel servidor?
+
 - Gestionar senyals
 
 - Separar els arxius en carpetes <source>, <headers>, <objects>. Modificar Makefile.
