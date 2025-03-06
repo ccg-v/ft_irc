@@ -410,6 +410,31 @@ int recv(int sockfd, void *buf, int len, int flags);
 
 - On error -1 is returned, and `errno` is set to the error number.
 
+- If a client is still connected but not sending data, `recv()` will behave as follows:
+
+	* **6.2.2.a Blocking Mode** (`recv()` waits for data):
+
+    	If the client is **idle** but still connected, `recv()` **blocks** (waits) until data is received.
+    	It will not return until:
+
+    	* Data arrives (returns the number of bytes read).
+        * The client disconnects (`recv()` returns `0`).
+        * An error occurs (returns `-1`).
+
+	* **6.2.2.b Non-Blocking Mode** (`recv()` returns immediately)
+
+		If the socket is *non-blocking* (`fcntl(fd, F_SETFL, O_NONBLOCK)`):
+
+		* If no data is available, `recv()` returns `-1` with `errno == EWOULDBLOCK` or `EAGAIN`.
+		* If the client disconnects, `recv()` returns `0`.
+		* If there’s an error, `recv()` returns `-1` with an appropriate `errno`.
+
+	* **When Used with `poll()` or `select()`**
+
+		* `poll()` or `select()` ensures `recv()` is only called when data is available.
+		* If a socket is connected but idle, `poll()` won't trigger `POLLIN`, so recv() is never called.
+		* If `POLLHUP` or `POLLERR` is triggered, it means the client has disconnected or an error occurred.
+
 </details>
 
 ---

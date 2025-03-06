@@ -1,16 +1,34 @@
-- En lloc de crear el hostmask dinàmicament cada cop que el necessitem (a RPL_WELCOME i PRIVMSG:sendToUser()), desar-lo com a atribut del Client
-	1. Afegir atribut _hostmask
-	2. Afegir _setHostMask() [_updateHostMask()]: ha de crear-se amb el registre, i actualitzar-se cada cop que el nick, el user o la ip canvien
-	3. Afegir _getHostMask()
-
 - Quan un usuari canvia de nick, notificar-ho als canals i a les converses privades
+- Quan un usuari surt amb /QUIT, notificar-ho als canals i a les converses privades
+- Quan un client envia CTRL + C, notificar-ho als canals i a les converses privades
+- Centralitzar-ho a _removeClient()?
 
-- Quan un client IRSSI es tanca amb /quit, el servidor també es tanca abruptament, imprimint: "basic_string: append"
+- En lloc de tenir _removeClient() i cridar la funció a _receiveRawData(), _pass() i _quit(), com que _quit() no fa res mes que cridar _removeClient() i prou,
+  per què no eliminar _removeClient() i cridar _quit() a _receiveRawData() i _pass()
 
 - QUIT també pel servidor?
 
 - Gestionar senyals
 
-- Separar els arxius en carpetes <source>, <headers>, <objects>. Modificar Makefile.
-
 - Leaks
+
+- acceptClient() extreu la ip del client i l'emmagatzema amb setClientIp()
+	1. Moure aquest fragment a una funció externa
+	2. Pot fer aquesta funció de setter?
+
+- moure _splitByComma a utils.cpp
+
+
+CANVIS
+
+1. CAPTURA DE senyals
+	1.1 El client envia un CTRL + C:
+		- El mètode antic era cridar `recv()` a `_receiveRawData()` i comprovar que no retorna un valor <= 0
+		- Ara és `poll()` qui detecta la desconnexió (el SO ha tancat el descriptor) i activa la flag POLLHUP (poll hang up) per aquell socket
+		- Quan el nostre bucle `startPoll()` detecta un socket on s'ha activat un event i és POLLHUP
+			✔ Close the client’s socket.
+			✔ l'elimina de `_pollFds`.
+			✔ l'elimina de `_clients`.
+			✔ Ho notifica als canals dels quals el client n'era membre
+		- D'aquesta manera la detecció és més ràpida, no cal cridar `recv()` cada vegada per comprovar si el client està connectat
+		- Ja no cal que passem l'index `i` a `_receiveRawData()` per poder-lo actualitzar

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/04 19:16:50 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/06 23:16:34 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,8 +162,6 @@ void	Server::_acceptClient()
         throw std::runtime_error("[SERVER]: Error: accept() failed");
 	}
 
-	// std::cout << "[SERVER]: New connection accepted!" << std::endl;
-
 	// Set the new socket to non-blocking
 	if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
 	{
@@ -174,14 +172,14 @@ void	Server::_acceptClient()
 	// Create a new struct `pollfd` and push it to `this->_pollFds` vector of structs
 	struct pollfd pfd;
 	pfd.fd = clientSocket;
-	pfd.events = POLLIN;
+	pfd.events = POLLIN | POLLHUP; // poll() watches for incoming data and hang ups
 	pfd.revents = 0;
 	this->_pollFds.push_back(pfd);
 
 	// Instantiate Client object and store it in `_clients` map		
 	this->_clients[clientSocket] = Client(clientSocket);
 
-    // Get and store the client's addres, to construct the client's mask later [5]
+    // Get and store the client's address, to construct the client's mask later [5]
     char ipStr[INET6_ADDRSTRLEN];
 
     if (clientAddr.ss_family == AF_INET)
@@ -211,9 +209,18 @@ void	Server::_receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by re
 
 	if (bytesReceived <= 0)
 	{
-		std::cerr << "[SERVER]: Connection closed or error" << std::endl;
-		close(this->_pollFds[i].fd);
-		this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
+		int	clientFd = this->_pollFds[i].fd;
+
+		// std::cerr << "[SERVER]: Client " << clientFd << " (" << currentClient.getHostMask() << ") disconnected." << std::endl;
+		// /* TO_DO ***************************************************************** */
+		// /*                                                                         */
+		// /*	broadcastToChannels() // Notify client quitting to its active channels */
+		// /*                                                                         */
+		// /* *********************************************************************** */
+		// close(clientFd);
+		// this->_clients.erase(clientFd);
+		// this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
+		_removeClient(clientFd);
 		--i;
 		return;
 	}
@@ -228,12 +235,9 @@ void	Server::_receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by re
 	// suffered in _splitBuffer() (full messages removed, incomplete messages remaining)
 	std::vector<std::string> fullMessages = _splitBuffer(clientBuffer);
 	
-	//std::cout << "\n[~DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
 	// Process each full message
 	for (size_t m = 0; m < fullMessages.size(); m++)
 	{
-		//std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
-		// std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
 		_processMessage(currentClient, fullMessages[m]);
 	}	
 }
@@ -369,12 +373,24 @@ void	Server::_sendMessage(Client &client, const std::string &message)
 }
 
 void	Server::_removeClient(int clientFd)
-{ 
-	close(clientFd); // Close the client's socket
+{
 
-	this->_clients.erase(clientFd); 	// Remove from _clients map
+	std::cerr << "[SERVER]: Client " << clientFd << " (" << _clients[clientFd].getHostMask() \
+			  << ") disconnected and removed." << std::endl;
+			  
+	/* TO_DO ***************************************************************** */
+	/*                                                                         */
+	/*	broadcastToChannels() // Notify client quitting to its active channels */
+	/*                                                                         */
+	/* *********************************************************************** */
 
-	// Remove from _pollFds vector
+	// 1. Close the client's socket
+	close(clientFd); 
+
+	// 2. Remove from _clients map
+	this->_clients.erase(clientFd);
+
+	// 3. Remove from _pollFds vector
 	for (size_t i = 0; i < _pollFds.size(); ++i)
 	{
 		if (_pollFds[i].fd == clientFd)
@@ -383,8 +399,6 @@ void	Server::_removeClient(int clientFd)
 			break;
 		}
 	}
-
-	std::cout << "[SERVER]: Client " << clientFd << " disconnected and removed." << std::endl;
 }
 
 void	Server::_closeSockets()
@@ -393,6 +407,18 @@ void	Server::_closeSockets()
     {
         close(this->_pollFds[i].fd);
     }
+}
+
+void	Server::_debugListClients()
+{
+	std::map<int, Client>::iterator it;
+
+	std::cout << "List of connected clients: " << std::endl;
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		std::cout << "\t" << it->first << ": " << it->second.getNickname() << std::endl;
+	}
+	std::cout << std::endl;
 }
 
 /*	[1] Protocols RFC 1459 and RFC 2812, section 2.3:

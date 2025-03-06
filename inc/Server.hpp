@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/04 20:47:20 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/06 22:25:17 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 #include <arpa/inet.h>  // inet_ntoa
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "Errors.hpp"
 #include "Replies.hpp"
 #include <typeinfo> // TEMP to print typeid of getChannels ft
 
@@ -120,6 +119,8 @@ class	Server
 		bool						_chanExists(const std::string &);
 		bool 						_validChannelName(std::string &name);
 		std::vector<std::string>	_splitByComma(const std::string &str);
+
+		void		_debugListClients();
 };
 
 #endif
