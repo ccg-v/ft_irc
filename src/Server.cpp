@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/06 23:16:34 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/07 00:30:29 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -413,10 +413,10 @@ void	Server::_debugListClients()
 {
 	std::map<int, Client>::iterator it;
 
-	std::cout << "List of connected clients: " << std::endl;
+	std::cout << "\tList of connected clients: " << std::endl;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
-		std::cout << "\t" << it->first << ": " << it->second.getNickname() << std::endl;
+		std::cout << "\t - " << it->first << ": " << it->second.getNickname() << std::endl;
 	}
 	std::cout << std::endl;
 }

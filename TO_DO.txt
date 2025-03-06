@@ -4,7 +4,12 @@
 - Centralitzar-ho a _removeClient()?
 
 - En lloc de tenir _removeClient() i cridar la funció a _receiveRawData(), _pass() i _quit(), com que _quit() no fa res mes que cridar _removeClient() i prou,
-  per què no eliminar _removeClient() i cridar _quit() a _receiveRawData() i _pass()
+  per què no eliminar _removeClient() i cridar _quit() a _receiveRawData() i _pass()?
+
+- Client IRSSI connectat, tornem a enviar '/connect localhost 8080 pass' -> intenta connectar, retorna ERRONEUSNICKNAME i 'connection lost to localserver', però
+  realment la connexió continua 
+
+- Protecció contra Ghost Client Attack? (els clients semirregistrats retenen un descriptor i un nick, establir un ´timeout connection´)
 
 - QUIT també pel servidor?
 
