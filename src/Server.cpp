@@ -22,11 +22,12 @@ Server::Server(const std::string &port, const std::string &password)
 	_serverName = "42ft_irc";
 	_creationTime = getCurrentDate();
 
-	_commandMap["CAP"] = &Server::handleCap;
-    _commandMap["PASS"] = &Server::handlePass;
-    _commandMap["NICK"] = &Server::handleNick;
-    _commandMap["USER"] = &Server::handleUser;
+	_commandMap["CAP"] = &Server::_cap;
+    _commandMap["PASS"] = &Server::_pass;
+    _commandMap["NICK"] = &Server::_nick;
+    _commandMap["USER"] = &Server::_user;
 	_commandMap["JOIN"] = &Server::_join;
+    _commandMap["MODE"] = &Server::_mode;
 	_commandMap["PING"] = &Server::_ping;
 	_commandMap["PONG"] = &Server::_pong;
 	_commandMap["PRIVMSG"] = &Server::_privmsg;
@@ -132,22 +133,22 @@ void	Server::startPoll()
             {
                 if (_pollFds[i].fd == this->_serverSocket) // Current is the listening socket -> New connection requested
                 {
-					acceptClient();
+					_acceptClient();
                 }
                 else // Current is a client socket -> Receive incoming data
                 {
-					// receiveRawData(i);
+					// _receiveRawData(i);
 					Client &currentClient = this->_clients[this->_pollFds[i].fd]; // Reference to client in _clients map
 					// currentClient.setFd(this->_pollFds[i].fd); // Store the client's fd in our class
-    				receiveRawData(currentClient, i);  // Pass the current client reference
+    				_receiveRawData(currentClient, i);  // Pass the current client reference
                 }
             }
         }
     }
-	closeSockets();
+	_closeSockets();
 }
 
-void	Server::acceptClient()
+void	Server::_acceptClient()
 {
 	struct sockaddr_storage clientAddr;
 	socklen_t 				addr_size;
@@ -157,7 +158,7 @@ void	Server::acceptClient()
 
 	if ((clientSocket = accept(this->_serverSocket, (struct sockaddr *) &clientAddr, &addr_size)) == -1)
 	{
-    	closeSockets();
+    	_closeSockets();
         throw std::runtime_error("[SERVER]: Error: accept() failed");
 	}
 
@@ -166,7 +167,7 @@ void	Server::acceptClient()
 	// Set the new socket to non-blocking
 	if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1)
 	{
-		closeSockets();
+		_closeSockets();
 		throw std::runtime_error("[SERVER]: Error: client's fcntl() failed");
 	}
 
@@ -200,7 +201,7 @@ void	Server::acceptClient()
 	this->_clients[clientSocket].setClientIp(ipStr);
 }
 
-void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by reference!!
+void	Server::_receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by reference!!
 {
 	char	buffer[BUFFER_SIZE];
 	size_t	bytesReceived;
@@ -224,8 +225,8 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 
 	// Extract full messages, leaving incomplete ones in clientBuffer
 	// We send a REFERENCE!! of clientBuffer, not a copy, to ensure it reflects changes
-	// suffered in splitBuffer() (full messages removed, incomplete messages remaining)
-	std::vector<std::string> fullMessages = splitBuffer(clientBuffer);
+	// suffered in _splitBuffer() (full messages removed, incomplete messages remaining)
+	std::vector<std::string> fullMessages = _splitBuffer(clientBuffer);
 	
 	//std::cout << "\n[~DEBUG]: Number of full messages stored = " << fullMessages.size() << std::endl;
 	// Process each full message
@@ -233,11 +234,11 @@ void	Server::receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by ref
 	{
 		//std::cout << "[~DEBUG]: \tfullMessages[" << m << "]: " << fullMessages[m];
 		// std::cout << "[DEBUG]: Now it's time TO splitMessage() into command [parameters] [:trailing]\n" << std::endl;
-		processMessage(currentClient, fullMessages[m]);
+		_processMessage(currentClient, fullMessages[m]);
 	}	
 }
 
-std::vector<std::string> Server::splitBuffer(std::string &buffer)
+std::vector<std::string> Server::_splitBuffer(std::string &buffer)
 {
     std::vector<std::string> fullMessages;
     size_t pos = 0;
@@ -250,7 +251,7 @@ std::vector<std::string> Server::splitBuffer(std::string &buffer)
     return fullMessages;  // Remaining (incomplete) data stays in buffer
 }
 
-t_tokens	Server::tokenizeMsg(const std::string &message)
+t_tokens	Server::_tokenizeMsg(const std::string &message)
 {
     std::istringstream	iss;
     std::string 		token;
@@ -283,7 +284,6 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
 		}
         tokenizedMsg.parameters.push_back(token); // Add parameter to vector
     }
-	
 	// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
 	if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
 		tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
@@ -291,7 +291,7 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
     return (tokenizedMsg);
 }
 
-// t_tokens	Server::tokenizeMsg(const std::string &message)
+// t_tokens	Server::_tokenizeMsg(const std::string &message)
 // {
 //     std::istringstream	iss;
 //     std::string 		token;
@@ -328,9 +328,9 @@ t_tokens	Server::tokenizeMsg(const std::string &message)
 //     return (tokenizedMsg);
 // }
 
-void Server::processMessage(Client &currentClient, std::string message)
+void Server::_processMessage(Client &currentClient, std::string message)
 {
-    t_tokens msgTokens = tokenizeMsg(message);
+    t_tokens msgTokens = _tokenizeMsg(message);
 	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
 
 	/* DEBUG PRINTINGS ------------------------------------------------------ */
@@ -359,16 +359,16 @@ void Server::processMessage(Client &currentClient, std::string message)
 	}
 	else
 	{
-		sendMessage(currentClient, ERR_UNKNOWNCOMMAND(this->_serverName, msgTokens.command));
+		_sendMessage(currentClient, ERR_UNKNOWNCOMMAND(this->_serverName, msgTokens.command));
 	}
 }
 
-void	Server::sendMessage(Client &client, const std::string &message)
+void	Server::_sendMessage(Client &client, const std::string &message)
 {
 	send(client.getFd(), message.c_str(), message.size(), 0);
 }
 
-void	Server::removeClient(int clientFd)
+void	Server::_removeClient(int clientFd)
 { 
 	close(clientFd); // Close the client's socket
 
@@ -387,7 +387,7 @@ void	Server::removeClient(int clientFd)
 	std::cout << "[SERVER]: Client " << clientFd << " disconnected and removed." << std::endl;
 }
 
-void	Server::closeSockets()
+void	Server::_closeSockets()
 {
     for (size_t i = 0; i < this->_pollFds.size(); ++i)
     {

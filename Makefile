@@ -6,34 +6,58 @@
 #    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/03/04 18:20:04 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/03/05 00:08:53 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME 		= ircserv
 
 CC 			= c++
-RM 			= rm -f
+RM 			= rm -rf
 FLAGS		= -Wall -Wextra -Werror -std=c++98 -pedantic
 
-SRC 		= 	main.cpp Server.cpp Client.cpp Channel.cpp join.cpp cap.cpp pass.cpp \
-				nick.cpp user.cpp ping.cpp pong.cpp privmsg.cpp quit.cpp utils.cpp
+# --- Folders ---------------------------------------------------------------- #
+
+SRC_DIR		= src/
+INC_DIR		= inc/
+OBJ_DIR		= obj/
+
+# --- Files ------------------------------------------------------------------ #
+
+SRC_FILES	=	main.cpp Server.cpp Client.cpp Channel.cpp utils.cpp \
+				cap.cpp join.cpp mode.cpp nick.cpp pass.cpp ping.cpp pong.cpp \
+				privmsg.cpp quit.cpp user.cpp
 				
-OBJ 		= $(SRC:.cpp=.o)
-DEP			= $(SRC:.cpp=.d)
+# *.cpp // PER PROVAR
+
+OBJ_FILES	= $(SRC_FILES:.cpp=.o)
+DEP_FILES	= $(OBJ_FILES:.cpp=.d)
+
+# --- Full Paths ------------------------------------------------------------- #
+
+SRC			= $(addprefix $(SRC_DIR), $(SRC_FILES))
+OBJ			= $(addprefix $(OBJ_DIR), $(OBJ_FILES))
+
+# --- Compiling rules -------------------------------------------------------- #
 
 all: $(NAME)
 
-$(NAME): $(OBJ) Makefile
-	$(CC) $(FLAGS) $(OBJ) -o $@
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
-%.o: %.cpp
-	$(CC) $(FLAGS) -MMD -MP -c $< -o $@
+$(NAME): $(OBJ) Makefile
+	$(CC) $(FLAGS) -I $(INC_DIR) $(OBJ) -o $@
+
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJ_DIR)
+	$(CC) $(FLAGS) -I $(INC_DIR) -MMD -MP -c $< -o $@
 
 -include $(DEP)
 
+# --- Cleaning rules --------------------------------------------------------- #
+
 clean:
 	$(RM) $(OBJ) $(DEP)
+	$(RM) $(OBJ_DIR)
 
 fclean: clean
 	$(RM) $(NAME)

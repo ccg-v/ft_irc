@@ -19,5 +19,5 @@ void	Server::_pong(Client &client, const t_tokens msgTokens)
 	
 	std::cout << "[~DEBUG]: " << getCurrentDate() << " :PONG sent to client" << client.getFd() << std::endl;
 	
-	sendMessage(client, "PONG " + serverName + "\r\n");
+	_sendMessage(client, "PONG " + serverName + "\r\n");
 }

@@ -15,30 +15,30 @@
 
 /* See RFC 2812, Section 3.1.3 */
 
-void 	Server::handleUser(Client &client, const t_tokens msgTokens)
+void 	Server::_user(Client &client, const t_tokens msgTokens)
 {
 	if(!client.getAuthentication())
 	{
-		sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
+		_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
 		return;
 	}
 
 	if(client.getRegistration())
 	{
-		sendMessage(client, ERR_ALREADYREGISTERED(this->_serverName));
+		_sendMessage(client, ERR_ALREADYREGISTERED(this->_serverName));
 		return;
 	}
 
 	if (msgTokens.parameters.size() != 3 || msgTokens.trailing.empty())
 	{
-		sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msgTokens.command));
+		_sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msgTokens.command));
 		return;
 	}
 
 	// Validate username
 	if (!_isUserValid(msgTokens.parameters[0])) 
 	{
-		sendMessage(client, ERR_INVALIDUSERNAME(this->_serverName, msgTokens.parameters[0]));
+		_sendMessage(client, ERR_INVALIDUSERNAME(this->_serverName, msgTokens.parameters[0]));
 		return;
 	}
 
@@ -48,15 +48,15 @@ void 	Server::handleUser(Client &client, const t_tokens msgTokens)
 
 	if(client.getNickname().empty())
 	{
-		sendMessage(client, NTC_NICKMISSING(this->_serverName, client.getNickname()));
+		_sendMessage(client, NTC_NICKMISSING(this->_serverName, client.getNickname()));
 		return;
 	}
 
 	client.setRegistration(true);
-	sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));
-	sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
-	sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
-	sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));
+	_sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));
+	_sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
+	_sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
+	_sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));
 }
 
 /*

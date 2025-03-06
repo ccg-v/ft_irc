@@ -15,21 +15,21 @@
 
 /* See RFC 2812, Section 3.1.1 */
 
-void 	Server::handlePass(Client &client, const t_tokens msgTokens)
+void 	Server::_pass(Client &client, const t_tokens msgTokens)
 {
 	if (msgTokens.parameters.empty() || msgTokens.parameters[0] != this->_password)
 	{
-		sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
+		_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
 
 		// Close client's socket and remove client from tracking containers
-		this->removeClient(client.getFd());
+		this->_removeClient(client.getFd());
 
 		return;
 	}
 
 	if (client.getAuthentication() == true)
 	{
-		sendMessage(client, ERR_ALREADYREGISTERED(this->_serverName));
+		_sendMessage(client, ERR_ALREADYREGISTERED(this->_serverName));
 		return;
 	}
 

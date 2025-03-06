@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/03 23:24:03 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/02/28 21:43:09 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 /* --- Public Coplien's functions ------------------------------------------- */
 
-Client::Client() : _fd(-1) // Default constructor - $$$CONFIRMAR SI ENS CAL O NO POSAR AIXO DE L'_fd = -1
+Client::Client() : _fd(-1) // Default constructor
 {
 }
 
@@ -22,13 +22,13 @@ Client::Client(int fd) // Parameterized constructor
 	: _fd(fd),
 	  _isAuthenticated(false), 
 	  _isRegistered(false),
-	  _clientBuffer(""),
-	  _maxChannels(3)
+	  _clientBuffer("")
+//	  _maxChannels(MAXCHAN)
 {
 //	std::cout << "\n[~DEBUG]: client created with sockefd: " << _fd << " and maxChannels: " << _maxChannels << std::endl;
 }
 
-Client::Client(const Client & source)
+Client::Client(const Client &source)
 {
 	_fd = source._fd;
 	_isAuthenticated = source._isAuthenticated;
@@ -36,16 +36,17 @@ Client::Client(const Client & source)
 	_clientBuffer = source._clientBuffer;
 }
 
-Client &Client::operator=(const Client & source)
+Client &Client::operator=(const Client &source)
 {
-    if (this != &source) {
+    if (this != &source)
+	{
         _fd = source._fd;
 		_nickname = source._nickname;
 		_username = source._username;
 		_isAuthenticated = source._isAuthenticated;
 		_isRegistered = source._isRegistered;
 		_clientBuffer = source._clientBuffer;
-		_maxChannels = source._maxChannels;
+	//	_maxChannels = source._maxChannels;
 		_channels = source._channels; 
     }
     return *this;
@@ -132,15 +133,15 @@ bool	Client::getAuthentication()
 	return (this->_isAuthenticated);
 }
 
-int Client::getChannelCnt(void) const
-{
-    return (this->_channels.size());
-}
+// int Client::getChannelCnt(void) const
+// {
+//     return (this->_channels.size());
+// }
 
-int Client::getMaxChannels(void) const
-{
-    return (this->_maxChannels);
-}
+// int Client::getMaxChannels(void) const
+// {
+//     return (this->_maxChannels);
+// }
 
 void	Client::setRegistration(bool isRegistered)
 {
@@ -161,7 +162,6 @@ std::map<std::string, bool>	&Client::getChannels()
 
 void Client::addChannel(std::string &channel, bool isChanOp)
 {
-	std::cout << "[~DEBUG]: addChannel ft" << std::endl;
     this->_channels[channel] = isChanOp; // [1]
 	// for (std::map<std::string, bool>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
 	// {
@@ -169,7 +169,7 @@ void Client::addChannel(std::string &channel, bool isChanOp)
 	// }
 }
 
-// void Client::sendMessage(const std::string &message) const
+// void Client::_sendMessage(const std::string &message) const
 // {
 //     std::string msg = message + "\r\n";
 //     send(this->_fd, msg.c_str(), msg.length(), 0);

@@ -1,21 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ping.cpp                                           :+:      :+:    :+:   */
+/*   cap.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/27 22:32:15 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/02 22:37:27 by ccarrace         ###   ########.fr       */
+/*   Created: 2025/02/21 01:48:59 by ccarrace          #+#    #+#             */
+/*   Updated: 2025/02/21 01:50:51 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Client.hpp"
 
-void	Server::_ping(Client &client, const t_tokens msgTokens)
+void 	Server::_cap(Client &currentClient, const t_tokens msgTokens)
 {
-	std::cout << "[~DEBUG]: " << getCurrentDate() << " :PING received from client " << client.getFd() << std::endl;
-	
-	this->_pong(client, msgTokens);
+	if (msgTokens.command == "CAP" && msgTokens.parameters[0] != "END")
+	{
+		std::string msg = ":localhost CAP * LS :None\r\n";
+		send(currentClient.getFd(), msg.c_str(), msg.size(), 0);
+	}
 }

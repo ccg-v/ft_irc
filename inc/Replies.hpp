@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/03 23:29:41 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:19:48 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,19 @@
 	(":" + serverName + " " + user + " :Erroneus username\r\n")
 
 /* --- JOIN command --------------------------------------------------------- */
-
 #define ERR_NOSUCHCHANNEL(serverName, client, channel) \
 	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
 #define ERR_TOOMANYCHANNELS(serverName, client, channel) \
 	(":" + serverName + " 405 " + client + " " + channel + \
 	" :Cannot join channel because you already joined 3 channels.\r\n")
+#define ERR_BADCHANMASK(serverName, chan_name) \
+	(":" + serverName + " 476 " + chan_name + " :Bad Channel Mask.\r\n")
+#define ERR_INVITEONLYCHAN(serverName, channel) \
+	(":" + serverName + " 473 " + channel + " :Cannot join channel (+i).\r\n")
+
+/* --- MODE command --------------------------------------------------------- */
+#define ERR_NOTONCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 442 " + client + " " + channel + " :You're not on that channel\r\n")
 
 /* --- PRIVMSG command ------------------------------------------------------ */
 
@@ -84,7 +91,7 @@
 #define RPL_MYINFO(serverName, nick) (":" + serverName + " 004 " + nick + " :" + serverName + \
 	" 1.0 -availableusermodes- -availablechannelmodes-\r\n")
 
-/* --- processMessage() ----------------------------------------------------- */
+/* --- _processMessage() ----------------------------------------------------- */
 
 #define ERR_UNKNOWNCOMMAND(serverName, command) \
 	(":" + serverName + " 421 " + command + " :Unknown command\r\n")

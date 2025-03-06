@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/04 20:45:11 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/04 20:47:20 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,13 @@
 #include "Channel.hpp"
 #include "Errors.hpp"
 #include "Replies.hpp"
+#include <typeinfo> // TEMP to print typeid of getChannels ft
 
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
 #define BACKLOG 5        // Max number of pending connections queue will hold
+//#define MAXCLIENTS 4     // Max number of clients that can join a channel
+// NO TE SENTIT PQ AIXO ES FA AMB el MODE 'l'
+#define MAXCHAN 3        // Max number of channels a client can join
 
 typedef struct s_tokens
 {
@@ -77,19 +81,22 @@ class	Server
 		Server(const Server &source);				// Copy constructor [1]
 		Server &operator=(const Server &source);	// Copy assignment operator [1]
 
-		void						acceptClient();
-		void						receiveRawData(Client &currentClient, size_t &i);
-		std::vector<std::string>	splitBuffer(std::string & buffer);
-		void						processMessage(Client &currentClient, std::string message);
-		t_tokens					tokenizeMsg(const std::string  &message);
-		void						sendMessage(Client &client, const std::string &message);
-		void						removeClient(int clientFd);
-		void						closeSockets();
+		void						_acceptClient();
+		void						_receiveRawData(Client &currentClient, size_t &i);
+		std::vector<std::string>	_splitBuffer(std::string & buffer);
+		void						_processMessage(Client &currentClient, std::string message);
+		t_tokens					_tokenizeMsg(const std::string  &message);
+		void						_sendMessage(Client &client, const std::string &message);
+		void						_removeClient(int clientFd);
+		void						_closeSockets();
 		
-		void 		handleCap(Client &client, const t_tokens msgTokens);
-		void 		handlePass(Client &client, const t_tokens msgTokens);
-		void 		handleNick(Client &client, const t_tokens msgTokens);
-		void 		handleUser(Client &client, const t_tokens msgTokens);
+		//* --- Connection operations ---------------------------------- */
+		void 		_cap(Client &client, const t_tokens msgTokens);
+		void 		_pass(Client &client, const t_tokens msgTokens);
+		void 		_nick(Client &client, const t_tokens msgTokens);
+		void 		_user(Client &client, const t_tokens msgTokens);
+
+		//* --- Channel operations ---------------------------------- */
 		void 		_join(Client &client, const t_tokens msgTokens);
 		void 		_ping(Client &client, const t_tokens msgTokens);
 		void 		_pong(Client &client, const t_tokens msgTokens);
@@ -97,18 +104,20 @@ class	Server
         // void _kick();
         // void _invite();
         // void _topic(int& i, std::vector<std::string> &args);
-        // void _mode();
+        void		_mode(Client &client, const t_tokens msgTokens);
+		
+		
 		void		_quit(Client &client, const t_tokens msgTokens);
 
-		bool	_isNickValid(const std::string &nick);
-		bool	_nickExists(const std::string &nick);
-		bool 	_isUserValid(const std::string &username);
+		bool		_isNickValid(const std::string &nick);
+		bool		_nickExists(const std::string &nick);
+		bool 		_isUserValid(const std::string &username);
 
-		void	_sendToChannel(Client &client, const std::string &target, const t_tokens msgTokens);
-		void	_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
+		void		_sendToChannel(Client &client, const std::string &target, const t_tokens msgTokens);
+		void		_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
 
 		//* --- Join ---------------------------------- */
-		bool						_chanExists(std::string &);
+		bool						_chanExists(const std::string &);
 		bool 						_validChannelName(std::string &name);
 		std::vector<std::string>	_splitByComma(const std::string &str);
 };

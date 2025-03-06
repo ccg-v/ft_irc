@@ -19,20 +19,20 @@
 #include "Server.hpp"
 #include "Client.hpp"
 
-void 	Server::handleNick(Client &client, const t_tokens msgTokens)
+void 	Server::_nick(Client &client, const t_tokens msgTokens)
 {
 	
 	// Password not given, authentication pending
 	if(!client.getAuthentication()) 
 	{
-		sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
+		_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
 		return;
 	}
 
 	// Ensure a nickname was provided
 	if (msgTokens.parameters.empty())
 	{
-		sendMessage(client, ERR_NONICKNAMEGIVEN(this->_serverName));
+		_sendMessage(client, ERR_NONICKNAMEGIVEN(this->_serverName));
 		return;
 	}
 
@@ -41,21 +41,21 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
 	// Validate new nickname
 	if (!_isNickValid(newNick))
 	{
-		sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, newNick));
+		_sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, newNick));
 		return;
 	}
 
 	// Check if nickname is already in use
 	if (_nickExists(newNick))
 	{
-		sendMessage(client, ERR_NICKNAMEINUSE(this->_serverName, client.getNickname(), newNick));
+		_sendMessage(client, ERR_NICKNAMEINUSE(this->_serverName, client.getNickname(), newNick));
 		return;	
 	}
 
 	// Handle nickname change
 	if(!client.getNickname().empty())
 	{
-		sendMessage(client, INF_NICKCHANGED(client.getNickname(), client.getUsername(), client.getClientIp(), newNick));
+		_sendMessage(client, INF_NICKCHANGED(client.getNickname(), client.getUsername(), client.getClientIp(), newNick));
 		client.setNickname(newNick);
 		client.setHostMask();
 		return;
@@ -67,17 +67,17 @@ void 	Server::handleNick(Client &client, const t_tokens msgTokens)
 	// If the username is missing, notify the client
 	if(client.getUsername().empty())
 	{
-		sendMessage(client, NTC_USERMISSING(this->_serverName, client.getUsername()));
+		_sendMessage(client, NTC_USERMISSING(this->_serverName, client.getUsername()));
 		return;
 	}
 	
 	// Complete registration and send welcome messages
 	client.setRegistration(true);
-	// sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getUsername(), client.getClientIp()));
-	sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));	
-	sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
-	sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
-	sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));
+	// _sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getUsername(), client.getClientIp()));
+	_sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));	
+	_sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
+	_sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));
+	_sendMessage(client, RPL_MYINFO(this->_serverName, client.getNickname()));
 }
 
 /*

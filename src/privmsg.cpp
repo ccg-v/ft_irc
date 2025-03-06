@@ -17,19 +17,19 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 {
 	if (!client.getRegistration())
 	{
-		sendMessage(client, ERR_NOTREGISTERED(this->_serverName, client.getNickname()));
+		_sendMessage(client, ERR_NOTREGISTERED(this->_serverName, client.getNickname()));
 		return;
 	}
 	
 	if (msgTokens.parameters.empty())
 	{
-		sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msgTokens.command));
+		_sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msgTokens.command));
 		return;
 	}
 
 	if (msgTokens.trailing.empty())
 	{
-		sendMessage(client, ERR_NOTEXTTOSEND(this->_serverName, client.getNickname()));
+		_sendMessage(client, ERR_NOTEXTTOSEND(this->_serverName, client.getNickname()));
 		return;
 	}
 	
@@ -55,7 +55,7 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 			continue ;
 		} 
 		// If it's neither, we return a generic "no such nick/channel" error
-		sendMessage(client, ERR_NOSUCHNICK(this->_serverName, client.getNickname(), target));
+		_sendMessage(client, ERR_NOSUCHNICK(this->_serverName, client.getNickname(), target));
 	}
 }
 
@@ -82,7 +82,7 @@ void	Server::_sendToUser(Client &client, const std::string &target, const t_toke
 		if (it->second.getNickname() == target)
 		{
 			std::string fullMessage = ":" + client.getHostMask() + " " + msgTokens.command + " " + target + " :" + msgTokens.trailing + "\r\n";
-			sendMessage(it->second, fullMessage);
+			_sendMessage(it->second, fullMessage);
 			return;
 		}
 	}
