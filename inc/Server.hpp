@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/07 00:30:21 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/07 21:09:33 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <cstring>  	// strncmp()
 #include <sstream>		// std::istringstream
 #include <arpa/inet.h>  // inet_ntoa
+#include <csignal>		// signal()
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Replies.hpp"
@@ -87,6 +88,7 @@ class	Server
 		t_tokens					_tokenizeMsg(const std::string  &message);
 		void						_sendMessage(Client &client, const std::string &message);
 		void						_removeClient(int clientFd);
+		void						_removeAllClients();
 		void						_closeSockets();
 		
 		//* --- Connection operations ---------------------------------- */

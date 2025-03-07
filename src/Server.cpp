@@ -6,13 +6,20 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/07 00:30:29 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/07 22:59:58 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
+bool	signalCaught = false;
+
 /* --- Public Coplien's functions ------------------------------------------- */
+
+void signalHandler(int signal) {
+	(void) signal; 
+	signalCaught = true;
+}
 
 // Parameterized constructor
 Server::Server(const std::string &port, const std::string &password)
@@ -121,12 +128,20 @@ Server::~Server()
 
 void	Server::startPoll()
 {
-    while (true)
+    std::signal(SIGINT, signalHandler);
+    while (!signalCaught)
     {
         if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
         {
-            throw std::runtime_error("[SERVER]: Error: poll()) failed");
+			if (signalCaught) // SIGINT caught
+			{
+				_removeAllClients();
+				std::cerr << "[SERVER]: SIGINT received, server closed. Bye!" << std::endl;
+			}
+			else
+				throw std::runtime_error("[SERVER]: Error: poll()) failed");
         }
+		
         for (size_t i = 0; i < _pollFds.size(); ++i)
         {
             if (_pollFds[i].revents & POLLIN) // Check for data to read in current socket [3]
@@ -137,9 +152,7 @@ void	Server::startPoll()
                 }
                 else // Current is a client socket -> Receive incoming data
                 {
-					// _receiveRawData(i);
 					Client &currentClient = this->_clients[this->_pollFds[i].fd]; // Reference to client in _clients map
-					// currentClient.setFd(this->_pollFds[i].fd); // Store the client's fd in our class
     				_receiveRawData(currentClient, i);  // Pass the current client reference
                 }
             }
@@ -269,68 +282,28 @@ t_tokens	Server::_tokenizeMsg(const std::string &message)
 
     tokenizedMsg.command = token;
 
-    // Extract parameters until ":"
+    // Extract parameters until ":", or after first parameter if command is PRIVMSG
     while (iss >> token)
 	{
-        if (token[0] == ':') // Extract trailing text (here token is storing the colon and the first word)
+        if (token[0] == ':' || (tokenizedMsg.command == "PRIVMSG" && tokenizedMsg.parameters.size() == 1)) // Extract trailing text (here token is storing the colon and the first word)
 		{
             std::string trailing;
             std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
-            tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with resto of trailing
+			if (token[0] == ':')
+            	tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with rest of trailing
+			else
+				tokenizedMsg.trailing = token + trailing; // the same but without substracting first char because there is no colon
             break ;
         }
-		if (tokenizedMsg.command == "PRIVMSG" && tokenizedMsg.parameters.size() == 1)
-		{
-            std::string trailing;
-            std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
-            tokenizedMsg.trailing = token + trailing; // concatenate first word (colon removed) with resto of trailing			
-			break ;
-		}
-        tokenizedMsg.parameters.push_back(token); // Add parameter to vector
-    }
-	// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
-	if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
-		tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
+		tokenizedMsg.parameters.push_back(token); // Add parameter to vector
+	}
+
+// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
+if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
+	tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
 
     return (tokenizedMsg);
 }
-
-// t_tokens	Server::_tokenizeMsg(const std::string &message)
-// {
-//     std::istringstream	iss;
-//     std::string 		token;
-// 	t_tokens			tokenizedMsg;// = new t_tokens;
-
-//     iss.str(message);
-
-//     // Extract command
-//     if (!(iss >> token))
-// 		return (tokenizedMsg); // Empty message
-
-//     tokenizedMsg.command = token;
-
-//     // Extract parameters until ":", or after first parameter if command is PRIVMSG
-//     while (iss >> token)
-// 	{
-//         if (token[0] == ':' || (tokenizedMsg.command == "PRIVMSG" && tokenizedMsg.parameters.size() == 1)) // Extract trailing text (here token is storing the colon and the first word)
-// 		{
-//             std::string trailing;
-//             std::getline(iss, trailing); // here we extract the rest of trailing line (does not include the colon and the first word)
-// 			if (token[0] == ':')
-//             	tokenizedMsg.trailing = token.substr(1) + trailing; // concatenate first word (colon removed) with rest of trailing
-// 			else
-// 				tokenizedMsg.trailing = token + trailing; // the same but without substracting first char because there is no colon
-//             break ;
-//         }
-// 		tokenizedMsg.parameters.push_back(token); // Add parameter to vector
-// 	}
-
-// // std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
-// if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
-// 	tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
-
-//     return (tokenizedMsg);
-// }
 
 void Server::_processMessage(Client &currentClient, std::string message)
 {
@@ -377,6 +350,14 @@ void	Server::_removeClient(int clientFd)
 
 	std::cerr << "[SERVER]: Client " << clientFd << " (" << _clients[clientFd].getHostMask() \
 			  << ") disconnected and removed." << std::endl;
+	if (signalCaught)
+	{
+		_sendMessage(this->_clients[clientFd], NTC_SERVERSHUTDOWN(this->_serverName, this->_clients[clientFd].getNickname()));
+	}
+	else
+	{
+		_sendMessage(this->_clients[clientFd], INF_CLIENTQUIT(this->_serverName, this->_clients[clientFd].getNickname()));
+	}
 			  
 	/* TO_DO ***************************************************************** */
 	/*                                                                         */
@@ -391,21 +372,33 @@ void	Server::_removeClient(int clientFd)
 	this->_clients.erase(clientFd);
 
 	// 3. Remove from _pollFds vector
-	for (size_t i = 0; i < _pollFds.size(); ++i)
+	std::vector<struct pollfd>::iterator it;
+
+	for (it = this->_pollFds.begin(); it != this->_pollFds.end(); it++)
 	{
-		if (_pollFds[i].fd == clientFd)
+		if (it->fd == clientFd)
 		{
-			_pollFds.erase(_pollFds.begin() + i);
+			this->_pollFds.erase(it);
 			break;
 		}
 	}
 }
 
+void Server::_removeAllClients()
+{
+	std::cerr << "[SERVER]: Removing all clients..." << std::endl;
+	
+    while (!_clients.empty()) 
+    {
+        _removeClient(_clients.begin()->first); // Always remove the first element
+    }
+}
+
 void	Server::_closeSockets()
 {
-    for (size_t i = 0; i < this->_pollFds.size(); ++i)
+    while (!_clients.empty()) 
     {
-        close(this->_pollFds[i].fd);
+        this->_removeClient(this->_clients.begin()->first);
     }
 }
 
@@ -414,7 +407,7 @@ void	Server::_debugListClients()
 	std::map<int, Client>::iterator it;
 
 	std::cout << "\tList of connected clients: " << std::endl;
-	for (it = _clients.begin(); it != _clients.end(); it++)
+	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
 		std::cout << "\t - " << it->first << ": " << it->second.getNickname() << std::endl;
 	}

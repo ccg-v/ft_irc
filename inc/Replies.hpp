@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/04 20:19:48 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/07 22:41:51 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,16 +67,20 @@
 	(":" + serverName + " 412 " + client + " :No text to send\r\n")
 #define ERR_NORECIPIENT(serverName, client, command) \
 	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
-
+	
 /* --- NOTICES -------------------------------------------------------------- */
 
 #define NTC_USERMISSING(serverName, nick) \
 	(":" + serverName + " NOTICE" + nick + " :Enter username to complete register\r\n")
 #define NTC_NICKMISSING(serverName, user) \
 	(":" + serverName + " NOTICE * :Enter nickname to complete register\r\n")
-	
+#define NTC_SERVERSHUTDOWN(serverName, nick) \
+	(":" + serverName + " NOTICE * :Server shutting down\r\n")
+
 #define INF_NICKCHANGED(oldNick, user, clientIp, newNick) \
 	(":" + oldNick + "!" + user + "@" + clientIp + " NICK :" + newNick + "\r\n")
+#define INF_CLIENTQUIT(serverName, nick) \
+	(":" + serverName + " :" + nick + " QUIT :Leaving the server\r\n")
 
 /* --- Handshake after complete register ------------------------------------ */
 

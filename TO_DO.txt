@@ -23,6 +23,7 @@
 
 - moure _splitByComma a utils.cpp
 
+- perquè QUIT tanca el client?
 
 CANVIS
 
