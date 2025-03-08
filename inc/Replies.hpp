@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/07 22:41:51 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/08 23:59:55 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,6 @@
 	(":" + serverName + " " + user + " :Erroneus username\r\n")
 
 /* --- JOIN command --------------------------------------------------------- */
-#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
-	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
 #define ERR_TOOMANYCHANNELS(serverName, client, channel) \
 	(":" + serverName + " 405 " + client + " " + channel + \
 	" :Cannot join channel because you already joined 3 channels.\r\n")
@@ -56,20 +54,27 @@
 #define ERR_NOTONCHANNEL(serverName, client, channel) \
 	(":" + serverName + " 442 " + client + " " + channel + " :You're not on that channel\r\n")
 
-/* --- PRIVMSG command ------------------------------------------------------ */
+/* --- KICK command --------------------------------------------------------- */
+//	ERR_NEEDMOREPARAMS()
+#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
+#define ERR_NOSUCHNICK(serverName, client, nick) \
+	(":" + serverName + " 401 " + client + " " + nick + " :No such nick\r\n")
+#define ERR_USERNOTINCHANNEL (serverName, client, channel) \
+	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n") 
 
+/* --- PRIVMSG command ------------------------------------------------------ */
 //	ERR_ERRONEUSNICKNAME()
+//	ERR_NOSUCHCHANNEL()
+//	ERR_NOSUCHNICK()
 #define ERR_NOTREGISTERED(serverName, client) \
 	(":" + serverName + " 451 " + client + " :You have not registered\r\n")
-#define ERR_NOSUCHNICK(serverName, client, nick) \
-	(":" + serverName + " 401 " + client + " :No such nick/channel\r\n")
 #define ERR_NOTEXTTOSEND(serverName, client) \
 	(":" + serverName + " 412 " + client + " :No text to send\r\n")
 #define ERR_NORECIPIENT(serverName, client, command) \
 	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
 	
 /* --- NOTICES -------------------------------------------------------------- */
-
 #define NTC_USERMISSING(serverName, nick) \
 	(":" + serverName + " NOTICE" + nick + " :Enter username to complete register\r\n")
 #define NTC_NICKMISSING(serverName, user) \
@@ -83,9 +88,6 @@
 	(":" + serverName + " :" + nick + " QUIT :Leaving the server\r\n")
 
 /* --- Handshake after complete register ------------------------------------ */
-
-/* #define RPL_WELCOME(serverName, nick, user, host) (":" + serverName + " 001 " + nick + \
- 	" :Welcome to the Internet Relay Network, " + nick + "!" + user + "@" + host + "\r\n") */
 #define RPL_WELCOME(serverName, nick, hostmask) (":" + serverName + " 001 " + nick + \
 	" :Welcome to the Internet Relay Network, " + hostmask + "\r\n")
 #define RPL_YOURHOST(serverName, nick) (":" + serverName + " 002 " + nick + \
@@ -96,7 +98,6 @@
 	" 1.0 -availableusermodes- -availablechannelmodes-\r\n")
 
 /* --- _processMessage() ----------------------------------------------------- */
-
 #define ERR_UNKNOWNCOMMAND(serverName, command) \
 	(":" + serverName + " 421 " + command + " :Unknown command\r\n")
 

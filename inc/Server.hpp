@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/07 21:09:33 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/08 22:17:42 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ class	Server
 		void 		_ping(Client &client, const t_tokens msgTokens);
 		void 		_pong(Client &client, const t_tokens msgTokens);
 		void 		_privmsg(Client &client, const t_tokens msgTokens);		
-        // void _kick();
+        void		_kick(Client &client, const t_tokens msgTokens);
         // void _invite();
         // void _topic(int& i, std::vector<std::string> &args);
         void		_mode(Client &client, const t_tokens msgTokens);

@@ -6,7 +6,7 @@
 #    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/03/05 00:08:53 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/03/08 22:17:20 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,8 @@ OBJ_DIR		= obj/
 # --- Files ------------------------------------------------------------------ #
 
 SRC_FILES	=	main.cpp Server.cpp Client.cpp Channel.cpp utils.cpp \
-				cap.cpp join.cpp mode.cpp nick.cpp pass.cpp ping.cpp pong.cpp \
-				privmsg.cpp quit.cpp user.cpp
+				cap.cpp join.cpp kick.cpp mode.cpp nick.cpp pass.cpp ping.cpp \
+				pong.cpp privmsg.cpp quit.cpp user.cpp
 				
 # *.cpp // PER PROVAR
 

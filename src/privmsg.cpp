@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/04 21:01:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/08 23:24:10 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,25 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 		if (target[0] == '#' || target[0] == '&')
 		{
 			// If it's a valid channel name, we broadcast the message to the channel
-			if (_validChannelName(target)) 
+			if (_chanExists(target)) 
 			{
 				_sendToChannel(client, target, msgTokens);
 				continue ;
 			}
+			else
+			{
+				_sendMessage(client, ERR_NOSUCHCHANNEL(this->_serverName, client.getNickname(), target));
+				continue;
+			}
 		}
-		// If it's a valid nickname and the nickname exists, we send to user
-		if (_isNickValid(target) && _nickExists(target))
+		// If the nickname exists, we send to user
+		if (_nickExists(target))
 		{
 			_sendToUser(client, target, msgTokens);
 			continue ;
 		} 
-		// If it's neither, we return a generic "no such nick/channel" error
-		_sendMessage(client, ERR_NOSUCHNICK(this->_serverName, client.getNickname(), target));
+		else
+			_sendMessage(client, ERR_NOSUCHNICK(this->_serverName, client.getNickname(), target));
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/07 22:59:58 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:58:50 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,17 @@
 
 bool	signalCaught = false;
 
-/* --- Public Coplien's functions ------------------------------------------- */
-
+// Handle server's termination with SIGINT(ctrl + C) or SIGQUIT (ctrl + \)
 void signalHandler(int signal) {
 	(void) signal; 
 	signalCaught = true;
+
+	std::ostringstream msg;
+    msg << "\n[SERVER]: " << strsignal(signal) << " received, closing server...";
+    std::cerr << msg.str() << std::endl;
 }
+
+/* --- Public Coplien's functions ------------------------------------------- */
 
 // Parameterized constructor
 Server::Server(const std::string &port, const std::string &password)
@@ -122,6 +127,9 @@ Server::Server(const std::string &port, const std::string &password)
 // Default destructor
 Server::~Server()
 {
+	this->_removeAllClients();
+	
+    std::cerr << "[SERVER]: Destructor called: all clients removed, server closed. Bye!" << std::endl;
 }
 
 /* --- Other class methods -------------------------------------------------- */
@@ -129,14 +137,14 @@ Server::~Server()
 void	Server::startPoll()
 {
     std::signal(SIGINT, signalHandler);
+    std::signal(SIGQUIT, signalHandler);
     while (!signalCaught)
     {
         if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
         {
-			if (signalCaught) // SIGINT caught
+			if (signalCaught)
 			{
 				_removeAllClients();
-				std::cerr << "[SERVER]: SIGINT received, server closed. Bye!" << std::endl;
 			}
 			else
 				throw std::runtime_error("[SERVER]: Error: poll()) failed");
@@ -185,7 +193,7 @@ void	Server::_acceptClient()
 	// Create a new struct `pollfd` and push it to `this->_pollFds` vector of structs
 	struct pollfd pfd;
 	pfd.fd = clientSocket;
-	pfd.events = POLLIN | POLLHUP; // poll() watches for incoming data and hang ups
+	pfd.events = POLLIN; // poll() watches for incoming data and hang ups
 	pfd.revents = 0;
 	this->_pollFds.push_back(pfd);
 
@@ -386,17 +394,20 @@ void	Server::_removeClient(int clientFd)
 
 void Server::_removeAllClients()
 {
+	if (this->_clients.empty())
+		return ;
+
 	std::cerr << "[SERVER]: Removing all clients..." << std::endl;
 	
-    while (!_clients.empty()) 
+    while (!this->_clients.empty()) 
     {
-        _removeClient(_clients.begin()->first); // Always remove the first element
+        this->_removeClient(this->_clients.begin()->first); // Always remove the first element
     }
 }
 
 void	Server::_closeSockets()
 {
-    while (!_clients.empty()) 
+    while (!this->_clients.empty()) 
     {
         this->_removeClient(this->_clients.begin()->first);
     }

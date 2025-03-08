@@ -25,6 +25,8 @@
 
 - perquè QUIT tanca el client?
 
+- Com puc forçar que poll() falli per saber si necessito cridar _removeClients() per fer net abans d'enviar l'excepció?
+
 CANVIS
 
 1. CAPTURA DE senyals
