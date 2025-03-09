@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/08 23:59:55 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/09 19:33:03 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@
 	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
 #define ERR_NOSUCHNICK(serverName, client, nick) \
 	(":" + serverName + " 401 " + client + " " + nick + " :No such nick\r\n")
-#define ERR_USERNOTINCHANNEL (serverName, client, channel) \
+#define ERR_USERNOTINCHANNEL(serverName, client, channel) \
 	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n") 
 
 /* --- PRIVMSG command ------------------------------------------------------ */
@@ -82,10 +82,13 @@
 #define NTC_SERVERSHUTDOWN(serverName, nick) \
 	(":" + serverName + " NOTICE * :Server shutting down\r\n")
 
+/* --- Regular messages------------------------------------------------------ */	
 #define INF_NICKCHANGED(oldNick, user, clientIp, newNick) \
 	(":" + oldNick + "!" + user + "@" + clientIp + " NICK :" + newNick + "\r\n")
 #define INF_CLIENTQUIT(serverName, nick) \
 	(":" + serverName + " :" + nick + " QUIT :Leaving the server\r\n")
+#define INF_KICKEDFROMCHANNEL(serverName, command, channel, nick) \
+	(":" + serverName + " :" + command + " " + channel + " " + nick + " :Kicked from channel")
 
 /* --- Handshake after complete register ------------------------------------ */
 #define RPL_WELCOME(serverName, nick, hostmask) (":" + serverName + " 001 " + nick + \

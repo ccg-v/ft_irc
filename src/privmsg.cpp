@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/08 23:24:10 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/09 19:39:12 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,11 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 
 		if (target[0] == '#' || target[0] == '&')
 		{
-			// If it's a valid channel name, we broadcast the message to the channel
-			if (_chanExists(target)) 
+			// If it's a valid channel name, we search if channel exists
+			Channel *channel = _findChannelByName(target);
+			if (channel) 
 			{
-				_sendToChannel(client, target, msgTokens);
+				_sendToChannel(*channel, msgTokens.trailing);
 				continue ;
 			}
 			else
@@ -64,18 +65,17 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 	}
 }
 
-void	Server::_sendToChannel(Client &client, const std::string &target, const t_tokens msgTokens)
+void	Server::_sendToChannel(Channel &channel, const std::string &message)
 {
-	(void)client;
-	std::cout << "Message should be broadcasted to full " << target << " channel" << std::endl;
+	std::cout << "Message should be broadcasted to full " << channel.getName() << " channel" << std::endl;
 
-	/* ********************************************************************** */
-	/*                                                                        */
-	/*                      ESPAI RESERVAT PER L'ESTER                        */
-	/*                                                                        */
-	/* ********************************************************************** */
-
-	std::cout << msgTokens.trailing << std::endl;
+	std::vector<int>::iterator it;
+	
+	for (size_t i = 0; i < channel.getClients().size(); i++)
+	{
+		Client *member = _findClientByFd(channel.getClients()[i]);
+		_sendMessage(*member, message);
+	}
 }
 
 void	Server::_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens)
@@ -91,4 +91,16 @@ void	Server::_sendToUser(Client &client, const std::string &target, const t_toke
 			return;
 		}
 	}
+}
+
+Client *Server::_findClientByFd(const int fd)
+{
+	std::map<int, Client>::iterator it;
+
+	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getFd() == fd)
+			return (&it->second);
+	}
+	return (NULL);
 }

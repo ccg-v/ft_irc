@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 22:47:55 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/06 22:26:34 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/09 20:28:31 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void	Server::_pong(Client &client, const t_tokens msgTokens)
 	std::cout << "[~DEBUG]: " << getCurrentDate() << " :PONG sent to client" << client.getFd() << std::endl;
 
 	_debugListClients();
+	_debugListChannels();
 	
 	_sendMessage(client, "PONG " + serverName + "\r\n");
 }

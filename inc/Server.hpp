@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/08 22:17:42 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/09 20:28:21 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,13 +91,13 @@ class	Server
 		void						_removeAllClients();
 		void						_closeSockets();
 		
-		//* --- Connection operations ---------------------------------- */
+		/* --- Connection operations ---------------------------------------- */
 		void 		_cap(Client &client, const t_tokens msgTokens);
 		void 		_pass(Client &client, const t_tokens msgTokens);
 		void 		_nick(Client &client, const t_tokens msgTokens);
 		void 		_user(Client &client, const t_tokens msgTokens);
 
-		//* --- Channel operations ---------------------------------- */
+		/* --- Command handlers --------------------------------------------- */
 		void 		_join(Client &client, const t_tokens msgTokens);
 		void 		_ping(Client &client, const t_tokens msgTokens);
 		void 		_pong(Client &client, const t_tokens msgTokens);
@@ -106,23 +106,31 @@ class	Server
         // void _invite();
         // void _topic(int& i, std::vector<std::string> &args);
         void		_mode(Client &client, const t_tokens msgTokens);
-		
-		
 		void		_quit(Client &client, const t_tokens msgTokens);
 
+		/* --- Nick --------------------------------------------------------- */
 		bool		_isNickValid(const std::string &nick);
 		bool		_nickExists(const std::string &nick);
 		bool 		_isUserValid(const std::string &username);
 
-		void		_sendToChannel(Client &client, const std::string &target, const t_tokens msgTokens);
+		/* --- Privmsg ------------------------------------------------------ */	
+		void		_sendToChannel(Channel &channel, const std::string &message);
 		void		_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
+		Client		*_findClientByFd(const int fd);
 
-		//* --- Join ---------------------------------- */
+		/* --- Join --------------------------------------------------------- */
 		bool						_chanExists(const std::string &);
 		bool 						_validChannelName(std::string &name);
 		std::vector<std::string>	_splitByComma(const std::string &str);
 
+		/* --- Kick --------------------------------------------------------- */
+		Channel 	*_findChannelByName(const std::string &channelName);
+		Client 		*_findClientByNick(const std::string &nickname);
+		bool		_isClientInChannel(Channel &channel, Client &client);
+
+		/* --- Debug -------------------------------------------------------- */		
 		void		_debugListClients();
+		void		_debugListChannels();
 };
 
 #endif

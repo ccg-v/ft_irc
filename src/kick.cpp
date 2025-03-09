@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/09 00:37:47 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/09 20:21:00 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,37 +22,76 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 		return ;
 	}
 
-	std::string channel = parameters[0];
-	std::vector<std::string> nicks = _splitByComma(msgTokens.parameters[1]);
+	std::string channelName = msgTokens.parameters[0];
 
-	if (!_chanExists(channel))
+	Channel *channel = _findChannelByName(channelName);
+	if (!channel)
 	{
-		this->_sendMessage(client, ERR_NOSUCHCHANNEL(this->_serverName, client.getNickname(), channel));
-		return ;
+		_sendMessage(client, ERR_NOSUCHCHANNEL(_serverName, client.getNickname(), channelName));
+		return;
 	}
 
-	for (int i = 0; i < nicks.size(); i++)
+	/* COMPROVAR QUE QUI EXECUTA EL KICK TÉ EL RANG D'OPERADOR DEL CANAL????? */
+
+	std::vector<std::string> nicks = _splitByComma(msgTokens.parameters[1]);
+
+	for (size_t i = 0; i < nicks.size(); i++)
 	{
-		if (_isMember(nick[i]))	// comprobar si _isMember
+		Client *member = _findClientByNick(nicks[i]);
+
+		if (member && _isClientInChannel(*channel, *member))
 		{
-			// guardamos la lista de clientes en el canal, o la lista de canales en el cliente
+			for (size_t i = 0; i < channel->getClients().size(); i++)
+			{
+				std::string message = INF_KICKEDFROMCHANNEL(this->_serverName, \
+					msgTokens.command, channel->getName(), client.getNickname());
+				this->_sendToChannel(*channel, message);
+			}
 		}
 		else
 		{
-			this->_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, nick[i], channel));
+			this->_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, nicks[i], channelName));
 		}
+		continue ;
 	}
-}	
+}
 
-bool	Server::_isMember(Channel &channel, Client &client)
+Channel *Server::_findChannelByName(const std::string &channelName)
 {
-	// std::vector<int>::iterator it;
+    // Step 1: Find the channel
+    std::map<std::string, Channel>::iterator it = this->_channels.find(channelName);
+    
+    if (it == _channels.end())
+        return (NULL);
+    
+    return (&it->second);
+}
 
-	// for (it = channel->_clients.begin(); it != channel->_clients.end(); it++)
-	// {
-	// 	if (*it == client.getFd())
-	// 		return (true);
-	// }
-	// return (false);
-	return (std::find(channel._clients.begin(), channel._clients.end(), client.getFd()) != channel._clients.end());
+Client *Server::_findClientByNick(const std::string &nickname)
+{
+	// Step 2: Find the client
+	std::map<int, Client>::iterator it;
+
+	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getNickname() == nickname)
+			return (&it->second);
+	}
+	return (NULL);
+}
+
+bool Server::_isClientInChannel(Channel &channel, Client &client)
+{
+    // Step 3: Check if the client is in the channel
+	std::vector<int>::iterator it;
+
+	for (it = channel.getClients().begin(); it != channel.getClients().end(); it++)
+	{
+		if (*it == client.getFd())
+			return (true);
+	}
+	return (false);
+
+	// Shorter version:
+    // return std::find(channel._clients.begin(), channel._clients.end(), client.getFd()) != channel._clients.end();
 }
