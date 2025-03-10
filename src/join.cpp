@@ -41,9 +41,6 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 				client.addChannel(ch_name, true); //add the channel to the clint's channels map
 				this->_channels[ch_name] = newChannel; //add the channel to the Server channels map
 				newChannel.addClient(client.getFd()); //add client to the Channel clients vector
-std::cout << "Client " << client.getFd() << " has been added to channel " << newChannel.getName() << std::endl;
-std::cout << "Number of clients in " << newChannel.getName() << " is " << newChannel.getClients().size() << std::endl;
-
 	// #ifndef DEBUG
 	// 		std::cout << "[~DEBUG]: channel MODE i: " << newChannel.getMode('i') << std::endl;
 	// 		std::cout << "[~DEBUG]: channel MODE t: " << newChannel.getMode('t') << std::endl;
@@ -54,7 +51,6 @@ std::cout << "Number of clients in " << newChannel.getName() << " is " << newCha
 		}
 		else  //channel exists
 		{
-std::cout << "---> HERE !!!!!!" << std::endl;
 			Channel &channel = this->_channels[ch_name];
 			//descomentar tot el de sota un cop gestionats els MODES
 			if (channel.getMode('i'))  // CAL MIRAR tb si ha rebut una invitacio (IDEA MESTRA)

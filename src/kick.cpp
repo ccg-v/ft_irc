@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/09 20:21:00 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:40:15 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,4 @@ bool Server::_isClientInChannel(Channel &channel, Client &client)
 			return (true);
 	}
 	return (false);
-
-	// Shorter version:
-    // return std::find(channel._clients.begin(), channel._clients.end(), client.getFd()) != channel._clients.end();
 }
