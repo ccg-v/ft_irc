@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   privmsg.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 21:26:38 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/11 00:41:11 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void	Server::_sendToChannel(Channel &channel, const std::string &message)
 	for (size_t i = 0; i < channel.getClients().size(); i++)
 	{
 		Client *member = _findClientByFd(channel.getClients()[i]);
+		
 		_sendMessage(*member, message);
 	}
 }

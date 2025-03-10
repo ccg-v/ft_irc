@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 21:26:25 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/10 23:46:32 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 					msgTokens.command, channel->getName(), client.getNickname());
 				this->_sendToChannel(*channel, message);
 			}
+			_removeFromChannel(*channel, client.getFd());
 		}
 		else
 		{
