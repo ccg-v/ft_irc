@@ -4,84 +4,84 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 {
 	std::vector<std::string>	chs2join; // in case there are several channels to join
     std::vector<std::string>	keys;	// if there are several channels with several keys
-//	Channel						channel;
-//	std::cout << "[~DEBUG]: STARTING JOIN FT - parameter 0 (channel name) is: " << msg.parameters[0] << std::endl;
 	bool somekey = msg.parameters.size() > 1 ? true : false; //true if >1 parameters; means client sent some key to some channel
+
     if (msg.parameters.size() < 1)
+	{
+		this->_sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msg.command));
 		return ;
-	chs2join = _splitByComma(msg.parameters[0]);
+	}
+	chs2join = splitByComma(msg.parameters[0]);
     if (somekey)
 	{
-        keys = _splitByComma(msg.parameters[1]);
+        keys = splitByComma(msg.parameters[1]);
 	}
 	int n = chs2join.size();
 	for (int i = 0; i < n; i++)
 	{
 		std::string ch_name = chs2join[i];
-		// std::cout << "[DEBUG]: chs2join[" << i << "]: " << chs2join[i] << std::endl;
-		// std::cout << "[DEBUG]: ch_name: " << ch_name << std::endl;
-		//std::cout << "[DEBUG]: channel i mode: " << channel.getMode('i') << std::endl;
-
-		// check if too many channels for client
+		std::string	key = "";
+		if (somekey && keys[i] != "x")  //CHECK NETCAT
+			key = keys[i];
+		else
+			key = "";
     	if (client.getChannels().size() >= MAXCHAN)
 		{
 			this->_sendMessage(client, ERR_TOOMANYCHANNELS(this->_serverName, client.getNickname(), ch_name));
-        	return;
+    	   	return;
     	}
-		// check if channel doesn't exist yet
-		if (!this->_chanExists(ch_name)) 
+		if (!this->_chanExists(ch_name)) //CHANNEL DOES NOT EXIST - NEED TO CREATE IT
 		{
-				// check valid channel name
-				if (!this->_validChannelName(ch_name))
-				{
-					this->_sendMessage(client, ERR_BADCHANMASK(this->_serverName, ch_name));
-					return;
-				}
-				Channel newChannel(ch_name); //instantiate the channel
-				client.addChannel(ch_name, true); //add the channel to the clint's channels map
-				this->_channels[ch_name] = newChannel; //add the channel to the Server channels map
-				newChannel.addClient(client.getFd()); //add client to the Channel clients vector
-	// #ifndef DEBUG
-	// 		std::cout << "[~DEBUG]: channel MODE i: " << newChannel.getMode('i') << std::endl;
-	// 		std::cout << "[~DEBUG]: channel MODE t: " << newChannel.getMode('t') << std::endl;
-	// 		std::cout << "[~DEBUG]: channel MODE k: " << newChannel.getMode('k') << std::endl;
-	// 		std::cout << "[~DEBUG]: channel MODE o: " << newChannel.getMode('o') << std::endl;
-	// 		std::cout << "[~DEBUG]: channel MODE l: " << newChannel.getMode('l') << std::endl;
-	// #endif
+			if (!this->_validChannelName(ch_name))
+			{
+				this->_sendMessage(client, ERR_BADCHANMASK(this->_serverName, ch_name));
+				return;
+			}
+			Channel newChannel(ch_name, key); //instantiate the channel
+			client.addChannel(ch_name, true); //add the channel to the client's channels map
+			newChannel.addClient(client.getFd()); //add client to the Channel clients vector
+			this->_channels[ch_name] = newChannel; //Store the MODIFIED channel to the Server channels map
 		}
 		else  //channel exists
 		{
 			Channel &channel = this->_channels[ch_name];
-			//descomentar tot el de sota un cop gestionats els MODES
-			if (channel.getMode('i'))  // CAL MIRAR tb si ha rebut una invitacio (IDEA MESTRA)
-            {
-				//std::cout << "[DEBUG]: entres IF (channel.getMode(i))" << std::endl;
-                this->_sendMessage(client, ERR_INVITEONLYCHAN(this->_serverName, ch_name));
-                return;
-            }
-			//JOIN THE CLIENT TO THE CHANNEL with 'false' as operator: 1. Channel, 2. List of channels for that client
+			if (this->_onChannel(client, ch_name)) //NOT SHOWING ON IRSSI (which manages that itself) - CHECK NETCAT
+				this->_sendMessage(client, ERR_USERONCHANNEL(this->_serverName, client.getNickname(), ch_name));
+		    // TO TEST - NOT WORKING
+			else if (channel.getIonly() && _isInvited(channel, client.getFd())) // 2a CONDICIO: MIRAR si ha rebut una invitacio
+                this->_sendMessage(client, ERR_INVITEONLYCHAN(this->_serverName, client.getNickname(), ch_name));
+			// PENDING COMPLEX TESTS!!!
+			else if (channel.getKey() != "" && key != channel.getKey())
+				this->_sendMessage(client, ERR_BADCHANNELKEY(this->_serverName, client.getNickname(), ch_name));
+			else if (channel.getLimit() && channel.getClients().size() == static_cast<size_t>(channel.getLimit()))
+				this->_sendMessage(client, ERR_CHANNELISFULL(this->_serverName, client.getNickname(), ch_name));
+			//JOIN THE CLIENT TO THE CHANNEL with 'false' as operator: 1. Add the channel to the list of channels for that client, 2. Add the client to the list of clients for the channel 
+			else
+			{
+				client.addChannel(ch_name, false); //add the channel to the client's channels map
+				channel.addClient(client.getFd()); //add client to the Channel clients vector
+				// TODO: Send the topic (TOPIC message) and names list (NAMES message) to the joining user.
+			}
 		}
 	}
 }
 
-std::vector<std::string>	Server::_splitByComma(const std::string &str)
+// TO TEST
+bool Server::_isInvited(Channel &channel, int client_fd)
 {
-    std::vector<std::string> result;
-    std::istringstream iss(str);
-    std::string token;
-
-    while (std::getline(iss, token, ','))   // Extract until ','
-	{  
-        result.push_back(token);
-    }
-    return result;
+	std::vector<int> fds = channel.getInvited();
+	for (std::vector<int>::iterator it = fds.begin(); it != fds.end(); ++it)
+	{
+    	if (*it == client_fd)
+        	return (true);
+	}
+	return (false);
 }
 
 bool	Server::_chanExists(const std::string &name)
 {  
-	//std::cout << "[~DEBUG] chanExists ft: first channel name: " << this->_channels.begin()->first << std::endl;
     std::map<std::string, Channel>::iterator it;
-    for (it = this->_channels.begin(); it != this->_channels.end(); it++)
+    for (it = this->_channels.begin(); it != this->_channels.end(); ++it)
     {
         if (it->first == name)
             return (true);
@@ -104,10 +104,8 @@ bool Server::_validChannelName(std::string &name)
     // Name should not be empty after the prefix and max 50 chars
     if (name.length() < 2 || name.length() > 50)
         return false;
-
     return true;
 }
-
 
 //     std::vector<std::string> channels;
 //     std::vector<std::string> keys;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   privmsg.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/09 19:39:12 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/10 21:26:38 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 		return;
 	}
 	
-	std::vector<std::string> targets = _splitByComma(msgTokens.parameters[0]);
+	std::vector<std::string> targets = splitByComma(msgTokens.parameters[0]);
 
 	for (size_t i = 0; i < targets.size(); i++)
 	{

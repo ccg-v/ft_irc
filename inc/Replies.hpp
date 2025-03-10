@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/09 19:33:03 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/10 20:56:35 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,27 @@
 /* --- JOIN command --------------------------------------------------------- */
 #define ERR_TOOMANYCHANNELS(serverName, client, channel) \
 	(":" + serverName + " 405 " + client + " " + channel + \
-	" :Cannot join channel because you already joined 3 channels.\r\n")
+	" :You have joined too many channels\r\n")
 #define ERR_BADCHANMASK(serverName, chan_name) \
 	(":" + serverName + " 476 " + chan_name + " :Bad Channel Mask.\r\n")
-#define ERR_INVITEONLYCHAN(serverName, channel) \
-	(":" + serverName + " 473 " + channel + " :Cannot join channel (+i).\r\n")
+#define ERR_INVITEONLYCHAN(serverName, nickname, channel) \
+	(":" + serverName + " 473 " + nickname + " " + channel + " :Cannot join channel (+i)\r\n")
+#define ERR_BADCHANNELKEY(serverName, nickname, channel) \
+	(":" + serverName + " 475 " + nickname + " " + channel + " :Cannot join channel (+k)\r\n")
+#define ERR_USERONCHANNEL(serverName, nick, channel) \
+	(":" + serverName + " 443 " + channel + " " + nick + " :is already on channel\r\n")
+#define ERR_CHANNELISFULL(serverName, nick, channel) \
+	(":" + serverName + " 471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n")
 
 /* --- MODE command --------------------------------------------------------- */
 #define ERR_NOTONCHANNEL(serverName, client, channel) \
 	(":" + serverName + " 442 " + client + " " + channel + " :You're not on that channel\r\n")
+#define ERR_INVALIDMODEPARAM(serverName, clientNick, mode, parameter) \
+    (":" + serverName + " 696 " + clientNick + " " + mode + " " + parameter + " :Invalid limit\r\n")
+#define ERR_CHANNELLIMITTOOLOW(serverName, clientNick, limit) \
+    (":" + serverName + " 476 " + clientNick + " " + limit + " :Limit too low, users would be kicked\r\n")
+#define ERR_CHANOPRIVSNEEDED(serverName, client, channel) \
+	(":" + serverName + " 482 " + client + " " + channel + " :You're not channel operator\r\n")
 
 /* --- KICK command --------------------------------------------------------- */
 //	ERR_NEEDMOREPARAMS()

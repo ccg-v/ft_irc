@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/09 20:28:21 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/10 21:25:52 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,14 @@
 #include <cstring>  	// strncmp()
 #include <sstream>		// std::istringstream
 #include <arpa/inet.h>  // inet_ntoa
+#include <cstdio>		// EOF
 #include <csignal>		// signal()
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Replies.hpp"
-#include <typeinfo> // TEMP to print typeid of getChannels ft
 
 #define BUFFER_SIZE 512  // Max buffer size for recv() [1]
 #define BACKLOG 5        // Max number of pending connections queue will hold
-//#define MAXCLIENTS 4     // Max number of clients that can join a channel
-// NO TE SENTIT PQ AIXO ES FA AMB el MODE 'l'
 #define MAXCHAN 3        // Max number of channels a client can join
 
 typedef struct s_tokens
@@ -90,8 +88,8 @@ class	Server
 		void						_removeClient(int clientFd);
 		void						_removeAllClients();
 		void						_closeSockets();
-		
-		/* --- Connection operations ---------------------------------------- */
+
+		//* --- Connection operations ---------------------------------- */
 		void 		_cap(Client &client, const t_tokens msgTokens);
 		void 		_pass(Client &client, const t_tokens msgTokens);
 		void 		_nick(Client &client, const t_tokens msgTokens);
@@ -118,10 +116,15 @@ class	Server
 		void		_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
 		Client		*_findClientByFd(const int fd);
 
-		/* --- Join --------------------------------------------------------- */
+		/* --- Join ---------------------------------- */
 		bool						_chanExists(const std::string &);
 		bool 						_validChannelName(std::string &name);
-		std::vector<std::string>	_splitByComma(const std::string &str);
+		bool				 		_isInvited(Channel &channel, int client_fd);
+		//std::vector<std::string>	_splitByComma(const std::string &str);		
+
+		/* --- Mode ---------------------------------- */
+		Channel		*_getChannel(const std::string &ch_name);
+		bool		_onChannel(Client &client, const std::string ch_name);
 
 		/* --- Kick --------------------------------------------------------- */
 		Channel 	*_findChannelByName(const std::string &channelName);

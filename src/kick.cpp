@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 19:40:15 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/10 21:26:25 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 
 	/* COMPROVAR QUE QUI EXECUTA EL KICK TÉ EL RANG D'OPERADOR DEL CANAL????? */
 
-	std::vector<std::string> nicks = _splitByComma(msgTokens.parameters[1]);
+	std::vector<std::string> nicks = splitByComma(msgTokens.parameters[1]);
 
 	for (size_t i = 0; i < nicks.size(); i++)
 	{

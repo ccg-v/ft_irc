@@ -15,7 +15,7 @@ class Channel
 {
 	public:
 		Channel(void);
-		Channel(std::string name);
+		Channel(std::string name, std::string key);
 		Channel(const Channel &src);
 		Channel	&operator=(const Channel &);
 
@@ -23,26 +23,36 @@ class Channel
 		//void setName(std::string name); //VOLS DIR QUE TE SENTIT? NO ES POT CREAR SI NO ES AMB EL NOM
 		//  void setTopic(std::string topic);
 		void	setKey(std::string key);
-		void	setMode(char mode, bool status); // to use only after checking that mode exists!
+	//	void	setMode(char mode, bool status); // to use only after checking that mode exists!
 		void	setLimit(int limit);
+		void 	setIonly(bool status);
+		void 	setTmode(bool status);
 
 		/* -------- GETTERS ------------------*/
 		std::string			getName(void) const;
-		//std::string		getTopic(void) const;
+		std::string			getTopic(void) const;
 		std::string			getKey(void) const;
-		bool				getMode(char mode) const; // to use only after checking that mode exists!  - erosas: ????
+		int					getLimit(void) const;
+	//	bool				getMode(char mode) const; // to use only after checking that mode exists!  - erosas: ????
+		bool 				getIonly() const;
+		bool 				getTmode() const;
 		std::vector<int>	getClients(void) const;
+		std::vector<int>	getInvited(void);
 
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
 
 	private:
-		std::string				_name;
-		//std::string _topic;
-		std::string				_key;
-		std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l
-		std::vector<int>		_clients; // fds of clients
-		int						_limit; //set with the 'l' mode
+		std::string			_name;
+		std::string 		_topic;
+		std::string			_key;
+		bool				_ionly;
+		bool				_tmode; // restrict topic changes to operators
+		int					_limit; //set with the 'l' mode
+
+		std::vector<int>	_clients; // fds of clients
+		std::vector<int>	_invited; // fds of clients that have been invited to the channel
+		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l		
 };
 
 #endif

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
+#    By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/03/08 22:17:20 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/03/10 20:53:28 by erosas-c         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,8 +28,6 @@ SRC_FILES	=	main.cpp Server.cpp Client.cpp Channel.cpp utils.cpp \
 				cap.cpp join.cpp kick.cpp mode.cpp nick.cpp pass.cpp ping.cpp \
 				pong.cpp privmsg.cpp quit.cpp user.cpp
 				
-# *.cpp // PER PROVAR
-
 OBJ_FILES	= $(SRC_FILES:.cpp=.o)
 DEP_FILES	= $(OBJ_FILES:.cpp=.d)
 
@@ -45,7 +43,7 @@ all: $(NAME)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-$(NAME): $(OBJ) Makefile
+$(NAME): $(OBJ_DIR) $(OBJ) Makefile
 	$(CC) $(FLAGS) -I $(INC_DIR) $(OBJ) -o $@
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJ_DIR)

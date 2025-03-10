@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 20:22:33 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/25 18:19:04 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/10 21:24:17 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <ctime>
-#include <string>
+
 #include "utils.hpp"
 
 /* 
@@ -46,4 +45,17 @@ std::string getCurrentDate()
 
 	std::strftime(buffer, sizeof(buffer), "%A, %b %d %Y, %H:%M:%S", ltm);
     return (std::string(buffer));
+}
+
+std::vector<std::string>	splitByComma(const std::string &str)
+{
+    std::vector<std::string> result;
+    std::istringstream iss(str);
+    std::string token;
+
+    while (std::getline(iss, token, ','))   // Extract until ','
+	{  
+        result.push_back(token);
+    }
+    return result;
 }
