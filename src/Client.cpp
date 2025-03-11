@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/02/28 21:43:09 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/12 00:12:15 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,3 +191,18 @@ void Client::addChannel(std::string &channel, bool isChanOp)
 	myMap["apple"] = 5;  // Inserts ("apple", 5)
 	myMap["banana"] = 10; // Inserts ("banana", 10)
 */
+
+void	Client::unsubscribe(std::string channelName)
+{
+	std::map<std::string, bool>::iterator it = _channels.find(channelName);
+	
+	if (it != _channels.end())
+	{
+		_channels.erase(it);
+	}
+	else
+	{
+		std::cout << "Channel not found among client's memberships" << std::endl;
+	}
+}
+

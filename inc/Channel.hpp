@@ -1,6 +1,8 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
+#include <algorithm> // std::find
+#include <set> 		 // std::set
 #include "Client.hpp"
 
 /* 	Channel names are strings (beginning with a '&' or '#' character) of length up to 200 characters. 
@@ -42,6 +44,8 @@ class Channel
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
 
+		void				removeClient(int fd);
+
 	private:
 		std::string			_name;
 		std::string 		_topic;
@@ -52,7 +56,9 @@ class Channel
 
 		std::vector<int>	_clients; // fds of clients
 		std::vector<int>	_invited; // fds of clients that have been invited to the channel
-		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l		
+
+		std::set<Client*>	_members;
+		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l
 };
 
 #endif

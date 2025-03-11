@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 23:53:28 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/11 21:10:51 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,19 +354,19 @@ void	Server::_sendMessage(Client &client, const std::string &message)
 	send(client.getFd(), message.c_str(), message.size(), 0);
 }
 
-void	Server::_removeFromChannel(Channel &channel, int clientFd)
-{
-	std::vector<int>::iterator it;
+// void	Server::_removeFromChannel(Channel &channel, int clientFd)
+// {
+// 	std::vector<int>::iterator it;
 	
-	for (it = channel.getClients().begin(); it != channel.getClients().end(); ++it)
-	{
-		if (*it == clientFd)
-		{
-			channel.getClients().erase(it);
-			break;
-		}
-	}
-}
+// 	for (it = channel.getClients().begin(); it != channel.getClients().end(); ++it)
+// 	{
+// 		if (*it == clientFd)
+// 		{
+// 			channel.getClients().erase(it);
+// 			break;
+// 		}
+// 	}
+// }
 
 void	Server::_removeClient(int clientFd)
 {

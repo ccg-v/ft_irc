@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 23:53:39 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/11 21:10:48 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ class	Server
 		void						_processMessage(Client &currentClient, std::string message);
 		t_tokens					_tokenizeMsg(const std::string  &message);
 		void						_sendMessage(Client &client, const std::string &message);
-		void						_removeFromChannel(Channel &channel, int clientFd);
+		// void						_removeFromChannel(Channel &channel, int clientFd);
 		void						_removeClient(int clientFd);
 		void						_removeAllClients();
 		void						_closeSockets();

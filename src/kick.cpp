@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 23:46:32 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/12 00:12:36 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,17 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 
 	for (size_t i = 0; i < nicks.size(); i++)
 	{
-		Client *member = _findClientByNick(nicks[i]);
+		Client *kickedClient = _findClientByNick(nicks[i]);
+		
+		// channel->removeClient(member->getFd());
 
-		if (member && _isClientInChannel(*channel, *member))
+		if (kickedClient && _isClientInChannel(*channel, *kickedClient))
 		{
-			for (size_t i = 0; i < channel->getClients().size(); i++)
-			{
-				std::string message = INF_KICKEDFROMCHANNEL(this->_serverName, \
-					msgTokens.command, channel->getName(), client.getNickname());
-				this->_sendToChannel(*channel, message);
-			}
-			_removeFromChannel(*channel, client.getFd());
+			// std::string message = INF_KICKEDFROMCHANNEL(this->_serverName, msgTokens.command, channel->getName(), client.getNickname());
+			std::string message = nicks[i] + " has been kicked from " + channel->getName() + "\r\n" ;
+			this->_sendToChannel(*channel, message);
+			channel->removeClient(kickedClient->getFd());
+			kickedClient->unsubscribe(channel->getName());
 		}
 		else
 		{

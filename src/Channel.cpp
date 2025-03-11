@@ -162,3 +162,20 @@ void Channel::addClient(const int &fd)
         If we want the getMode function to be const, _modes is treated as a
         const std::map<char, bool>, and SO operator[] cannot be used.
 */
+
+void	Channel::removeClient(int fd)
+{
+    // if (!isOperator(kickerFd)) {
+    //     std::cout << "kicker must be an operator" << std::endl;
+    // }
+
+    // Check if the target client is in the channel
+    std::vector<int>::iterator it = std::find(_clients.begin(), _clients.end(), fd);
+    if (it == _clients.end()) {
+        std::cout << "Client is not in the channel." << std::endl;
+		return ;
+    }
+
+    // Remove the client
+    _clients.erase(it);
+}
