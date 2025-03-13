@@ -37,9 +37,20 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 				this->_sendMessage(client, ERR_BADCHANMASK(this->_serverName, ch_name));
 				return;
 			}
-			Channel newChannel(ch_name, key); //instantiate the channel
+
+			// Channel newChannel(ch_name, key); //instantiate the channel
+			this->_channels[ch_name] = Channel(ch_name, key); // Insert the channel in the Server's container of channels
+			Channel& newChannel = this->_channels[ch_name];   // Reference to stored object
+
+std::cout << "[DEBUG~]: Channels in server:\t ";
+for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+{
+	std::cout << " " << it->first << "(" << it->second.getName() << ")"; 
+}
+std::cout << std::endl;
 
 			client.addSubscription(&newChannel, true); //add the channel to the client's channels map: std::map<Channel*, bool> _subscriptions
+
 std::cout << "[DEBUG~]: Client's subscriptions:\t";
 for (std::map<Channel*, bool>::iterator it = client.getSubscriptions().begin(); it != client.getSubscriptions().end(); ++it)
 {
@@ -48,6 +59,7 @@ for (std::map<Channel*, bool>::iterator it = client.getSubscriptions().begin(); 
 std::cout << std::endl;
 
 			newChannel.addMember(&client); //add client to the Channel clients vector:	std::set<Client*> _members;
+			
 std::cout << "[DEBUG~]: Members in " << newChannel.getName() << ":\t";
 for (std::set<Client*>::iterator it = newChannel.getMembers().begin(); it != newChannel.getMembers().end(); ++it)
 {
@@ -55,13 +67,13 @@ for (std::set<Client*>::iterator it = newChannel.getMembers().begin(); it != new
 }
 std::cout << std::endl;
 
-			this->_channels[ch_name] = newChannel; //Store the MODIFIED channel to the Server channels map:	std::map<std::string, Channel*>	_channels;
-std::cout << "[DEBUG~]: Channels in server:\t ";
-for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-{
-	std::cout << " " << it->first << "(" << it->second.getName() << ")"; 
-}
-std::cout << std::endl;
+			// this->_channels[ch_name] = newChannel; //Store the MODIFIED channel to the Server channels map:	std::map<std::string, Channel*>	_channels;
+// std::cout << "[DEBUG~]: Channels in server:\t ";
+// for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+// {
+// 	std::cout << " " << it->first << "(" << it->second.getName() << ")"; 
+// }
+// std::cout << std::endl;
 		}
 		else  //channel exists
 		{
