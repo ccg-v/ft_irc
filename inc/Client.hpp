@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/12 00:50:13 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:00:01 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,13 @@ class	Client
 		int 						getChannelCnt();
 		// void 						setChannelCnt(void);
 	//	int							getMaxChannels(void) const;
-		std::map<std::string, bool>	&getChannels();
+		std::map<Channel*, bool>	&getSubscriptions();
 	
 		/* --- Other public methods ----------------------------------------- */
-		void			addChannel(std::string &channel, bool isChanOp);
+		// void			addChannel(std::string &channel, bool isChanOp);
 		//	void			_sendMessage(const std::string &message) const;
-		void			unsubscribe(std::string channelName);
+		void 						addSubscription(Channel *channel, bool isChanOp);
+		void						unsubscribe(Channel &channel);
 	
 	private:
 
@@ -69,7 +70,7 @@ class	Client
 		bool						_isRegistered;
 		std::string					_clientBuffer;
 	//	int							_maxChannels;
-		std::map<std::string, bool> _channels; // key = channel name, bool: whether the client is operator (chanop / admin) of that channel OR NOT
+		// std::map<std::string, bool> _channels; // key = channel name, bool: whether the client is operator (chanop / admin) of that channel OR NOT
 		std::map<Channel*, bool>	_subscriptions;
 };
 

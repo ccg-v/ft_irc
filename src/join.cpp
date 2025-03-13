@@ -25,7 +25,7 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 			key = keys[i];
 		else
 			key = "";
-    	if (client.getChannels().size() >= MAXCHAN)
+    	if (client.getSubscriptions().size() >= MAXCHAN)
 		{
 			this->_sendMessage(client, ERR_TOOMANYCHANNELS(this->_serverName, client.getNickname(), ch_name));
     	   	return;
@@ -38,29 +38,65 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 				return;
 			}
 			Channel newChannel(ch_name, key); //instantiate the channel
-			client.addChannel(ch_name, true); //add the channel to the client's channels map
-			newChannel.addClient(client.getFd()); //add client to the Channel clients vector
-			this->_channels[ch_name] = newChannel; //Store the MODIFIED channel to the Server channels map
+
+			client.addSubscription(&newChannel, true); //add the channel to the client's channels map: std::map<Channel*, bool> _subscriptions
+std::cout << "[DEBUG~]: Client's subscriptions:\t";
+for (std::map<Channel*, bool>::iterator it = client.getSubscriptions().begin(); it != client.getSubscriptions().end(); ++it)
+{
+	std::cout << " " << it->first->getName() << " | isOp = " << it->second << ";";
+}
+std::cout << std::endl;
+
+			newChannel.addMember(&client); //add client to the Channel clients vector:	std::set<Client*> _members;
+std::cout << "[DEBUG~]: Members in " << newChannel.getName() << ":\t";
+for (std::set<Client*>::iterator it = newChannel.getMembers().begin(); it != newChannel.getMembers().end(); ++it)
+{
+	std::cout << " " << (*it)->getNickname();
+}
+std::cout << std::endl;
+
+			this->_channels[ch_name] = newChannel; //Store the MODIFIED channel to the Server channels map:	std::map<std::string, Channel*>	_channels;
+std::cout << "[DEBUG~]: Channels in server:\t ";
+for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+{
+	std::cout << " " << it->first << "(" << it->second.getName() << ")"; 
+}
+std::cout << std::endl;
 		}
 		else  //channel exists
 		{
-			Channel &channel = this->_channels[ch_name];
-			if (this->_onChannel(client, ch_name)) //NOT SHOWING ON IRSSI (which manages that itself) - CHECK NETCAT
+			Channel *channel = _findChannelByName(ch_name);
+			if (this->_onChannel(client, *channel)) //NOT SHOWING ON IRSSI (which manages that itself) - CHECK NETCAT
 				this->_sendMessage(client, ERR_USERONCHANNEL(this->_serverName, client.getNickname(), ch_name));
 		    // TO TEST - NOT WORKING
-			else if (channel.getIonly() && _isInvited(channel, client.getFd())) // 2a CONDICIO: MIRAR si ha rebut una invitacio
+			else if (channel->getIonly() && _isInvited(*channel, client.getFd())) // 2a CONDICIO: MIRAR si ha rebut una invitacio
                 this->_sendMessage(client, ERR_INVITEONLYCHAN(this->_serverName, client.getNickname(), ch_name));
 			// PENDING COMPLEX TESTS!!!
-			else if (channel.getKey() != "" && key != channel.getKey())
+			else if (channel->getKey() != "" && key != channel->getKey())
 				this->_sendMessage(client, ERR_BADCHANNELKEY(this->_serverName, client.getNickname(), ch_name));
-			else if (channel.getLimit() && channel.getClients().size() == static_cast<size_t>(channel.getLimit()))
+			else if (channel->getLimit() && channel->getMembers().size() == static_cast<size_t>(channel->getLimit()))
 				this->_sendMessage(client, ERR_CHANNELISFULL(this->_serverName, client.getNickname(), ch_name));
 			//JOIN THE CLIENT TO THE CHANNEL with 'false' as operator: 1. Add the channel to the list of channels for that client, 2. Add the client to the list of clients for the channel 
 			else
 			{
-				client.addChannel(ch_name, false); //add the channel to the client's channels map
-				channel.addClient(client.getFd()); //add client to the Channel clients vector
+				client.addSubscription(channel, false); //add the channel to the client's channels map
+				channel->addMember(&client); //add client to the Channel clients vector
 				// TODO: Send the topic (TOPIC message) and names list (NAMES message) to the joining user.
+
+				std::cout << "[DEBUG~]: Client's subscriptions:\t";
+				for (std::map<Channel*, bool>::iterator it = client.getSubscriptions().begin(); it != client.getSubscriptions().end(); ++it)
+				{
+					std::cout << " " << it->first->getName() << " | isOp = " << it->second << ";";
+				}
+				std::cout << std::endl;
+
+				std::cout << "[DEBUG~]: Members in " << channel->getName() << ":\t";
+				for (std::set<Client*>::iterator it = channel->getMembers().begin(); it != channel->getMembers().end(); ++it)
+				{
+					std::cout << " " << (*it)->getNickname();
+				}
+				std::cout << std::endl;
+								
 			}
 		}
 	}
@@ -80,13 +116,20 @@ bool Server::_isInvited(Channel &channel, int client_fd)
 
 bool	Server::_chanExists(const std::string &name)
 {  
-    std::map<std::string, Channel>::iterator it;
-    for (it = this->_channels.begin(); it != this->_channels.end(); ++it)
-    {
-        if (it->first == name)
-            return (true);
-    }
-    return (false);
+    // std::map<std::string, Channel>::iterator it;
+    // for (it = this->_channels.begin(); it != this->_channels.end(); ++it)
+    // {
+    //     if (it->first == name)
+    //         return (true);
+    // }
+    // return (false);
+
+    std::map<std::string, Channel>::iterator it = this->_channels.find(name);
+    
+    if (it == _channels.end())
+        return (false);
+    
+    return (true);
 }
 
 bool Server::_validChannelName(std::string &name)

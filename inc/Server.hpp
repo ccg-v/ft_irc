@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/11 21:10:48 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/13 17:47:00 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,15 +117,14 @@ class	Server
 		void		_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
 		Client		*_findClientByFd(const int fd);
 
-		/* --- Join ---------------------------------- */
-		bool						_chanExists(const std::string &);
-		bool 						_validChannelName(std::string &name);
-		bool				 		_isInvited(Channel &channel, int client_fd);
-		//std::vector<std::string>	_splitByComma(const std::string &str);		
+		/* --- Join --------------------------------------------------------- */
+		bool		_chanExists(const std::string &);
+		bool 		_validChannelName(std::string &name);
+		bool		_isInvited(Channel &channel, int client_fd);	
 
-		/* --- Mode ---------------------------------- */
+		/* --- Mode --------------------------------------------------------- */
 		Channel		*_getChannel(const std::string &ch_name);
-		bool		_onChannel(Client &client, const std::string ch_name);
+		bool		_onChannel(Client &client, Channel &channel);
 
 		/* --- Kick --------------------------------------------------------- */
 		Channel 	*_findChannelByName(const std::string &channelName);

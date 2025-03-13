@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/11 21:10:51 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/13 19:52:46 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -440,25 +440,72 @@ void	Server::_debugListClients()
 	std::cout << std::endl;
 }
 
-void	Server::_debugListChannels()
-{
-	std::map<std::string, Channel>::iterator channelIt;
+void Server::_debugListChannels()
+{   
+    if (_channels.empty())
+    {
+        std::cout << "\tNo channels exist." << std::endl;
+        return;
+    }
 
-	std::cout << "\tList of channels and their members: " << std::endl;
-	for (channelIt = this->_channels.begin(); channelIt != this->_channels.end(); channelIt++)
-	{
-		std::cout << "\t - " << channelIt->first << std::endl;
+    std::cout << "\tList of channels and their members: " << std::endl;
 
-		std::vector<int> members = channelIt->second.getClients();
-		std::cout << "\t   size of " << channelIt->first << " is " << members.size() << std::endl;
-		for (size_t i = 0; i < members.size(); i++)
-		{
-			int fd = members[i];
-			std::cout << "\t\t · " << this->_clients[fd].getNickname() << std::endl;	
-		}
-	}
-	std::cout << std::endl;
+    for (std::map<std::string, Channel>::iterator chIt = _channels.begin(); chIt != _channels.end(); ++chIt)
+    {
+        std::cout << "\t - " << chIt->first << std::endl;
+
+        for (std::set<Client*>::iterator membIt = chIt->second.getMembers().begin(); membIt != chIt->second.getMembers().end(); ++membIt)
+        {
+            std::cout << "\t   · " << (*membIt)->getNickname();
+
+			std::map<Channel*, bool>& subscriptions = (*membIt)->getSubscriptions();
+			std::map<Channel*, bool>::iterator subIt = subscriptions.find(&chIt->second);
+
+			if (subIt != subscriptions.end())
+			{
+				if (subIt->second == true)  // Ensure the channel exists in the subscriptions map
+					std::cout << "\t +o" << std::endl;
+				else
+					std::cout << "\t -o" << std::endl;
+			}
+			else
+				std::cout << "\tIterator over subscriptions reached the end. No channel found." << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
+
+// void Server::_debugListChannels()
+// {   
+//     if (_channels.empty())
+//     {
+//         std::cout << "\tNo channels exist." << std::endl;
+//         return;
+//     }
+
+//     std::cout << "\tList of channels and their members: " << std::endl;
+
+// 	std::map<std::string, Channel*>::iterator chIt;	
+//     for (chIt = _channels.begin(); chIt != _channels.end(); ++chIt)
+//     {
+//         Channel *currChannel = chIt->second;
+// 		if (!currChannel)
+// 			return ;
+		
+//         std::cout << "\t - " << currChannel->getName() << std::endl;
+
+//         // std::set<Client*> &members = currChannel->getMembers();
+// 		// std::set<Client*>::iterator membIt;
+
+//         // for (membIt= members.begin(); membIt != members.end(); ++membIt)
+//         // {
+//         //     std::cout << "\t   · " << (*membIt)->getNickname() << std::endl;
+//         // }
+//         std::cout << std::endl;
+//     }
+//     std::cout << std::endl;
+// }
 
 /*	[1] Protocols RFC 1459 and RFC 2812, section 2.3:
  *

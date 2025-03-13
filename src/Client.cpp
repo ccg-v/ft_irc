@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/12 00:12:15 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:04:53 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ Client::Client(const Client &source)
 	_isAuthenticated = source._isAuthenticated;
 	_isRegistered = source._isRegistered;
 	_clientBuffer = source._clientBuffer;
+	_subscriptions = source._subscriptions;
 }
 
 Client &Client::operator=(const Client &source)
@@ -47,7 +48,8 @@ Client &Client::operator=(const Client &source)
 		_isRegistered = source._isRegistered;
 		_clientBuffer = source._clientBuffer;
 	//	_maxChannels = source._maxChannels;
-		_channels = source._channels; 
+		// _channels = source._channels;
+		_subscriptions = source._subscriptions;
     }
     return *this;
 }
@@ -153,16 +155,16 @@ bool	Client::getRegistration()
 	return (this->_isRegistered);
 }
 
-std::map<std::string, bool>	&Client::getChannels()
+std::map<Channel*, bool>& Client::getSubscriptions()
 {
-	return (this->_channels);
+	return (this->_subscriptions);
 }
 
 // OTHER METHODS
 
-void Client::addChannel(std::string &channel, bool isChanOp)
+void Client::addSubscription(Channel *channel, bool isChanOp)
 {
-    this->_channels[channel] = isChanOp; // [1]
+    this->_subscriptions[channel] = isChanOp; // [1]
 	// for (std::map<std::string, bool>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
 	// {
     // 	std::cout << "[~DEBUG]: one channel is: " << it->first << std::endl;
@@ -192,17 +194,17 @@ void Client::addChannel(std::string &channel, bool isChanOp)
 	myMap["banana"] = 10; // Inserts ("banana", 10)
 */
 
-void	Client::unsubscribe(std::string channelName)
+void	Client::unsubscribe(Channel &channel)
 {
-	std::map<std::string, bool>::iterator it = _channels.find(channelName);
+	std::map<Channel*, bool>::iterator it = _subscriptions.find(&channel);
 	
-	if (it != _channels.end())
+	if (it != _subscriptions.end())
 	{
-		_channels.erase(it);
+		_subscriptions.erase(it);
 	}
 	else
 	{
-		std::cout << "Channel not found among client's memberships" << std::endl;
+		std::cout << "[~DEBUG]: Client is not subscribed to that channel" << std::endl;
 	}
 }
 

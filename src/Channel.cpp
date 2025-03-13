@@ -11,7 +11,7 @@ Channel::Channel(const Channel &src)
 {
 	_name = src._name;
 	_key = src._key;
-    _clients = src._clients;
+    _members = src._members;
 	_limit = src._limit;
     _topic = src._topic;
     _ionly = src._ionly;
@@ -24,7 +24,7 @@ Channel &Channel::operator=(const Channel &src)
     {
         _name = src._name;
 	    _key = src._key;
-        _clients = src._clients;
+        _members = src._members;
 	    _limit = src._limit;
         _topic = src._topic;
         _ionly = src._ionly;
@@ -109,7 +109,7 @@ bool Channel::getIonly() const
 //     return (false);
 // }
 
-std::vector<int> Channel::getClients(void) const
+std::set<Client*> &Channel::getMembers()
 {
 // #ifdef DEBUG
 //     std::cout << "CLIENTS IN GETCLIENTS: ";
@@ -119,7 +119,7 @@ std::vector<int> Channel::getClients(void) const
 //     }
 //     std::cout << std::endl;
 // #endif
-    return (this->_clients);
+    return (this->_members);
 }
 
 std::vector<int> Channel::getInvited(void)
@@ -127,9 +127,9 @@ std::vector<int> Channel::getInvited(void)
     return (this->_invited);
 }
 
-void Channel::addClient(const int &fd)
+void Channel::addMember(Client *client)
 {
-    this->_clients.push_back(fd);
+    this->_members.insert(client);
 	//std::cout << "Client with fd " << fd << " added to channel named: " << this->_name << std::endl;
 	// for (size_t i = 0; i < this->_clients.size(); ++i)
 	// {
@@ -163,19 +163,19 @@ void Channel::addClient(const int &fd)
         const std::map<char, bool>, and SO operator[] cannot be used.
 */
 
-void	Channel::removeClient(int fd)
+void	Channel::removeMember(Client *client)
 {
     // if (!isOperator(kickerFd)) {
     //     std::cout << "kicker must be an operator" << std::endl;
     // }
 
     // Check if the target client is in the channel
-    std::vector<int>::iterator it = std::find(_clients.begin(), _clients.end(), fd);
-    if (it == _clients.end()) {
+    std::set<Client*>::iterator it = std::find(_members.begin(), _members.end(), client);
+    if (it == _members.end()) {
         std::cout << "Client is not in the channel." << std::endl;
 		return ;
     }
 
     // Remove the client
-    _clients.erase(it);
+    _members.erase(it);
 }

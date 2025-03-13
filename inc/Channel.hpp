@@ -38,13 +38,13 @@ class Channel
 	//	bool				getMode(char mode) const; // to use only after checking that mode exists!  - erosas: ????
 		bool 				getIonly() const;
 		bool 				getTmode() const;
-		std::vector<int>	getClients(void) const;
+		std::set<Client*>	& getMembers(void);
 		std::vector<int>	getInvited(void);
 
-		void				addClient(const int &fd);
+		void				addMember(Client *client);
 		//void _sendMessage(const std::string& message) const;
 
-		void				removeClient(int fd);
+		void				removeMember(Client *client);
 
 	private:
 		std::string			_name;
@@ -54,9 +54,8 @@ class Channel
 		bool				_tmode; // restrict topic changes to operators
 		int					_limit; //set with the 'l' mode
 
-		std::vector<int>	_clients; // fds of clients
+		// std::vector<int>	_clients; // fds of clients
 		std::vector<int>	_invited; // fds of clients that have been invited to the channel
-
 		std::set<Client*>	_members;
 		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l
 };

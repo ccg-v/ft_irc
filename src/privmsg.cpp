@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/11 00:41:11 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/12 14:14:42 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,11 @@ void	Server::_sendToChannel(Channel &channel, const std::string &message)
 {
 	std::cout << "Message should be broadcasted to full " << channel.getName() << " channel" << std::endl;
 
-	std::vector<int>::iterator it;
+	std::set<Client*>::iterator it;
 	
-	for (size_t i = 0; i < channel.getClients().size(); i++)
+	for (it = channel.getMembers().begin(); it != channel.getMembers().end(); it++)
 	{
-		Client *member = _findClientByFd(channel.getClients()[i]);
-		
-		_sendMessage(*member, message);
+		_sendMessage(**it, message);
 	}
 }
 
