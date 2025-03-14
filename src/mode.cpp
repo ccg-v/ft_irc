@@ -15,13 +15,13 @@ void Server::_mode(Client &client, const t_tokens msg)
 	
 	Channel *channel = _getChannel(msg.parameters[0]);	//copy the channel to an easier parameter "channel"
 	//0. CHECK IF client is on that channel
-	if (!_onChannel(client, *channel))
+	if (!_onChannel(client, channel->getName()))
 	{
 		this->_sendMessage(client, ERR_NOTONCHANNEL(this->_serverName, client.getNickname(), channel->getName()));
      	return ;
 	}
 	//1. CHECK IF client has permission to change modes in the channel
-	std::map<Channel*, bool>::iterator it = client.getSubscriptions().find(channel);
+	std::map<std::string, bool>::iterator it = client.getChannels().find(channel->getName());
 	if (!it->second) 
 	{
     	this->_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channel->getName()));
@@ -62,7 +62,7 @@ void Server::_mode(Client &client, const t_tokens msg)
 				return ;
 			}
 			// Check that the limit passed is not lower than current number of clients in the channel
-			if (static_cast<size_t>(num) < channel->getMembers().size())
+			if (static_cast<size_t>(num) < channel->getClients().size())
 			{
 				std::stringstream ss;
     			ss << num;
@@ -93,7 +93,7 @@ void Server::_mode(Client &client, const t_tokens msg)
 			}
 			if (target)
 			{
-				target->getSubscriptions()[channel] = newstatus;
+				target->getChannels()[channel->getName()] = newstatus;
 			}
 			else
 			{
@@ -105,28 +105,21 @@ void Server::_mode(Client &client, const t_tokens msg)
 
 Channel	*Server::_getChannel(const std::string &ch_name)
 {
-	// std::map<std::string, Channel>::iterator it;
-	// for (it = this->_channels.begin(); it != this->_channels.end(); ++it)
-	// {
-	// 	if (it->first == ch_name)
-	// 		return(&it->second);
-	// }
-	// return (NULL);
-
-    std::map<std::string, Channel>::iterator it = this->_channels.find(ch_name);
-    
-    if (it == _channels.end())
-        return (NULL);
-    
-    return (&it->second);
+	std::map<std::string, Channel>::iterator it;
+	for (it = this->_channels.begin(); it != this->_channels.end(); ++it)
+	{
+		if (it->first == ch_name)
+			return(&it->second);
+	}
+	return (NULL);
 }
 
-bool	Server::_onChannel(Client &client, Channel &channel)
+bool	Server::_onChannel(Client &client, const std::string ch_name)
 {
-	std::map<Channel*, bool>::iterator it;
-	for (it = client.getSubscriptions().begin(); it != client.getSubscriptions().end(); ++it)
+	std::map<std::string, bool>::iterator it;
+	for (it = client.getChannels().begin(); it != client.getChannels().end(); ++it)
 	{
-		if (it->first == &channel)
+		if (it->first == ch_name)
 			return (true);
 	}
 	return (false);

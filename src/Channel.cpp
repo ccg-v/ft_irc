@@ -11,7 +11,7 @@ Channel::Channel(const Channel &src)
 {
 	_name = src._name;
 	_key = src._key;
-    _members = src._members;
+    _clients = src._clients;
 	_limit = src._limit;
     _topic = src._topic;
     _ionly = src._ionly;
@@ -24,7 +24,7 @@ Channel &Channel::operator=(const Channel &src)
     {
         _name = src._name;
 	    _key = src._key;
-        _members = src._members;
+        _clients = src._clients;
 	    _limit = src._limit;
         _topic = src._topic;
         _ionly = src._ionly;
@@ -109,7 +109,7 @@ bool Channel::getIonly() const
 //     return (false);
 // }
 
-std::set<Client*> &Channel::getMembers()
+std::vector<int> Channel::getClients(void) const
 {
 // #ifdef DEBUG
 //     std::cout << "CLIENTS IN GETCLIENTS: ";
@@ -119,7 +119,7 @@ std::set<Client*> &Channel::getMembers()
 //     }
 //     std::cout << std::endl;
 // #endif
-    return (this->_members);
+    return (this->_clients);
 }
 
 std::vector<int> Channel::getInvited(void)
@@ -127,9 +127,9 @@ std::vector<int> Channel::getInvited(void)
     return (this->_invited);
 }
 
-void Channel::addMember(Client *client)
+void Channel::addClient(const int &fd)
 {
-    this->_members.insert(client);
+    this->_clients.push_back(fd);
 	//std::cout << "Client with fd " << fd << " added to channel named: " << this->_name << std::endl;
 	// for (size_t i = 0; i < this->_clients.size(); ++i)
 	// {
@@ -156,26 +156,22 @@ void Channel::addMember(Client *client)
 //     client._sendMessage(RPL_ENDOFNAMES(client.getNickname(), this->_name));
 // }
 
+void	Channel::removeMember(int fd)
+{
+    std::vector<int>::iterator it;
+
+	it = std::find(this->_clients.begin(), this->_clients.end(), fd);
+    if (it == this->_clients.end()) {
+        std::cout << "Client is not in the channel." << std::endl;
+		return ;
+    }
+    // Remove the client
+    this->_clients.erase(it);
+}
+
 /*  [1] Cannot use "return (this->_modes[mode])" because the operator[] on std::map
         is not a const function and it can modify the map by inserting a default value
         if the key does not exist.
         If we want the getMode function to be const, _modes is treated as a
         const std::map<char, bool>, and SO operator[] cannot be used.
 */
-
-void	Channel::removeMember(Client *client)
-{
-    // if (!isOperator(kickerFd)) {
-    //     std::cout << "kicker must be an operator" << std::endl;
-    // }
-
-    // Check if the target client is in the channel
-    std::set<Client*>::iterator it = std::find(_members.begin(), _members.end(), client);
-    if (it == _members.end()) {
-        std::cout << "Client is not in the channel." << std::endl;
-		return ;
-    }
-
-    // Remove the client
-    _members.erase(it);
-}

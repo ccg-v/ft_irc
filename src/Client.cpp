@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/12 20:04:53 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/14 20:07:10 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ Client::Client(const Client &source)
 	_isAuthenticated = source._isAuthenticated;
 	_isRegistered = source._isRegistered;
 	_clientBuffer = source._clientBuffer;
-	_subscriptions = source._subscriptions;
 }
 
 Client &Client::operator=(const Client &source)
@@ -48,8 +47,7 @@ Client &Client::operator=(const Client &source)
 		_isRegistered = source._isRegistered;
 		_clientBuffer = source._clientBuffer;
 	//	_maxChannels = source._maxChannels;
-		// _channels = source._channels;
-		_subscriptions = source._subscriptions;
+		_channels = source._channels; 
     }
     return *this;
 }
@@ -155,16 +153,16 @@ bool	Client::getRegistration()
 	return (this->_isRegistered);
 }
 
-std::map<Channel*, bool>& Client::getSubscriptions()
+std::map<std::string, bool>	&Client::getChannels()
 {
-	return (this->_subscriptions);
+	return (this->_channels);
 }
 
 // OTHER METHODS
 
-void Client::addSubscription(Channel *channel, bool isChanOp)
+void Client::addChannel(std::string &channel, bool isChanOp)
 {
-    this->_subscriptions[channel] = isChanOp; // [1]
+    this->_channels[channel] = isChanOp; // [1]
 	// for (std::map<std::string, bool>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
 	// {
     // 	std::cout << "[~DEBUG]: one channel is: " << it->first << std::endl;
@@ -186,21 +184,13 @@ void Client::addSubscription(Channel *channel, bool isChanOp)
 //     this->_clientBuffer += buffer;
 // }
 
-/*	[1] You can add items to a std::map<Key, Value> using these methods:
-	1. Using operator[] (Creates or Updates)
-
-	std::map<std::string, int> myMap;
-	myMap["apple"] = 5;  // Inserts ("apple", 5)
-	myMap["banana"] = 10; // Inserts ("banana", 10)
-*/
-
-void	Client::unsubscribe(Channel &channel)
+void	Client::unsubscribe(std::string channelName)
 {
-	std::map<Channel*, bool>::iterator it = _subscriptions.find(&channel);
+	std::map<std::string, bool>::iterator it = this->_channels.find(channelName);
 	
-	if (it != _subscriptions.end())
+	if (it != this->_channels.end())
 	{
-		_subscriptions.erase(it);
+		this->_channels.erase(it);
 	}
 	else
 	{
@@ -208,3 +198,10 @@ void	Client::unsubscribe(Channel &channel)
 	}
 }
 
+/*	[1] You can add items to a std::map<Key, Value> using these methods:
+	1. Using operator[] (Creates or Updates)
+
+	std::map<std::string, int> myMap;
+	myMap["apple"] = 5;  // Inserts ("apple", 5)
+	myMap["banana"] = 10; // Inserts ("banana", 10)
+*/

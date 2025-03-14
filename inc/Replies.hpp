@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/11 22:02:14 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/11 13:33:08 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@
 #define INF_CLIENTQUIT(serverName, nick) \
 	(":" + serverName + " :" + nick + " QUIT :Leaving the server\r\n")
 #define INF_KICKEDFROMCHANNEL(serverName, command, channel, nick) \
-	(":" + serverName + " :" + command + " " + channel + " " + nick + " :Kicked from channel")
+	(":" + serverName + " :" + command + " " + channel + " " + nick + " :Kicked from channel\r\n")
 
 /* --- Handshake after complete register ------------------------------------ */
 #define RPL_WELCOME(serverName, nick, hostmask) (":" + serverName + " 001 " + nick + \

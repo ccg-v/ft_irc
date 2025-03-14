@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/13 17:47:00 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/14 21:57:54 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ class	Server
 	private:
 
 		/* --- Private attributes ------------------------------------------- */
-
 		std::string						_port;
 		std::string 					_password;
 		std::string						_serverName;
@@ -75,7 +74,6 @@ class	Server
 		std::map<std::string, void (Server::*)(Client&, t_tokens)> _commandMap; // [2]
 		
 		/* --- Private Coplien's functions ---------------------------------- */
-
 		Server(const Server &source);				// Copy constructor [1]
 		Server &operator=(const Server &source);	// Copy assignment operator [1]
 
@@ -85,12 +83,12 @@ class	Server
 		void						_processMessage(Client &currentClient, std::string message);
 		t_tokens					_tokenizeMsg(const std::string  &message);
 		void						_sendMessage(Client &client, const std::string &message);
-		// void						_removeFromChannel(Channel &channel, int clientFd);
+		void						_removeFromChannel(Channel &channel, int clientFd);
 		void						_removeClient(int clientFd);
 		void						_removeAllClients();
 		void						_closeSockets();
 
-		//* --- Connection operations ---------------------------------- */
+		//* --- Connection operations --------------------------------------- */
 		void 		_cap(Client &client, const t_tokens msgTokens);
 		void 		_pass(Client &client, const t_tokens msgTokens);
 		void 		_nick(Client &client, const t_tokens msgTokens);
@@ -113,9 +111,8 @@ class	Server
 		bool 		_isUserValid(const std::string &username);
 
 		/* --- Privmsg ------------------------------------------------------ */	
-		void		_sendToChannel(Channel &channel, const std::string &message);
+		void		_sendToChannel(Client &client, Channel &channel, const t_tokens msgTokens);
 		void		_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens);
-		Client		*_findClientByFd(const int fd);
 
 		/* --- Join --------------------------------------------------------- */
 		bool		_chanExists(const std::string &);
@@ -124,11 +121,12 @@ class	Server
 
 		/* --- Mode --------------------------------------------------------- */
 		Channel		*_getChannel(const std::string &ch_name);
-		bool		_onChannel(Client &client, Channel &channel);
+		bool		_onChannel(Client &client, const std::string ch_name);
 
 		/* --- Kick --------------------------------------------------------- */
 		Channel 	*_findChannelByName(const std::string &channelName);
 		Client 		*_findClientByNick(const std::string &nickname);
+		Client		*_findClientByFd(const int fd);
 		bool		_isClientInChannel(Channel &channel, Client &client);
 
 		/* --- Debug -------------------------------------------------------- */		

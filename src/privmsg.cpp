@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/12 14:14:42 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/14 22:01:24 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 			Channel *channel = _findChannelByName(target);
 			if (channel) 
 			{
-				_sendToChannel(*channel, msgTokens.trailing);
+				_sendToChannel(client, *channel, msgTokens);
 				continue ;
 			}
 			else
@@ -65,17 +65,36 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 	}
 }
 
-void	Server::_sendToChannel(Channel &channel, const std::string &message)
+void	Server::_sendToChannel(Client &client, Channel &channel, const t_tokens msgTokens)
 {
 	std::cout << "Message should be broadcasted to full " << channel.getName() << " channel" << std::endl;
 
-	std::set<Client*>::iterator it;
-	
-	for (it = channel.getMembers().begin(); it != channel.getMembers().end(); it++)
+	std::string fullMessage = ":" + client.getHostMask() + " " + msgTokens.command \
+		+ " " + channel.getName() + " :" + msgTokens.trailing + "\r\n";
+
+	for (size_t i = 0; i < channel.getClients().size(); i++)
 	{
-		_sendMessage(**it, message);
+		Client *member = _findClientByFd(channel.getClients()[i]);
+		
+		if (member && member->getFd() != client.getFd()) // Don't send to sender
+			_sendMessage(*member, fullMessage);
 	}
 }
+
+
+// void	Server::_sendToChannel(Channel &channel, const std::string &message)
+// {
+// 	std::cout << "Message should be broadcasted to full " << channel.getName() << " channel" << std::endl;
+
+// 	std::vector<int>::iterator it;
+	
+// 	for (size_t i = 0; i < channel.getClients().size(); i++)
+// 	{
+// 		Client *member = _findClientByFd(channel.getClients()[i]);
+		
+// 		_sendMessage(*member, message);
+// 	}
+// }
 
 void	Server::_sendToUser(Client &client, const std::string &target, const t_tokens msgTokens)
 {
@@ -90,16 +109,4 @@ void	Server::_sendToUser(Client &client, const std::string &target, const t_toke
 			return;
 		}
 	}
-}
-
-Client *Server::_findClientByFd(const int fd)
-{
-	std::map<int, Client>::iterator it;
-
-	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
-	{
-		if (it->second.getFd() == fd)
-			return (&it->second);
-	}
-	return (NULL);
 }

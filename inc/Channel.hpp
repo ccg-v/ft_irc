@@ -1,8 +1,7 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include <algorithm> // std::find
-#include <set> 		 // std::set
+#include <algorithm>	// std::find
 #include "Client.hpp"
 
 /* 	Channel names are strings (beginning with a '&' or '#' character) of length up to 200 characters. 
@@ -38,13 +37,12 @@ class Channel
 	//	bool				getMode(char mode) const; // to use only after checking that mode exists!  - erosas: ????
 		bool 				getIonly() const;
 		bool 				getTmode() const;
-		std::set<Client*>	& getMembers(void);
+		std::vector<int>	getClients(void) const;
 		std::vector<int>	getInvited(void);
 
-		void				addMember(Client *client);
+		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
-
-		void				removeMember(Client *client);
+		void				removeMember(int fd);
 
 	private:
 		std::string			_name;
@@ -54,10 +52,9 @@ class Channel
 		bool				_tmode; // restrict topic changes to operators
 		int					_limit; //set with the 'l' mode
 
-		// std::vector<int>	_clients; // fds of clients
+		std::vector<int>	_clients; // fds of clients
 		std::vector<int>	_invited; // fds of clients that have been invited to the channel
-		std::set<Client*>	_members;
-		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l
+		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l		
 };
 
 #endif
