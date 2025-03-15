@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/14 23:04:58 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/15 11:54:16 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,37 +35,61 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 	std::map<std::string, bool> &subscriptions = client.getChannels();
 	std::map<std::string, bool>::iterator it;
 
-	// for (it = subscriptions.begin(); it != subscriptions.end(); it++)
-	// {
-	// 	if (it->first == channelName)
-	// 		std::cout << client.getNickname() << " is a channel operator" << std::endl;
-	// 	else
-	// 		std::cout << " is NOT an operator!!" << std::endl;
-	// }
-
 	it = subscriptions.find(channelName);
-    if (it != subscriptions.end()) {
-		if (it->second == true)
-		{
-			std::cout << client.getNickname() << " is an operator in " << channelName<< std::endl;
-		}
-		else
-		{
-        	std::cout << client.getNickname() << " is NOT an operator in " << channelName<< std::endl;
-			return ;
-		}
-    }
+    if (it == subscriptions.end())
+	{
+		std::cout << client.getNickname() << " is not member of " << channelName << "(442: ERR_NOTONCHANNEL)" << std::endl;
+		return ;
+	}
+
+	bool isOperator = it->second;
+	if (!isOperator)
+	{
+		std::cout << client.getNickname() << " is NOT operator in " << channelName << "(482: ERR_CHANOPRIVSNEEDED)" << std::endl;
+		return ;
+	}
+
+    // if (it != subscriptions.end()) {
+	// 	if (it->second == true)
+	// 	{
+	// 		std::cout << client.getNickname() << " is an operator in " << channelName<< std::endl;
+	// 	}
+	// 	else
+	// 	{
+    //     	std::cout << client.getNickname() << " is NOT an operator in " << channelName<< std::endl;
+	// 		return ;
+	// 	}
+    // }
+
+// ===============	START ==================== //
+// :Alice!alice@host KICK #chatroom Bob :Alice //
 
 	std::vector<std::string> nicks = splitByComma(msgTokens.parameters[1]);
 
 	for (size_t i = 0; i < nicks.size(); i++)
 	{
-		Client * kickedClient = _findClientByNick(nicks[i]);
+ 		Client *kickedClient = _findClientByNick(nicks[i]);
 
-		if (kickedClient && _isClientInChannel(*channel, *kickedClient))
+		if (!kickedClient)
+		{
+			_sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, nicks[i]));
+			continue;
+		}
+		if (_isClientInChannel(*channel, *kickedClient))
 		{
 			// std::string message = INF_KICKEDFROMCHANNEL(this->_serverName, msgTokens.command, channel->getName(), member->getNickname());
-			std::string message = kickedClient->getNickname() + " has been kicked from " + channel->getName() + "\r\n";
+			// std::string message = kickedClient->getNickname() + " has been kicked from " + channel->getName() + "\r\n";
+			// std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
+			// 					  " " + channelName + " " + kickedClient->getNickname() +
+			// 					  " :" + client.getNickname();
+			// std::cout << message << std::endl;
+			
+// this->_sendToChannel(client, *channel, msgTokens);
+
+			std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
+									" " + channelName + " " + kickedClient->getNickname() +
+									" :" + client.getNickname();
+			std::cout << message << std::endl;
 			this->_sendToChannel(client, *channel, msgTokens);
 			channel->removeMember(kickedClient->getFd());
 			kickedClient->unsubscribe(channelName);
@@ -74,8 +98,9 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 		{
 std::cout << "_kick(): " << kickedClient->getNickname() << " is not a member of " << channel->getName() << std::endl;
  			this->_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, nicks[i], channelName));
+			 continue ;
 		}
-		continue ;
+		// continue ;
 	}
 }
 

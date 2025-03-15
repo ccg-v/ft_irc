@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/14 22:43:15 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/15 10:16:04 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -444,14 +444,16 @@ void	Server::_debugListClients()
 void	Server::_debugListChannels()
 {
 	std::map<std::string, Channel>::iterator channelIt;
-
-	std::cout << "[~DEBUG]:\tList of channels and their members: " << std::endl;
+	if (this->_channels.empty())
+		std::cout << "[DEBUG~]:\tNo channels on server" << std::endl;
+	else
+		std::cout << "[~DEBUG]:\tList of channels and their members: " << std::endl;
+	
 	for (channelIt = this->_channels.begin(); channelIt != this->_channels.end(); channelIt++)
 	{
 		std::cout << "[~DEBUG]:\t- " << channelIt->first << std::endl;
 
 		std::vector<int> members = channelIt->second.getClients();
-		std::cout << "[~DEBUG]:\tsize of " << channelIt->first << " is " << members.size() << std::endl;
 
 		for (size_t i = 0; i < members.size(); i++)
 		{
