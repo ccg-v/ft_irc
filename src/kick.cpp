@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/16 01:34:29 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/16 02:47:57 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 			// std::cout << message << std::endl;
 			
 // this->_sendToChannel(client, *channel, msgTokens);
-
-			std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
-									" " + channelName + " " + kickedClient->getNickname() +
-									" :" + client.getNickname() + "\r\n";
+			std::cout << "msgTokens.trailing is '"<< msgTokens.trailing << "'" << std::endl;
+ 			std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
+								  " " + channelName + " " + kickedClient->getNickname() + 
+								  " " + msgTokens.trailing + "\r\n";
 			std::cout << message << std::endl;
 			// this->_sendToChannel(client, *channel, msgTokens);
 
