@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/15 11:54:16 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/16 01:34:29 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,21 +49,6 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 		return ;
 	}
 
-    // if (it != subscriptions.end()) {
-	// 	if (it->second == true)
-	// 	{
-	// 		std::cout << client.getNickname() << " is an operator in " << channelName<< std::endl;
-	// 	}
-	// 	else
-	// 	{
-    //     	std::cout << client.getNickname() << " is NOT an operator in " << channelName<< std::endl;
-	// 		return ;
-	// 	}
-    // }
-
-// ===============	START ==================== //
-// :Alice!alice@host KICK #chatroom Bob :Alice //
-
 	std::vector<std::string> nicks = splitByComma(msgTokens.parameters[1]);
 
 	for (size_t i = 0; i < nicks.size(); i++)
@@ -75,7 +60,8 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 			_sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, nicks[i]));
 			continue;
 		}
-		if (_isClientInChannel(*channel, *kickedClient))
+		// if (_isClientInChannel(*channel, *kickedClient))
+		if (_onChannel(*kickedClient, channelName))
 		{
 			// std::string message = INF_KICKEDFROMCHANNEL(this->_serverName, msgTokens.command, channel->getName(), member->getNickname());
 			// std::string message = kickedClient->getNickname() + " has been kicked from " + channel->getName() + "\r\n";
@@ -88,9 +74,18 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 
 			std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
 									" " + channelName + " " + kickedClient->getNickname() +
-									" :" + client.getNickname();
+									" :" + client.getNickname() + "\r\n";
 			std::cout << message << std::endl;
-			this->_sendToChannel(client, *channel, msgTokens);
+			// this->_sendToChannel(client, *channel, msgTokens);
+
+for (size_t i = 0; i < channel->getClients().size(); i++)
+{
+	Client *member = _findClientByFd(channel->getClients()[i]);
+	
+	if (member && member->getFd() != client.getFd()) // Don't send to sender
+		_sendMessage(*member, message);
+}
+
 			channel->removeMember(kickedClient->getFd());
 			kickedClient->unsubscribe(channelName);
 		}

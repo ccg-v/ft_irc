@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/14 22:01:24 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/16 01:22:02 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,10 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 			Channel *channel = _findChannelByName(target);
 			if (channel) 
 			{
-				_sendToChannel(client, *channel, msgTokens);
+				if (_onChannel(client, channel->getName()))
+					_sendToChannel(client, *channel, msgTokens);
+				else
+					std::cout << client.getNickname() << " is NOT a member of " << channel->getName() << std::endl;
 				continue ;
 			}
 			else
