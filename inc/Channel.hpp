@@ -38,6 +38,7 @@ class Channel
 		bool 				getIonly() const;
 		bool 				getTmode() const;
 		std::vector<int>	getClients(void) const;
+		void				setClients(const std::vector<int>& newClients);
 		std::vector<int>	getInvited(void);
 
 		void				addClient(const int &fd);

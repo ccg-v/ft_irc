@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/16 03:03:43 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:01:55 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ Server::Server(const std::string &port, const std::string &password)
 	_commandMap["PONG"] = &Server::_pong;
 	_commandMap["PRIVMSG"] = &Server::_privmsg;
 	_commandMap["KICK"] = &Server::_kick;
+	_commandMap["PART"] = &Server::_part;
 	_commandMap["QUIT"] = &Server::_quit;
 
     struct addrinfo hints;
@@ -307,9 +308,9 @@ t_tokens	Server::_tokenizeMsg(const std::string &message)
 		tokenizedMsg.parameters.push_back(token); // Add parameter to vector
 	}
 
-// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
-if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
-	tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
+	// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
+	if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
+		tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
 
     return (tokenizedMsg);
 }
@@ -352,21 +353,6 @@ void Server::_processMessage(Client &currentClient, std::string message)
 void	Server::_sendMessage(Client &client, const std::string &message)
 {
 	send(client.getFd(), message.c_str(), message.size(), 0);
-}
-
-void	Server::_removeFromChannel(Channel &channel, int clientFd)
-{
-	std::vector<int>::iterator it;
-	
-	for (it = channel.getClients().begin(); it != channel.getClients().end(); ++it)
-	{
-		if (*it == clientFd)
-		{
-std::cout << "[DEBUG~]: " << "_removeFromChannel: removing " << *it << " from " << channel.getName() << std::endl;
-			channel.getClients().erase(it);
-			break;
-		}
-	}
 }
 
 void	Server::_removeClient(int clientFd)

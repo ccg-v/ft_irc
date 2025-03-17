@@ -122,6 +122,11 @@ std::vector<int> Channel::getClients(void) const
     return (this->_clients);
 }
 
+void	Channel::setClients(const std::vector<int>& newClients)
+{
+	this->_clients = newClients;
+}
+
 std::vector<int> Channel::getInvited(void)
 {
     return (this->_invited);

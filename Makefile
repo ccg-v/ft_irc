@@ -6,7 +6,7 @@
 #    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/03/16 03:04:10 by ccarrace         ###   ########.fr        #
+#    Updated: 2025/03/17 00:10:30 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,8 @@ OBJ_DIR		= obj/
 # --- Files ------------------------------------------------------------------ #
 
 SRC_FILES	=	main.cpp Server.cpp Client.cpp Channel.cpp utils.cpp \
-				cap.cpp debug.cpp join.cpp kick.cpp mode.cpp nick.cpp pass.cpp \
-				ping.cpp pong.cpp privmsg.cpp quit.cpp user.cpp
+				cap.cpp debug.cpp join.cpp kick.cpp mode.cpp nick.cpp part.cpp \
+				pass.cpp ping.cpp pong.cpp privmsg.cpp quit.cpp user.cpp
 				
 OBJ_FILES	= $(SRC_FILES:.cpp=.o)
 DEP_FILES	= $(OBJ_FILES:.cpp=.d)

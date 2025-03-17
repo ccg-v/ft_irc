@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/15 23:21:13 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/16 22:01:23 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 #include <arpa/inet.h>  // inet_ntoa
 #include <cstdio>		// EOF
 #include <csignal>		// signal()
+#include <algorithm>	// std::find
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Replies.hpp"
@@ -103,6 +104,7 @@ class	Server
         // void _invite();
         // void _topic(int& i, std::vector<std::string> &args);
         void		_mode(Client &client, const t_tokens msgTokens);
+		void		_part(Client &client, const t_tokens msgTokens);
 		void		_quit(Client &client, const t_tokens msgTokens);
 
 		/* --- Nick --------------------------------------------------------- */
