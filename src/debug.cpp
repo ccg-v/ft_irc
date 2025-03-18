@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 03:02:37 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/16 12:08:20 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/18 01:12:22 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,23 +59,24 @@ void Server::_debugListChannels()
                 continue;
             }
 
-            // Check if channels map is valid before accessing
+            //	// Check if member has any subscriptions to
             std::map<std::string, bool> subscriptions = member->getChannels();
             if (subscriptions.empty()) {
-                std::cerr << "Warning: Client " << member->getNickname() << " has no channel subscriptions!" << std::endl;
+                // std::cerr << "Warning: Client " << member->getNickname() << " has no channel subscriptions!" << std::endl;
                 continue;
             }
 
             std::map<std::string, bool>::iterator it = subscriptions.find(channelName);
 
-            std::cout << "\t\t · " << _clients[fd].getNickname();
+            std::cout << "\t\t · ";
             if (it != subscriptions.end())
             {
                 if (it->second == true)  
-                    std::cout << "\t +o" << std::endl;
+                    std::cout << "+o ";
                 else
-                    std::cout << "\t -o" << std::endl;
-            }           
+                    std::cout << "-o ";
+            }
+			std::cout << _clients[fd].getNickname() << std::endl;      
         }
     }
     std::cout << std::endl;

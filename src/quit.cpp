@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 18:20:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/07 22:59:52 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/18 01:23:33 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,11 @@
 void	Server::_quit(Client &client, const t_tokens msgTokens)
 {
 	(void)msgTokens;
-
+	
+	_part(client, msgTokens);
 	_removeClient(client.getFd());
+
+	std::cout << "=============== QUIT ===============" << std::endl;
+	_debugListChannels();
+	std::cout << "====================================" << std::endl;
 }

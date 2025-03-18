@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/16 22:01:23 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/18 00:26:55 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 #include <cstdio>		// EOF
 #include <csignal>		// signal()
 #include <algorithm>	// std::find
+#include <set>			// std::set
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Replies.hpp"
