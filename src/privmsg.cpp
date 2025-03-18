@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/18 01:03:18 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 00:17:26 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 				if (_onChannel(client, channel->getName()))
 					_sendToChannel(client, *channel, msgTokens);
 				else
-					std::cout << client.getNickname() << " is NOT a member of " << channel->getName() << std::endl;
+					_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, client.getNickname(), channel->getName()));
 				continue ;
 			}
 			else
@@ -70,8 +70,6 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 
 void	Server::_sendToChannel(Client &client, Channel &channel, const t_tokens msgTokens)
 {
-	std::cout << "Message should be broadcasted to full " << channel.getName() << " channel" << std::endl;
-
 	std::string fullMessage = ":" + client.getHostMask() + " " + msgTokens.command \
 		+ " " + channel.getName() + " :" + msgTokens.trailing + "\r\n";
 

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/18 01:05:23 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 00:12:56 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,13 +83,14 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 			std::cout << message << std::endl;
 			// this->_sendToChannel(client, *channel, msgTokens);
 
-for (size_t i = 0; i < channel->getClients().size(); i++)
-{
-	Client *member = _findClientByFd(channel->getClients()[i]);
-	
-	if (member && member->getFd() != client.getFd()) // Don't send to sender
-		_sendMessage(*member, message);
-}
+			// BROADCAST message to channel
+			for (size_t i = 0; i < channel->getClients().size(); i++)
+			{
+				Client *member = _findClientByFd(channel->getClients()[i]);
+				
+				if (member && member->getFd() != client.getFd()) // Don't send to sender
+					_sendMessage(*member, message);
+			}
 
 			channel->removeMember(kickedClient->getFd());
 			kickedClient->unsubscribe(channelName);

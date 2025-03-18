@@ -122,6 +122,11 @@ std::vector<int> Channel::getClients(void) const
     return (this->_clients);
 }
 
+std::vector<int>& Channel::getClientsByRef()
+{
+	return (this->_clients);
+}
+
 void	Channel::setClients(const std::vector<int>& newClients)
 {
 	this->_clients = newClients;
@@ -161,17 +166,17 @@ void Channel::addClient(const int &fd)
 //     client._sendMessage(RPL_ENDOFNAMES(client.getNickname(), this->_name));
 // }
 
-void	Channel::removeMember(int fd)
+bool	Channel::removeMember(int fd)
 {
     std::vector<int>::iterator it;
 
 	it = std::find(this->_clients.begin(), this->_clients.end(), fd);
-    if (it == this->_clients.end()) {
-        std::cout << "Client is not in the channel." << std::endl;
-		return ;
-    }
-    // Remove the client
-    this->_clients.erase(it);
+    if (it != this->_clients.end())
+	{
+		this->_clients.erase(it);
+		return (true);
+	}
+	return (false);
 }
 
 /*  [1] Cannot use "return (this->_modes[mode])" because the operator[] on std::map

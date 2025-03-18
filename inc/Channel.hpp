@@ -38,12 +38,13 @@ class Channel
 		bool 				getIonly() const;
 		bool 				getTmode() const;
 		std::vector<int>	getClients(void) const;
+		std::vector<int>	&getClientsByRef();
 		void				setClients(const std::vector<int>& newClients);
 		std::vector<int>	getInvited(void);
 
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
-		void				removeMember(int fd);
+		bool				removeMember(int fd);
 
 	private:
 		std::string			_name;
