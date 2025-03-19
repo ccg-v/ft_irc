@@ -6,11 +6,20 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 03:02:37 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 13:38:50 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 19:56:35 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+void Server::_debug(Client &client, const t_tokens msgTokens)
+{
+	(void)client;
+	(void)msgTokens;
+	
+	_debugListClients();
+	_debugListChannels();
+}
 
 void	Server::_debugListClients()
 {

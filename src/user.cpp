@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:55:20 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/03 23:33:48 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 00:02:20 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,11 @@ void 	Server::_user(Client &client, const t_tokens msgTokens)
 {
 	if(!client.getAuthentication())
 	{
-		_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
+		if (client.getPassErrSent() == false)
+		{
+			_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
+			client.setPassErrSent(true);
+		}
 		return;
 	}
 

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 00:40:35 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 23:55:54 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ class	Client
 		bool						getAuthentication();
 		void						setRegistration(bool isRegistered);
 		bool						getRegistration();
+		void						setPassErrSent(bool passErrSent);
+		bool						getPassErrSent();
 	//	int 						getChannelCnt(void) const;
 	//	void 						setChannelCnt(void);
 	//	int							getMaxChannels(void) const;
@@ -66,6 +68,7 @@ class	Client
 		std::string					_hostMask;
 		bool						_isAuthenticated;
 		bool						_isRegistered;
+		bool						_passErrSent;
 		std::string					_clientBuffer;
 	//	int							_maxChannels;
 		std::map<std::string, bool> _channels; // key = channel name, bool: whether the client is operator (chanop / admin) of that channel OR NOT

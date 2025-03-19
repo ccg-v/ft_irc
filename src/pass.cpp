@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:43:33 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/06 23:50:32 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 00:02:58 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,13 @@ void 	Server::_pass(Client &client, const t_tokens msgTokens)
 {
 	if (msgTokens.parameters.empty() || msgTokens.parameters[0] != this->_password)
 	{
-		_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
-
-		// Close client's socket and remove client from tracking containers
-		_removeClient(client.getFd());
+		if (client.getPassErrSent() == false)
+		{
+			_sendMessage(client, ERR_PASSWDMISMATCH(this->_serverName, client.getNickname()));
+			client.setPassErrSent(true);
+		}
+		// // Close client's socket and remove client from tracking containers
+		// _removeClient(client.getFd());
 
 		return;
 	}

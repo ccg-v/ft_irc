@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/18 00:26:55 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 19:53:17 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ class	Server
         void		_mode(Client &client, const t_tokens msgTokens);
 		void		_part(Client &client, const t_tokens msgTokens);
 		void		_quit(Client &client, const t_tokens msgTokens);
+		void		_debug(Client &client, const t_tokens msgTokens);
 
 		/* --- Nick --------------------------------------------------------- */
 		bool		_isNickValid(const std::string &nick);

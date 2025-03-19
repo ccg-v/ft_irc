@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 00:40:21 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 23:56:41 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ Client::Client(int fd) // Parameterized constructor
 	: _fd(fd),
 	  _isAuthenticated(false), 
 	  _isRegistered(false),
+	  _passErrSent(false),
 	  _clientBuffer("")
 //	  _maxChannels(MAXCHAN)
 {
@@ -33,6 +34,7 @@ Client::Client(const Client &source)
 	_fd = source._fd;
 	_isAuthenticated = source._isAuthenticated;
 	_isRegistered = source._isRegistered;
+	_passErrSent = source._passErrSent;
 	_clientBuffer = source._clientBuffer;
 }
 
@@ -45,6 +47,7 @@ Client &Client::operator=(const Client &source)
 		_username = source._username;
 		_isAuthenticated = source._isAuthenticated;
 		_isRegistered = source._isRegistered;
+		_passErrSent = source._passErrSent;
 		_clientBuffer = source._clientBuffer;
 	//	_maxChannels = source._maxChannels;
 		_channels = source._channels; 
@@ -151,6 +154,16 @@ void	Client::setRegistration(bool isRegistered)
 bool	Client::getRegistration()
 {
 	return (this->_isRegistered);
+}
+
+void	Client::setPassErrSent(bool passErrSent)
+{
+	this->_passErrSent = passErrSent;
+}
+
+bool	Client::getPassErrSent()
+{
+	return (this->_passErrSent);
 }
 
 std::map<std::string, bool>	&Client::getChannels()
