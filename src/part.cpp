@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 19:14:04 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/18 23:20:28 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 00:45:03 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ void	Server::_part(Client &client, const t_tokens msgTokens)
 
 	for (size_t i = 0; i < partingChannels.size(); ++i)
 	{
-		std::cout << "[DEBUG~]: Channel to part: " << partingChannels[i] << std::endl;
-
 		// Find the channel object by name
 		Channel *channel = this->_findChannelByName(partingChannels[i]);
 		if (!channel)
@@ -50,7 +48,11 @@ void	Server::_part(Client &client, const t_tokens msgTokens)
 		// members.erase(clientIt);
 
 		// In the client, remove subscription to the channel
-		client.unsubscribe(partingChannels[i]);
+		if(!client.unsubscribe(partingChannels[i]))
+		{
+			_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, client.getNickname(), partingChannels[i]));
+			continue;
+		}
 		// std::map<std::string, bool>::iterator it = client.getChannels().find(partingChannels[i]);
 		
 		// if (it != client.getChannels().end())
@@ -59,7 +61,7 @@ void	Server::_part(Client &client, const t_tokens msgTokens)
 		// }
 		// else
 		// {
-		// 	_sendMessage(client, ERR_NOTONCHANNEL(this->_serverName, client.getNickname(), partingChannels[i]));
+		// 	_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, client.getNickname(), partingChannels[i]));
 		// 	continue ;
 		// }		
 	}

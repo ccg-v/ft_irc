@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/14 20:07:10 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 00:40:21 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,18 +184,16 @@ void Client::addChannel(std::string &channel, bool isChanOp)
 //     this->_clientBuffer += buffer;
 // }
 
-void	Client::unsubscribe(std::string channelName)
+bool	Client::unsubscribe(std::string channelName)
 {
 	std::map<std::string, bool>::iterator it = this->_channels.find(channelName);
 	
 	if (it != this->_channels.end())
 	{
 		this->_channels.erase(it);
+		return (true);
 	}
-	else
-	{
-		std::cout << "[~DEBUG]: Client is not subscribed to that channel" << std::endl;
-	}
+	return (false);
 }
 
 /*	[1] You can add items to a std::map<Key, Value> using these methods:

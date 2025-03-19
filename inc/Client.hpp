@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/14 20:01:42 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/19 00:40:35 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class	Client
 		/* --- Other public methods ----------------------------------------- */
 		void			addChannel(std::string &channel, bool isChanOp);
 		//	void			_sendMessage(const std::string &message) const;
-		void						unsubscribe(std::string channelName);		
+		bool						unsubscribe(std::string channelName);		
 	
 	private:
 
