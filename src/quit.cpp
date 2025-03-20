@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 18:20:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 14:00:09 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 01:05:29 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,23 @@ void	Server::_quit(Client &client, const t_tokens msgTokens)
 
 		/**********************************************************************/
 		/*         BROADCAST QUIT TO MEMBERS OF THE CHANNELS TO LEAVE         */
-		/**********************************************************************/		
+		/**********************************************************************/	
+
+		// BROADCAST message to channel		
+		std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
+								" " + channelName + " " + client.getNickname() + 
+								" " + msgTokens.trailing + "\r\n";
+		std::cout << message << std::endl;
+
+		for (size_t i = 0; i < channel->getClients().size(); i++)
+		{
+			Client *member = _findClientByFd(channel->getClients()[i]);
+			
+			if (member && member->getFd() != client.getFd()) // Don't send to sender
+				_sendMessage(*member, message);
+		}
 		channel->removeMember(client.getFd());
 		client.unsubscribe(channelName);
 	}
+	this->_removeClient(client.getFd());
 }
