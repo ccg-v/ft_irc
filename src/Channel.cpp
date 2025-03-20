@@ -166,6 +166,16 @@ void Channel::addClient(const int &fd)
 //     client._sendMessage(RPL_ENDOFNAMES(client.getNickname(), this->_name));
 // }
 
+void	Channel::setTopic(const std::string & topic)
+{
+	this->_topic = topic;
+}
+
+std::string	Channel::getTopic()
+{
+	return (this->_topic);
+}
+
 bool	Channel::removeMember(int fd)
 {
     std::vector<int>::iterator it;

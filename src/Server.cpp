@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 21:10:52 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 11:51:04 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ Server::Server(const std::string &port, const std::string &password)
 	_commandMap["PONG"] = &Server::_pong;
 	_commandMap["PRIVMSG"] = &Server::_privmsg;
 	_commandMap["KICK"] = &Server::_kick;
+	_commandMap["TOPIC"] = &Server::_topic;
 	_commandMap["PART"] = &Server::_part;
 	_commandMap["QUIT"] = &Server::_quit;
 	_commandMap["DEBUG"] = &Server::_debug;

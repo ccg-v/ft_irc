@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 23:55:54 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 10:15:30 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ class	Client
 		bool						_isRegistered;
 		bool						_passErrSent;
 		std::string					_clientBuffer;
+		std::string					_topic;
 	//	int							_maxChannels;
 		std::map<std::string, bool> _channels; // key = channel name, bool: whether the client is operator (chanop / admin) of that channel OR NOT
 };

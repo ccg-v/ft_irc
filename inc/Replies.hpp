@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/11 13:33:08 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 13:33:58 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,12 @@
 #include "utils.hpp"
 
 /* --- PASS command --------------------------------------------------------- */
-
 #define ERR_PASSWDMISMATCH(serverName, nick) \
 	(":" + serverName + " 464 " + nick + " :Password not given or incorrect.\r\n")
 #define ERR_ALREADYREGISTERED(serverName) \
 	(":" + serverName + " 462 " + " :You may not reregister\r\n")
 
 /* --- NICK command --------------------------------------------------------- */
-
 //	ERR_PASSWDMISMATCH()
 #define ERR_NONICKNAMEGIVEN(serverName) \
 	(":" + serverName + " 431" + " :No nickname given\r\n")
@@ -33,7 +31,6 @@
     (":" + serverName + " 433 " + nick + " " + newNick + " :Nickname is already in use\r\n")
 
 /* --- USER command --------------------------------------------------------- */
-
 //	ERR_PASSWDMISMATCH()
 //	ERR_ALREADYREGISTERED()
 #define ERR_NEEDMOREPARAMS(serverName, command) \
@@ -66,26 +63,38 @@
 #define ERR_CHANOPRIVSNEEDED(serverName, client, channel) \
 	(":" + serverName + " 482 " + client + " " + channel + " :You're not channel operator\r\n")
 
-/* --- KICK command --------------------------------------------------------- */
-//	ERR_NEEDMOREPARAMS()
-#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
-	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
-#define ERR_NOSUCHNICK(serverName, client, nick) \
-	(":" + serverName + " 401 " + client + " " + nick + " :No such nick\r\n")
-#define ERR_USERNOTINCHANNEL(serverName, client, channel) \
-	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n") 
-
 /* --- PRIVMSG command ------------------------------------------------------ */
-//	ERR_ERRONEUSNICKNAME()
-//	ERR_NOSUCHCHANNEL()
-//	ERR_NOSUCHNICK()
+//	ERR_NEEDMOREPARAMS()
+//	ERR_USERNOTINCHANNEL()
 #define ERR_NOTREGISTERED(serverName, client) \
 	(":" + serverName + " 451 " + client + " :You have not registered\r\n")
 #define ERR_NOTEXTTOSEND(serverName, client) \
 	(":" + serverName + " 412 " + client + " :No text to send\r\n")
-#define ERR_NORECIPIENT(serverName, client, command) \
-	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
-	
+#define ERR_USERNOTINCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n") 
+#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
+#define ERR_NOSUCHNICK(serverName, client, nick) \
+	(":" + serverName + " 401 " + client + " " + nick + " :No such nick\r\n")
+// #define ERR_NORECIPIENT(serverName, client, command)
+// 	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
+
+/* --- KICK command --------------------------------------------------------- */
+//	ERR_NEEDMOREPARAMS()
+//	ERR_NOSUCHCHANNEL()
+//	ERR_NOTONCHANNEL()
+//	ERR_CHANOPRIVSNEEDED()
+//	ERR_ERRONEUSNICKNAME()
+//	ERR_USERNOTINCHANNEL()
+
+/* --- TOPIC command -------------------------------------------------------- */
+//	ERR_NEEDMOREPARAMS()
+//	ERR_NOSUCHCHANNEL()
+//	ERR_NOTONCHANNEL()
+//	ERR_CHANOPRIVSNEEDED()
+#define RPL_TOPIC(serverName, client, channel, topic) \
+	(":" + serverName + " 332 " + client + " " + channel + " :" + topic + "\r\n")
+
 /* --- NOTICES -------------------------------------------------------------- */
 #define NTC_USERMISSING(serverName, nick) \
 	(":" + serverName + " NOTICE" + nick + " :Enter username to complete register\r\n")

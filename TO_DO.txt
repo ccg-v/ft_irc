@@ -11,21 +11,15 @@
 
 - Protecció contra Ghost Client Attack? (els clients semirregistrats retenen un descriptor i un nick, establir un ´timeout connection´)
 
-- QUIT també pel servidor?
-
-- Gestionar senyals
-
 - Leaks
 
 - acceptClient() extreu la ip del client i l'emmagatzema amb setClientIp()
 	1. Moure aquest fragment a una funció externa
 	2. Pot fer aquesta funció de setter?
 
-- moure _splitByComma a utils.cpp
-
-- perquè QUIT tanca el client?
-
 - Com puc forçar que poll() falli per saber si necessito cridar _removeClients() per fer net abans d'enviar l'excepció?
+
+JOIN: Send RPL_TOPIC (332) to a client when joining the <channel> to inform them of the current topic of the channel.
 
 CANVIS
 

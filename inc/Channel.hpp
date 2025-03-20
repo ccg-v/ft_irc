@@ -41,7 +41,8 @@ class Channel
 		std::vector<int>	&getClientsByRef();
 		void				setClients(const std::vector<int>& newClients);
 		std::vector<int>	getInvited(void);
-
+		void				setTopic(const std::string & topic);
+		std::string			getTopic();
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
 		bool				removeMember(int fd);
