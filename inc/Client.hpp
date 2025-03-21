@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 10:15:30 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 21:47:22 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class	Client
 		void			addChannel(std::string &channel, bool isChanOp);
 		//	void			_sendMessage(const std::string &message) const;
 		bool						unsubscribe(std::string channelName);		
+		bool						isOperator(std::string &ch_name);
 	
 	private:
 

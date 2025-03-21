@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 20:22:33 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/10 21:24:17 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/21 01:24:59 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,3 +59,28 @@ std::vector<std::string>	splitByComma(const std::string &str)
     }
     return result;
 }
+
+bool	validKey(const std::string &key)
+{
+	std::string allowedChars = "$%&'()*+-.@"; // Allowed special chars
+	
+	if (key.length() > 32 || key.length() < 2)
+		return false ;
+	for (size_t i = 0; i < key.length(); ++i)
+	{
+        char c = key[i];
+        if (!std::isalnum(c) && allowedChars.find(c) == std::string::npos)
+            return false;  // Invalid character found
+    }
+    return true;
+}
+
+// bool	isOnlySpaces(const std::string &str)
+// {
+//     return (str.find_first_not_of(" \t\n\v\f\r") == std::string::npos);
+// }
+
+/*	[1] If str is "key1,", the returned std::vector<std::string> will have two elements:
+		- "key1"
+		- "" (empty string, because there's a trailing comma)
+*/

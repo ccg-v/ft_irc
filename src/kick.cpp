@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 00:12:56 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 21:51:51 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,11 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 	if (!isOperator)
 	{
 		// std::cout << client.getNickname() << " is NOT operator in " << channelName << "(482: ERR_CHANOPRIVSNEEDED)" << std::endl;
-		// _sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
+		_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
 		/* ********************************************************************************************************** */
 		/* HAIG DE CONSTRUIR UNA NOTIFICACIO PERQUE QUAN IRSSi REP "ERR_CHANOPRIVSNEEDED" TANCA LA FINESTRA DEL CANAL */
 		/* ********************************************************************************************************** */
-		_sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n");
+		//_sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n");
 		return ;
 	}
 

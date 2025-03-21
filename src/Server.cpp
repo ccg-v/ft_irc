@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 11:51:04 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 21:47:37 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,6 +356,12 @@ void	Server::_sendMessage(Client &client, const std::string &message)
 {
 	send(client.getFd(), message.c_str(), message.size(), 0);
 }
+
+void	Server::_sendMessage_fd(int fd, const std::string &message)
+{
+	send(fd, message.c_str(), message.size(), 0);
+}
+
 
 void	Server::_removeClient(int clientFd)
 {

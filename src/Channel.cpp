@@ -78,10 +78,10 @@ int Channel::getLimit(void) const
     return (this->_limit);
 }
 
-// std::string Channel::getTopic(void) const
-// {
-//     return (this->_topic);
-// }
+std::string Channel::getTopic(void) const
+{
+    return (this->_topic);
+}
 
 std::string Channel::getKey(void) const
 {
@@ -111,7 +111,8 @@ bool Channel::getIonly() const
 
 std::vector<int> Channel::getClients(void) const
 {
-// #ifdef DEBUG
+    return (this->_clients);
+	// #ifdef DEBUG
 //     std::cout << "CLIENTS IN GETCLIENTS: ";
 //     for (size_t i = 0; i < this->_clients.size(); i ++)
 //     {
@@ -119,7 +120,6 @@ std::vector<int> Channel::getClients(void) const
 //     }
 //     std::cout << std::endl;
 // #endif
-    return (this->_clients);
 }
 
 std::vector<int>& Channel::getClientsByRef()
@@ -140,6 +140,9 @@ std::vector<int> Channel::getInvited(void)
 void Channel::addClient(const int &fd)
 {
     this->_clients.push_back(fd);
+	//send notifications about the channel to the new client added
+
+
 	//std::cout << "Client with fd " << fd << " added to channel named: " << this->_name << std::endl;
 	// for (size_t i = 0; i < this->_clients.size(); ++i)
 	// {

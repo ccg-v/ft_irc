@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 23:56:41 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 21:47:02 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,16 +136,6 @@ bool	Client::getAuthentication()
 	return (this->_isAuthenticated);
 }
 
-// int Client::getChannelCnt(void) const
-// {
-//     return (this->_channels.size());
-// }
-
-// int Client::getMaxChannels(void) const
-// {
-//     return (this->_maxChannels);
-// }
-
 void	Client::setRegistration(bool isRegistered)
 {
 	this->_isRegistered = isRegistered;
@@ -173,7 +163,14 @@ std::map<std::string, bool>	&Client::getChannels()
 
 // OTHER METHODS
 
-void Client::addChannel(std::string &channel, bool isChanOp)
+bool	Client::isOperator(std::string &ch_name)
+{
+	if (this->_channels[ch_name] == true)
+		return (true);
+	return (false);
+}
+
+void	Client::addChannel(std::string &channel, bool isChanOp)
 {
     this->_channels[channel] = isChanOp; // [1]
 	// for (std::map<std::string, bool>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)

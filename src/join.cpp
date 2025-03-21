@@ -12,10 +12,8 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 		return ;
 	}
 	chs2join = splitByComma(msg.parameters[0]);
-    if (somekey)
-	{
-        keys = splitByComma(msg.parameters[1]);
-	}
+	if (somekey)
+	    keys = splitByComma(msg.parameters[1]);
 	int n = chs2join.size();
 	for (int i = 0; i < n; i++)
 	{
@@ -23,9 +21,7 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 		std::string	key = "";
 		if (somekey && keys[i] != "x")  //CHECK NETCAT
 			key = keys[i];
-		else
-			key = "";
-    	if (client.getChannels().size() >= MAXCHAN)
+		if (client.getChannels().size() >= MAXCHAN)
 		{
 			this->_sendMessage(client, ERR_TOOMANYCHANNELS(this->_serverName, client.getNickname(), ch_name));
     	   	return;
@@ -38,33 +34,126 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 				return;
 			}
 			Channel newChannel(ch_name, key); //instantiate the channel
-			client.addChannel(ch_name, true); //add the channel to the client's channels map
+//			client.addChannel(ch_name, true); //add the channel to the client's channels map
 			newChannel.addClient(client.getFd()); //add client to the Channel clients vector
 			this->_channels[ch_name] = newChannel; //Store the MODIFIED channel to the Server channels map
+			
+			//JOIN message to the creator (only current member)
+			std::string ms = ":" + client.getNickname() + " JOIN " + ch_name + "\r\n";
+			this->_sendMessage(client, ms);
+		
+			client.addChannel(ch_name, true); //add the channel to the client's channels map		
+			//MODE message to the creator
+			std::string msg = ":" + this->_serverName + " MODE " + ch_name + " +o " + client.getNickname() + "\r\n";
+			this->_sendMessage(client, msg);
 		}
 		else  //channel exists
 		{
+			std::cout << "[~DEBUG]: Channel exists" << std::endl;
 			Channel &channel = this->_channels[ch_name];
-			if (this->_onChannel(client, ch_name)) //NOT SHOWING ON IRSSI (which manages that itself) - CHECK NETCAT
+			if (this->_onChannel(client, ch_name)) //NOT SHOWING ON IRSSI (which manages that itself) - [TODO] CHECK NETCAT AGAIN DUE TO CHANGE IN POSITION OF TEST
 				this->_sendMessage(client, ERR_USERONCHANNEL(this->_serverName, client.getNickname(), ch_name));
-		    // TO TEST - NOT WORKING
-			else if (channel.getIonly() && _isInvited(channel, client.getFd())) // 2a CONDICIO: MIRAR si ha rebut una invitacio
+		    // Check that channel is NOT inviteOnly OR user has an invitation to it
+			// [TODO] TEST SECOND CONDITION
+			else if (channel.getIonly() && !_isInvited(channel, client.getFd())) // 2a CONDICIO: MIRAR si ha rebut una invitacio
                 this->_sendMessage(client, ERR_INVITEONLYCHAN(this->_serverName, client.getNickname(), ch_name));
 			// PENDING COMPLEX TESTS!!!
 			else if (channel.getKey() != "" && key != channel.getKey())
 				this->_sendMessage(client, ERR_BADCHANNELKEY(this->_serverName, client.getNickname(), ch_name));
 			else if (channel.getLimit() && channel.getClients().size() == static_cast<size_t>(channel.getLimit()))
 				this->_sendMessage(client, ERR_CHANNELISFULL(this->_serverName, client.getNickname(), ch_name));
-			//JOIN THE CLIENT TO THE CHANNEL with 'false' as operator: 1. Add the channel to the list of channels for that client, 2. Add the client to the list of clients for the channel 
+			//JOIN THE CLIENT TO THE CHANNEL with 'false' as operator, except when channel is empty:
+			// 1. Add the channel to the list of channels for that client, 2. Add the client to the list of clients for the channel 
 			else
 			{
-				client.addChannel(ch_name, false); //add the channel to the client's channels map
+				if (channel.getClients().size() == 0)
+					client.addChannel(ch_name, true); //if the channel is empty, the fist client to join it becomes its operator
+				else
+					client.addChannel(ch_name, false); //add the channel to the client's channels map
 				channel.addClient(client.getFd()); //add client to the Channel clients vector
+				// invite disappears when client joins
+				if (_isInvited(channel, client.getFd()))
+					_removeInvite(channel, client.getFd());
 				// TODO: Send the topic (TOPIC message) and names list (NAMES message) to the joining user.
+				//JOIN message to ALL CLIENTS in the channel
+				_joinMsgToAll(client, this->_channels[ch_name]);
+				//TOPIC MESSAGE only to the joiner
+				if (this->_channels[ch_name].getTopic() != "")
+					this->_sendMessage(client, RPL_TOPIC(this->_serverName, client.getNickname(), ch_name, this->_channels[ch_name].getTopic()));
+				else
+					this->_sendMessage(client, RPL_NOTOPIC(this->_serverName, client.getNickname(), ch_name));
 			}
 		}
 	}
 }
+
+void	Server::_joinMsgToAll(Client &joiner, Channel &channel)
+{
+	//std::string ms = ":" + joiner.getNickname() + " JOIN " + channel.getName() + "\r\n";
+	std::string ms = ":" + joiner.getHostMask() + " JOIN " + channel.getName() + "\r\n";
+	std::vector<int> chanClients = channel.getClients();
+	for (std::vector<int>::iterator it = chanClients.begin(); it != chanClients.end(); ++it)
+	{
+		this->_sendMessage_fd(*it, ms);
+	}
+}
+
+
+// void	Server::_sendNames(const std::vector<int> &fds, std::string &ch_name, Client &joiner)
+// {
+// 	std::string namesList = "";
+
+// 	for (size_t i = 0; i < fds.size(); ++i)
+// 	{
+// 		std::map<int, Client>::iterator it = this->_clients.find(fds[i]);
+// 		if (it != this->_clients.end())
+// 		{
+// 			if (!namesList.empty())
+// 				namesList += " ";  // Separate names with a space
+// 			std::string prefix = it->second.isOperator(ch_name) ? "@" : "";
+// 			namesList += prefix + it->second.getHostMask();
+// 		//	namesList += prefix + it->second.getNickname();
+// 		}
+// 	}
+// 	// Send the full list in one message
+// 	this->_sendMessage(joiner, RPL_NAMREPLY(this->_serverName, joiner.getNickname(), ch_name, namesList));
+
+// 	// Send end-of-names reply
+// 	this->_sendMessage(joiner, RPL_ENDOFNAMES(this->_serverName, joiner.getNickname(), ch_name));
+// }
+
+// void	Server::_sendNames(const std::vector<int> &fds, std::string &ch_name, Client &joiner)
+// {
+// 	for (size_t i = 0; i < fds.size(); ++i)
+// 	{
+// 		std::map<int, Client>::iterator it = this->_clients.find(fds[i]);
+// 		if (it != this->_clients.end())
+// 		{
+// 			std::string prefix = it->second.isOperator(ch_name) ? "@" : "";
+// 			this->_sendMessage(it->second, RPL_NAMREPLY(this->_serverName, joiner.getNickname(), ch_name, prefix, it->second.getNickname()));
+// 		}
+// 	}
+// 	this->_sendMessage(joiner, RPL_ENDOFNAMES(this->_serverName, joiner.getNickname(), ch_name));
+// }
+
+// From the vector of ints with all clients in the channel, returns a string including "user1 user2 ...userN"
+// std::string Server::_listChannelClients(const std::vector<int> &fds, std::string &ch_name)
+// {
+// 	std::string result = "";
+	
+// 	for (size_t i = 0; i < fds.size(); ++i)
+// 	{
+// 		std::map<int, Client>::iterator it = this->_clients.find(fds[i]);
+// 		if (it != this->_clients.end())
+// 		{
+// 			if (!result.empty())
+// 				result += " ";
+// 			std::string prefix = it->second.isOperator(ch_name) ? "@" : "";
+// 			result += prefix + it->second.getHostMask();
+// 		}
+// 	}
+// 	return (result);
+// }
 
 // TO TEST
 bool Server::_isInvited(Channel &channel, int client_fd)
@@ -76,6 +165,23 @@ bool Server::_isInvited(Channel &channel, int client_fd)
         	return (true);
 	}
 	return (false);
+}
+// TO TEST
+void Server::_removeInvite(Channel &channel, int client_fd)
+{
+	std::vector<int> fds = channel.getInvited();
+	std::vector<int>::iterator it = std::find(fds.begin(), fds.end(), client_fd);
+	if (it != fds.end())
+		fds.erase(it);
+	else
+		std::cout << "[~DEBUG]: could not delete invite" << std::endl;
+	/*for (std::vector<int>::iterator it = fds.begin(); it != fds.end();)
+	{
+    	if (*it == client_fd)
+        	it = fds.erase(it);
+		else
+			++it;
+	}*/
 }
 
 bool	Server::_chanExists(const std::string &name)

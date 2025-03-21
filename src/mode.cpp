@@ -2,11 +2,19 @@
 
 void Server::_mode(Client &client, const t_tokens msg)
 {
-	bool	newstatus = false;
-	if (msg.parameters[1][0] == '+')
-		newstatus = true;
-	char	mode = msg.parameters[1][1];
+	const t_tokens *ms = &msg;
+	//quan n'hi ha un mes del que creiem es pq des de la finestra del canal IRSSI sol ja envia el canal com a parameter[0]
+	//std::cout << "[DEBUG] ms->parameters.size() is: " << ms->parameters.size() << std::endl;
+	if (_badModeSyntax(ms, client))
+		return ;
+	if (!_chanExists(msg.parameters[0])) //channel does not exist yet
+	{
+		if (ms->parameters[0][0] == '#' || ms->parameters[0][0] == '&')
+			this->_sendMessage(client, ERR_NOSUCHCHANNEL(this->_serverName, client.getNickname(), msg.parameters[0]));
+		return ;
+	}
 
+	char	mode = msg.parameters[1][1];
 	if (!_chanExists(msg.parameters[0])) //channel does not exist yet
 	{
 		this->_sendMessage(client, ERR_NOSUCHCHANNEL(this->_serverName, client.getNickname(), msg.parameters[0]));
@@ -14,17 +22,20 @@ void Server::_mode(Client &client, const t_tokens msg)
 	}
 	
 	Channel *channel = _getChannel(msg.parameters[0]);	//copy the channel to an easier parameter "channel"
+	std::string &server = this->_serverName;
+	const std::string &nick = client.getNickname();
+	const std::string &ch_name = channel->getName();
 	//0. CHECK IF client is on that channel
 	if (!_onChannel(client, channel->getName()))
 	{
-		this->_sendMessage(client, ERR_NOTONCHANNEL(this->_serverName, client.getNickname(), channel->getName()));
+		this->_sendMessage(client, ERR_NOTONCHANNEL(server, nick, ch_name));
      	return ;
 	}
 	//1. CHECK IF client has permission to change modes in the channel
 	std::map<std::string, bool>::iterator it = client.getChannels().find(channel->getName());
 	if (!it->second) 
 	{
-    	this->_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channel->getName()));
+    	this->_sendMessage(client, ERR_CHANOPRIVSNEEDED(server, nick, ch_name));
     	return ;
 	}
 	if (msg.parameters.size() == 2)
@@ -47,7 +58,14 @@ void Server::_mode(Client &client, const t_tokens msg)
 	else  // is +k, +l OR +/-o
 	{
 		if (mode == 'k')
+		{
+			if (!validKey(msg.parameters[2]))
+			{
+				this->_sendMessage(client, ERR_KEYSET(server, nick, ch_name));
+				return ; 
+			}
 			channel->setKey(msg.parameters[2]);
+		}
 		if (mode == 'l')
 		{
 			std::stringstream ss(msg.parameters[2]);
@@ -57,8 +75,7 @@ void Server::_mode(Client &client, const t_tokens msg)
 			if (ss.fail() || num <= 0 || ss.peek() != EOF) //[1]
 			{
    				// Handle invalid input
-   				this->_sendMessage(client, ERR_INVALIDMODEPARAM(this->_serverName, \
-					client.getNickname(), "l", msg.parameters[2]));
+   				this->_sendMessage(client, ERR_INVALIDMODEPARAM(server, nick, "l", msg.parameters[2]));
 				return ;
 			}
 			// Check that the limit passed is not lower than current number of clients in the channel
@@ -67,22 +84,30 @@ void Server::_mode(Client &client, const t_tokens msg)
 				std::stringstream ss;
     			ss << num;
 
-   				this->_sendMessage(client, ERR_CHANNELLIMITTOOLOW(this->_serverName, \
-					client.getNickname(), ss.str()));
+   				this->_sendMessage(client, ERR_CHANNELLIMITTOOLOW(server, nick, ss.str()));
 				return ;
 			}
-			else
-			{
-   				channel->setLimit(num); // Only set the limit if it's valid
-			}
+			channel->setLimit(num); // Only set the limit if it's valid
 		}
 		if (mode == 'o')
 		{
+			bool newstatus = false;
+			if (msg.parameters[1][0] == '+')
+				newstatus = true;
 			//  NEED TO TEST ALL THIS
 			std::string targetnick = msg.parameters[2];
+
+//ERRRORRRRRR NO ESTA FUNCIONANT AQUESTA FUNCIOOO
+			// we have the nickname of that Client - TEST if this does the sam that the last else in ft
+			//if (!_isNickValid(targetnick))
+			// {
+			// 	std::cout << "[DEBUG]: NICK IS NOT VALID no such nick: " << targetnick << std::endl;
+
+			// 	this->_sendMessage(client, ERR_NOSUCHNICK(server, nick, targetnick));
+			// 	return ;
+			// }
 			Client 		*target = NULL;
-			//target is the target Client to change to isOp or isNotOp status (true)
-			// we have the nickname of that Client  //APROFITAR FUNCIO EXISTENT CARLES a nick.cpp (Server::_nickExists)
+			// target is the target Client to change to isOp or isNotOp status (true)
 			for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
 			{
 				if (it->second.getNickname() == targetnick)
@@ -91,14 +116,13 @@ void Server::_mode(Client &client, const t_tokens msg)
 					break ;
 				}
 			}
-			if (target)
-			{
+			// CHECK IF the client to be set as +o OR -o is on that channel
+			if (target && !_onChannel(*target, ch_name))
+				this->_sendMessage(client, ERR_USERNOTINCHANNEL(server, targetnick, ch_name));
+			else if (target)
 				target->getChannels()[channel->getName()] = newstatus;
-			}
 			else
-			{
-				this->_sendMessage(client, ERR_NOSUCHNICK(this->_serverName, client.getNickname(), msg.parameters[2]));
-			}
+			 	this->_sendMessage(client, ERR_NOSUCHNICK(server, nick, targetnick));
 		}
 	}
 }
@@ -123,6 +147,32 @@ bool	Server::_onChannel(Client &client, const std::string ch_name)
 			return (true);
 	}
 	return (false);
+}
+
+bool	Server::_badModeSyntax(const t_tokens *ms, Client &client)
+{
+	bool result = true;
+	std::string validModes = "iklto";
+	std::string signs = "-+";
+	
+	//std::cout << "[DEBUG]: ms->parameters.size() is: " << ms->parameters.size() << std::endl;
+	//less than 2 params, need 2 at least: channel + mode (WORKING OK)
+	if (ms->parameters.size() < 2 || (ms->parameters.size() == 2 &&
+		(ms->parameters[1] == "+o" || ms->parameters[1] == "-o" || ms->parameters[1] == "+k" || ms->parameters[1] == "+l")))
+		this->_sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, ms->parameters[0]));
+
+	//mode has to be 2 chars long, and be sign + validMode (Basic tests OK)
+	else if (ms->parameters[1].length() != 2 || signs.find(ms->parameters[1][0]) == std::string::npos
+		|| validModes.find(ms->parameters[1][1]) == std::string::npos)
+		this->_sendMessage(client, ERR_MODEERROR(this->_serverName, ms->parameters[0], ms->parameters[1]));
+	
+	//cannot have more than 3 params, and if 3, has to be +o, -o, +l, +k (Basic tests OK)
+	else if (ms->parameters.size() > 3 || (ms->parameters.size() == 3 &&
+		(ms->parameters[1] != "+o" && ms->parameters[1] != "-o" && ms->parameters[1] != "+k" && ms->parameters[1] != "+l")))
+		this->_sendMessage(client, ERR_TOOMANYPARAMS(this->_serverName, ms->parameters[0]));
+	else
+		result = false;
+	return (result);
 }
 
 /* For channel operators, the MODE command is used as follows:

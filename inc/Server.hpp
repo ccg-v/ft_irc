@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 11:50:26 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 22:04:39 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,11 +85,14 @@ class	Server
 		void						_processMessage(Client &currentClient, std::string message);
 		t_tokens					_tokenizeMsg(const std::string  &message);
 		void						_sendMessage(Client &client, const std::string &message);
+		void						_sendMessage_fd(int fd, const std::string &message);
 		void						_removeFromChannel(Channel &channel, int clientFd);
 		void						_removeClient(int clientFd);
 		void						_removeAllClients();
 		void						_closeSockets();
-
+		void						_sendNames(const std::vector<int> &fds, std::string &ch_name, Client &joiner);
+		bool						_badModeSyntax(const t_tokens *ms, Client &client);
+		
 		//* --- Connection operations --------------------------------------- */
 		void 		_cap(Client &client, const t_tokens msgTokens);
 		void 		_pass(Client &client, const t_tokens msgTokens);
@@ -122,7 +125,10 @@ class	Server
 		/* --- Join --------------------------------------------------------- */
 		bool		_chanExists(const std::string &);
 		bool 		_validChannelName(std::string &name);
-		bool		_isInvited(Channel &channel, int client_fd);	
+		bool		_isInvited(Channel &channel, int client_fd);
+		void 		_removeInvite(Channel &channel, int client_fd);
+		std::string _listChannelClients(const std::vector<int> &fds, std::string &ch_name);
+		void		_joinMsgToAll(Client &joiner, Channel &channel);
 
 		/* --- Mode --------------------------------------------------------- */
 		Channel		*_getChannel(const std::string &ch_name);

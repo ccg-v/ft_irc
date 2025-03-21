@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 13:33:58 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/20 22:05:25 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,14 @@
 	(":" + serverName + " 443 " + channel + " " + nick + " :is already on channel\r\n")
 #define ERR_CHANNELISFULL(serverName, nick, channel) \
 	(":" + serverName + " 471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n")
+#define ERR_KEYSET(serverName, nick, channel) \
+	(":" + serverName + " 467 " + nick + " " + channel + " :Channel key must be 2-32 chars long and contain only alphanumeric chars or $%&'()*+-.@\r\n")
+//#define RPL_NAMREPLY(serverName, joinernick, channel, prefix, membernick) 
+//	(":" + serverName + " 353 " + joinernick + " = " + channel + " :" + prefix + membernick + "\r\n")
+// #define RPL_NAMREPLY(serverName, joinernick, channel, namesList) 
+// 	(":" + serverName + " 353 " + joinernick + " = " + channel + " :" + namesList + "\r\n")
+// #define RPL_ENDOFNAMES(serverName, client, channel) 
+// 	(":" + serverName + " 366 " + client + " " + channel + " :End of /NAMES list\r\n")
 
 /* --- MODE command --------------------------------------------------------- */
 #define ERR_NOTONCHANNEL(serverName, client, channel) \
@@ -62,6 +70,29 @@
     (":" + serverName + " 476 " + clientNick + " " + limit + " :Limit too low, users would be kicked\r\n")
 #define ERR_CHANOPRIVSNEEDED(serverName, client, channel) \
 	(":" + serverName + " 482 " + client + " " + channel + " :You're not channel operator\r\n")
+#define ERR_TOOMANYPARAMS(serverName, command) \
+	(":" + serverName + " 461 " + command + " :Too many parameters\r\n")
+#define ERR_MODEERROR(serverName, command, mode) \
+	(":" + serverName + " " + command + " " + mode + " :Available modes: +k -k +i -i +o -o +t -t +l -l\r\n")
+
+/* --- KICK command --------------------------------------------------------- */
+//	ERR_NEEDMOREPARAMS()
+#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
+#define ERR_NOSUCHNICK(serverName, client, nick) \
+	(":" + serverName + " 401 " + client + " " + nick + " :No such nick\r\n")
+#define ERR_USERNOTINCHANNEL(serverName, client, channel) \
+	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n")
+
+/* --- TOPIC command -------------------------------------------------------- */
+//	ERR_NEEDMOREPARAMS()
+//	ERR_NOSUCHCHANNEL()
+//	ERR_NOTONCHANNEL()
+//	ERR_CHANOPRIVSNEEDED()
+#define RPL_NOTOPIC(serverName, client, channel) \
+	(":" + serverName + " 331 " + client + " " + channel + " :No topic is set\r\n")
+#define RPL_TOPIC(serverName, client, channel, topic) \
+	(":" + serverName + " 332 " + client + " " + channel + " :" + topic + "\r\n")
 
 /* --- PRIVMSG command ------------------------------------------------------ */
 //	ERR_NEEDMOREPARAMS()
@@ -92,9 +123,11 @@
 //	ERR_NOSUCHCHANNEL()
 //	ERR_NOTONCHANNEL()
 //	ERR_CHANOPRIVSNEEDED()
+#define RPL_NOTOPIC(serverName, client, channel) \
+	(":" + serverName + " 331 " + client + " " + channel + " :No topic is set\r\n")
 #define RPL_TOPIC(serverName, client, channel, topic) \
 	(":" + serverName + " 332 " + client + " " + channel + " :" + topic + "\r\n")
-
+	
 /* --- NOTICES -------------------------------------------------------------- */
 #define NTC_USERMISSING(serverName, nick) \
 	(":" + serverName + " NOTICE" + nick + " :Enter username to complete register\r\n")
