@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 21:47:37 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/22 00:57:54 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,8 @@ void	Server::startPoll()
 {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGQUIT, signalHandler);
+	int	numClients = 0;
+
     while (!signalCaught)
     {
         if (poll(&_pollFds[0], _pollFds.size(), -1) == -1)
@@ -160,7 +162,18 @@ void	Server::startPoll()
             {
                 if (_pollFds[i].fd == this->_serverSocket) // Current is the listening socket -> New connection requested
                 {
-					_acceptClient();
+					if (numClients < BACKLOG)
+					{
+						_acceptClient();
+						numClients++;
+					}
+					else
+					{
+						int	refusedClient = accept(this->_serverSocket, NULL, NULL);
+						std::string message = INF_SERVERISFULL(this->_serverName);
+						send(refusedClient, message.c_str(), message.size(), 0);
+						close(refusedClient);
+					}
                 }
                 else // Current is a client socket -> Receive incoming data
                 {

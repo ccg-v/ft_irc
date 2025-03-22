@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 20:22:33 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 01:24:59 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/21 22:48:24 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,13 @@ bool	validKey(const std::string &key)
     }
     return true;
 }
+
+std::string timeToString(time_t timestamp) {
+    std::stringstream ss;
+    ss << timestamp;
+    return ss.str();
+}
+
 
 // bool	isOnlySpaces(const std::string &str)
 // {

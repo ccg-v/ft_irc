@@ -43,6 +43,8 @@ class Channel
 		std::vector<int>	getInvited(void);
 		void				setTopic(const std::string & topic);
 		std::string			getTopic();
+		void				setWhoSetTopic(const std::string & nickname);
+		std::string			getWhoSetTopic();
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
 		bool				removeMember(int fd);
@@ -54,6 +56,7 @@ class Channel
 		bool				_ionly;
 		bool				_tmode; // restrict topic changes to operators
 		int					_limit; //set with the 'l' mode
+		std::string			_whoSetTopic;
 
 		std::vector<int>	_clients; // fds of clients
 		std::vector<int>	_invited; // fds of clients that have been invited to the channel

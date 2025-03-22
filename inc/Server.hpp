@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 22:04:39 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/22 00:58:51 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@
 #include "Channel.hpp"
 #include "Replies.hpp"
 
-#define BUFFER_SIZE 512  // Max buffer size for recv() [1]
-#define BACKLOG 5        // Max number of pending connections queue will hold
-#define MAXCHAN 3        // Max number of channels a client can join
+#define BUFFER_SIZE 512	// Max buffer size for recv() [1]
+#define BACKLOG 4		// Max number of pending connections queue will hold
+#define MAXCHAN 3		// Max number of channels a client can join
 
 typedef struct s_tokens
 {

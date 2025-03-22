@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 22:05:25 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/22 00:42:41 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,8 @@
 	(":" + serverName + " 331 " + client + " " + channel + " :No topic is set\r\n")
 #define RPL_TOPIC(serverName, client, channel, topic) \
 	(":" + serverName + " 332 " + client + " " + channel + " :" + topic + "\r\n")
+#define RPL_TOPICWHOTIME(serverName, client, channel, whoSetNick, wasSetAt) \
+	(":" + serverName + " 333 " + client + " " + channel + " " + whoSetNick + " " + wasSetAt + "\r\n")
 
 /* --- PRIVMSG command ------------------------------------------------------ */
 //	ERR_NEEDMOREPARAMS()
@@ -117,16 +119,6 @@
 //	ERR_CHANOPRIVSNEEDED()
 //	ERR_ERRONEUSNICKNAME()
 //	ERR_USERNOTINCHANNEL()
-
-/* --- TOPIC command -------------------------------------------------------- */
-//	ERR_NEEDMOREPARAMS()
-//	ERR_NOSUCHCHANNEL()
-//	ERR_NOTONCHANNEL()
-//	ERR_CHANOPRIVSNEEDED()
-#define RPL_NOTOPIC(serverName, client, channel) \
-	(":" + serverName + " 331 " + client + " " + channel + " :No topic is set\r\n")
-#define RPL_TOPIC(serverName, client, channel, topic) \
-	(":" + serverName + " 332 " + client + " " + channel + " :" + topic + "\r\n")
 	
 /* --- NOTICES -------------------------------------------------------------- */
 #define NTC_USERMISSING(serverName, nick) \
@@ -136,13 +128,17 @@
 #define NTC_SERVERSHUTDOWN(serverName, nick) \
 	(":" + serverName + " NOTICE * :Server shutting down\r\n")
 
-/* --- Regular messages------------------------------------------------------ */	
+/* --- Custom messages------------------------------------------------------- */	
 #define INF_NICKCHANGED(oldNick, user, clientIp, newNick) \
 	(":" + oldNick + "!" + user + "@" + clientIp + " NICK :" + newNick + "\r\n")
 #define INF_CLIENTQUIT(serverName, nick) \
 	(":" + serverName + " :" + nick + " QUIT :Leaving the server\r\n")
 #define INF_KICKEDFROMCHANNEL(serverName, command, channel, nick) \
 	(":" + serverName + " :" + command + " " + channel + " " + nick + " :Kicked from channel\r\n")
+#define INF_NICKNAMEIS(serverName, nick) \
+	(":" + serverName + ": Your nickname is " + nick + "\r\n")
+#define INF_SERVERISFULL(serverName) \
+	(":" + serverName + ": The server is full. Please try again later \r\n")
 
 /* --- Handshake after complete register ------------------------------------ */
 #define RPL_WELCOME(serverName, nick, hostmask) (":" + serverName + " 001 " + nick + \

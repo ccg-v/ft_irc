@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:52:25 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 00:02:31 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/21 21:26:55 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,14 @@ void 	Server::_nick(Client &client, const t_tokens msgTokens)
 		return;
 	}
 
-	// Ensure a nickname was provided
+	// - Ensure a nickname was provided during registration, or...
+	// - ... display nickname if command is passed after registering
 	if (msgTokens.parameters.empty())
 	{
-		_sendMessage(client, ERR_NONICKNAMEGIVEN(this->_serverName));
+		if (client.getAuthentication() && client.getRegistration())
+			_sendMessage(client, INF_NICKNAMEIS(this->_serverName, client.getNickname()));
+		else
+			_sendMessage(client, ERR_NONICKNAMEGIVEN(this->_serverName));
 		return;
 	}
 

@@ -3,7 +3,9 @@
 Channel::Channel(void) {}
 
 //AFEGIR PARAMETRE KEY i mirar requisits de la KEY, tot allo de la x, etc.
-Channel::Channel(std::string name, std::string key) : _name(name), _topic(""), _key(key), _ionly(false), _tmode(true), _limit(0){
+Channel::Channel(std::string name, std::string key) 
+	: _name(name), _topic(""), _key(key), _ionly(false), _tmode(true), _limit(0),_whoSetTopic("")
+{
     std::cout << "Channel created, with name: " << name << std::endl;
 }
 
@@ -16,6 +18,7 @@ Channel::Channel(const Channel &src)
     _topic = src._topic;
     _ionly = src._ionly;
     _tmode = src._tmode;
+	_whoSetTopic = src._whoSetTopic;
 }
 
 Channel &Channel::operator=(const Channel &src)
@@ -29,6 +32,7 @@ Channel &Channel::operator=(const Channel &src)
         _topic = src._topic;
         _ionly = src._ionly;
         _tmode = src._tmode;
+		_whoSetTopic = src._whoSetTopic;
     }
     return (*this);
 }
@@ -177,6 +181,16 @@ void	Channel::setTopic(const std::string & topic)
 std::string	Channel::getTopic()
 {
 	return (this->_topic);
+}
+
+void	Channel::setWhoSetTopic(const std::string & nickname)
+{
+	this->_whoSetTopic = nickname;
+}
+
+std::string	Channel::getWhoSetTopic()
+{
+	return (_whoSetTopic);
 }
 
 bool	Channel::removeMember(int fd)

@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 23:57:21 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 01:17:42 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/21 23:55:04 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,25 +40,42 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
 		_sendMessage(client, ERR_NOTONCHANNEL(this->_serverName, client.getNickname(), channelName));
 		return ;
 	}
-// _TMODE TRUE -> RESTRINGIT
+
 	bool 		isOperator = it->second;
 	std::string oldTopic = channel->getTopic();
 	std::string	newTopic = msgTokens.trailing;
+	std::string	wasSetAt = timeToString(std::time(0));
+	
+	if (newTopic.empty())
+	{
+		std::string message;
+		if (oldTopic.empty())
+			_sendMessage(client, RPL_NOTOPIC(this->_serverName, client.getNickname(), channelName));
+		else
+		{
+			_sendMessage(client, RPL_TOPIC(this->_serverName, client.getNickname(), channelName, oldTopic));
+			_sendMessage(client, RPL_TOPICWHOTIME(this->_serverName, client.getNickname(), channelName, channel->getWhoSetTopic(), wasSetAt));
+		}
+		return;
+	}
 
-	if (oldTopic != newTopic) 
+	if (oldTopic != newTopic || !msgTokens.trailing.empty()) 
 	{
 		if (!channel->getTmode() || isOperator)
 		{
 			channel->setTopic(msgTokens.trailing);
+			channel->setWhoSetTopic(client.getNickname());
 
 			// BROADCAST message to channel		
-			std::string message = RPL_TOPIC(this->_serverName, client.getNickname(), channelName, newTopic);
+			std::string rpl_topic = RPL_TOPIC(this->_serverName, client.getNickname(), channelName, newTopic);
+			std::string rpl_topicwhotime = RPL_TOPICWHOTIME(this->_serverName, client.getNickname(), channelName, channel->getWhoSetTopic(), wasSetAt);
 
 			for (size_t i = 0; i < channel->getClients().size(); i++)
 			{
 				Client *member = _findClientByFd(channel->getClients()[i]);
 			
-				_sendMessage(*member, message);
+				_sendMessage(*member, rpl_topic);
+				_sendMessage(*member, rpl_topicwhotime);
 			}
 		}
 		else
