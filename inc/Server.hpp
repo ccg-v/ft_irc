@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 01:20:19 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/22 02:40:01 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 #define BUFFER_SIZE 512	// Max buffer size for recv() [1]
 #define BACKLOG 4		// Max number of pending connections queue will hold
 #define MAXCHAN 3		// Max number of channels a client can join
+#define TIMEOUT 15		// Max seconds allowed to complete registration (to prevent ghost clients)
 
 typedef struct s_tokens
 {
@@ -88,6 +89,7 @@ class	Server
 		void						_sendMessage(Client &client, const std::string &message);
 		void						_sendMessage_fd(int fd, const std::string &message);
 		void						_removeFromChannel(Channel &channel, int clientFd);
+		void						_checkGhostClients();
 		void						_removeClient(int clientFd);
 		void						_removeAllClients();
 		void						_closeSockets();

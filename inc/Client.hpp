@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 23:31:19 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/22 01:51:46 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class	Client
 		bool						getRegistration();
 		void						setPassErrSent(bool passErrSent);
 		bool						getPassErrSent();
+		time_t						getStartTime();
 	//	int 						getChannelCnt(void) const;
 	//	void 						setChannelCnt(void);
 	//	int							getMaxChannels(void) const;
@@ -72,6 +73,7 @@ class	Client
 		bool						_passErrSent;
 		std::string					_clientBuffer;
 		std::string					_topic;
+		time_t						_startTime;
 	//	int							_maxChannels;
 		std::map<std::string, bool> _channels; // key = channel name, bool: whether the client is operator (chanop / admin) of that channel OR NOT
 };

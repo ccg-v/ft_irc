@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 01:21:04 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/22 02:46:08 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,7 @@ void	Server::startPoll()
 					}
 					else
 					{
+						// int	refusedClient = accept(this->_serverSocket, NULL, NULL);
 						int	refusedClient = accept(this->_serverSocket, NULL, NULL);
 						std::string message = INF_SERVERISFULL(this->_serverName);
 						send(refusedClient, message.c_str(), message.size(), 0);
@@ -184,6 +185,7 @@ void	Server::startPoll()
                 }
             }
         }
+		_checkGhostClients();
     }
 	_closeSockets();
 }
@@ -375,6 +377,66 @@ void	Server::_sendMessage(Client &client, const std::string &message)
 void	Server::_sendMessage_fd(int fd, const std::string &message)
 {
 	send(fd, message.c_str(), message.size(), 0);
+}
+
+// void	Server::_checkGhostClients()
+// {
+//     time_t now = time(NULL);
+// 	std::map<int, Client>::iterator it = this->_clients.begin();
+
+//     while (it != this->_clients.end())
+// 	{
+//         if (!it->second.getAuthentication() && (now - it->second.getStartTime()) > TIMEOUT)
+// 		{
+//             std::cout << "[~DEBUG]: Disconnecting ghost client on fd " << it->second.getFd() 
+// 					  << " (registration timeout)" << std::endl;
+//             close(it->second.getFd());
+
+//             std::map<int, Client>::iterator next = it;
+//             ++next; // Get the next iterator before erasing
+//             this->_clients.erase(it);
+// 			it = next; // Move to the next element safely
+//         }
+// 		else
+//             ++it;
+//     }
+// }
+
+void Server::_checkGhostClients()
+{
+    time_t now = time(NULL);
+    std::map<int, Client>::iterator it = this->_clients.begin();
+
+    while (it != this->_clients.end())
+    {
+        if (!it->second.getAuthentication() && (now - it->second.getStartTime()) > TIMEOUT)
+        {
+            int fd = it->second.getFd();
+            std::cout << "[~DEBUG]: Disconnecting ghost client on fd " << fd
+                      << " (registration timeout)" << std::endl;
+            close(fd);
+
+            // Remove FD from poll list
+            for (std::vector<struct pollfd>::iterator pollIt = _pollFds.begin(); pollIt != _pollFds.end(); ++pollIt)
+            {
+                if (pollIt->fd == fd)
+                {
+                    _pollFds.erase(pollIt);
+                    break; // Exit after erasing to avoid invalid iterators
+                }
+            }
+
+            // Safely erase the client from _clients
+            std::map<int, Client>::iterator next = it;
+            ++next;
+            this->_clients.erase(it);
+            it = next;
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 

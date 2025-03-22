@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 21:47:02 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/22 02:00:16 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ Client::Client(int fd) // Parameterized constructor
 	  _isAuthenticated(false), 
 	  _isRegistered(false),
 	  _passErrSent(false),
-	  _clientBuffer("")
+	  _clientBuffer(""),
+	  _startTime(std::time(0))
 //	  _maxChannels(MAXCHAN)
 {
 //	std::cout << "\n[~DEBUG]: client created with sockefd: " << _fd << " and maxChannels: " << _maxChannels << std::endl;
@@ -36,6 +37,7 @@ Client::Client(const Client &source)
 	_isRegistered = source._isRegistered;
 	_passErrSent = source._passErrSent;
 	_clientBuffer = source._clientBuffer;
+	_startTime = source._startTime;
 }
 
 Client &Client::operator=(const Client &source)
@@ -50,7 +52,8 @@ Client &Client::operator=(const Client &source)
 		_passErrSent = source._passErrSent;
 		_clientBuffer = source._clientBuffer;
 	//	_maxChannels = source._maxChannels;
-		_channels = source._channels; 
+		_channels = source._channels;
+		_startTime = source._startTime;
     }
     return *this;
 }
@@ -159,6 +162,11 @@ bool	Client::getPassErrSent()
 std::map<std::string, bool>	&Client::getChannels()
 {
 	return (this->_channels);
+}
+
+time_t	Client::getStartTime()
+{
+	return (this->_startTime);
 }
 
 // OTHER METHODS
