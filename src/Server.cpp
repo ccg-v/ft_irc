@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 00:57:54 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/22 01:21:04 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ Server::Server(const std::string &port, const std::string &password)
 	_password = password;
 	_serverName = "42ft_irc";
 	_creationTime = getCurrentDate();
+	// _numClients = 0;
 
 	_commandMap["CAP"] = &Server::_cap;
     _commandMap["PASS"] = &Server::_pass;
@@ -142,7 +143,7 @@ void	Server::startPoll()
 {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGQUIT, signalHandler);
-	int	numClients = 0;
+	int 	numClients = 0;
 
     while (!signalCaught)
     {
@@ -173,6 +174,7 @@ void	Server::startPoll()
 						std::string message = INF_SERVERISFULL(this->_serverName);
 						send(refusedClient, message.c_str(), message.size(), 0);
 						close(refusedClient);
+						numClients--;
 					}
                 }
                 else // Current is a client socket -> Receive incoming data

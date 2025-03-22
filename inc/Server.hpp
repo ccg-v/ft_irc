@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 00:58:51 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/22 01:20:19 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ class	Server
     	std::vector<struct pollfd> 		_pollFds;  		// Polling sockets
     	std::map<int, Client> 			_clients;  		// Map of descriptors (key) and clients
 		std::map<std::string, Channel>	_channels; // key in the map is a channel's name
+		// int								_numClients;
 
 		std::map<std::string, void (Server::*)(Client&, t_tokens)> _commandMap; // [2]
 		
