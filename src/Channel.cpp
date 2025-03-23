@@ -203,7 +203,7 @@ bool	Channel::isMember(int fd)
 	return (false);
 }
 
-bool	Channel::removeMember(int fd)
+void	Channel::removeMember(int fd)
 {
     std::vector<int>::iterator it;
 
@@ -211,9 +211,7 @@ bool	Channel::removeMember(int fd)
     if (it != this->_clients.end())
 	{
 		this->_clients.erase(it);
-		return (true);
 	}
-	return (false);
 }
 
 /*  [1] Cannot use "return (this->_modes[mode])" because the operator[] on std::map

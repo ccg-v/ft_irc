@@ -47,7 +47,7 @@ class Channel
 		std::string			getWhoSetTopic();
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
-		bool				removeMember(int fd);
+		void				removeMember(int fd);
 		bool				isMember(int fd);
 
 	private:

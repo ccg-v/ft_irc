@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 00:11:31 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 13:16:43 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,16 +211,14 @@ bool	Client::isSubscriber(const std::string &channelName)
 	return (false);
 }
 
-bool	Client::unsubscribe(std::string channelName)
+void	Client::unsubscribe(std::string channelName)
 {
 	std::map<std::string, bool>::iterator it = this->_channels.find(channelName);
 	
 	if (it != this->_channels.end())
 	{
 		this->_channels.erase(it);
-		return (true);
 	}
-	return (false);
 }
 
 /*	[1] You can add items to a std::map<Key, Value> using these methods:
