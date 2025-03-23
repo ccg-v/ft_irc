@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 03:15:51 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 00:13:58 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,8 +258,18 @@ void	Server::_receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by re
 
 	std::string &clientBuffer = currentClient.getBuffer(); // REFERENCE!!
 
+	// Enforce a reasonable buffer limit to avoid oversized messages
+	if (clientBuffer.size() + bytesReceived > 512) 
+	{
+		_sendMessage(currentClient, "Server.cpp: " + ERR_INPUTTOOLONG(this->_serverName, currentClient.getNickname()));
+		clientBuffer.clear(); // Clear the buffer to prevent partial overflowed messages
+		return;
+	}
+
     // Append received data to client's buffer
     clientBuffer.append(buffer, bytesReceived);
+
+
 
 	// Extract full messages, leaving incomplete ones in clientBuffer
 	// We send a REFERENCE!! of clientBuffer, not a copy, to ensure it reflects changes

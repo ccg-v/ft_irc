@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 02:48:59 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 19:51:39 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,11 @@
 
 // #define ERR_NORECIPIENT(serverName, client, command)
 // 	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
+
+/* --- PART command -----------------------------------------------'''------- */
+//	ERR_NEEDMOREPARAMS()
+//	ERR_NOSUCHCHANNEL()
+//	ERR_NOTONCHANNEL()
 	
 /* --- NOTICES -------------------------------------------------------------- */
 #define NTC_USERMISSING(serverName, nick) \
