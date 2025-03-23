@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 02:46:08 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 03:15:51 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ void	Server::startPoll()
 {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGQUIT, signalHandler);
-	int 	numClients = 0;
+	// int 	numClients = 0;
 
     while (!signalCaught)
     {
@@ -163,10 +163,9 @@ void	Server::startPoll()
             {
                 if (_pollFds[i].fd == this->_serverSocket) // Current is the listening socket -> New connection requested
                 {
-					if (numClients < BACKLOG)
+					if (this->_clients.size() < BACKLOG)
 					{
 						_acceptClient();
-						numClients++;
 					}
 					else
 					{
@@ -175,7 +174,6 @@ void	Server::startPoll()
 						std::string message = INF_SERVERISFULL(this->_serverName);
 						send(refusedClient, message.c_str(), message.size(), 0);
 						close(refusedClient);
-						numClients--;
 					}
                 }
                 else // Current is a client socket -> Receive incoming data
@@ -253,15 +251,6 @@ void	Server::_receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by re
 	{
 		int	clientFd = this->_pollFds[i].fd;
 
-		// std::cerr << "[SERVER]: Client " << clientFd << " (" << currentClient.getHostMask() << ") disconnected." << std::endl;
-		// /* TO_DO ***************************************************************** */
-		// /*                                                                         */
-		// /*	broadcastToChannels() // Notify client quitting to its active channels */
-		// /*                                                                         */
-		// /* *********************************************************************** */
-		// close(clientFd);
-		// this->_clients.erase(clientFd);
-		// this->_pollFds.erase(this->_pollFds.begin() + i); // erase method expects an iterator
 		_removeClient(clientFd);
 		--i;
 		return;
@@ -340,8 +329,8 @@ void Server::_processMessage(Client &currentClient, std::string message)
 	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
 
 	/* DEBUG PRINTINGS ------------------------------------------------------ */
-	for (size_t i = 0; i < msgTokens.trailing.size(); i++)
-		std::cout << std::hex << (int)(unsigned char)msgTokens.trailing[i] << " ";
+	// for (size_t i = 0; i < msgTokens.trailing.size(); i++)
+	// 	std::cout << std::hex << (int)(unsigned char)msgTokens.trailing[i] << " ";
 	std::cout << std::endl;	
 
 	std::cout << "[~DEBUG]: " << message;
@@ -379,50 +368,40 @@ void	Server::_sendMessage_fd(int fd, const std::string &message)
 	send(fd, message.c_str(), message.size(), 0);
 }
 
-// void	Server::_checkGhostClients()
-// {
-//     time_t now = time(NULL);
-// 	std::map<int, Client>::iterator it = this->_clients.begin();
-
-//     while (it != this->_clients.end())
-// 	{
-//         if (!it->second.getAuthentication() && (now - it->second.getStartTime()) > TIMEOUT)
-// 		{
-//             std::cout << "[~DEBUG]: Disconnecting ghost client on fd " << it->second.getFd() 
-// 					  << " (registration timeout)" << std::endl;
-//             close(it->second.getFd());
-
-//             std::map<int, Client>::iterator next = it;
-//             ++next; // Get the next iterator before erasing
-//             this->_clients.erase(it);
-// 			it = next; // Move to the next element safely
-//         }
-// 		else
-//             ++it;
-//     }
-// }
+void Server::_broadcastToChannel(Channel &channel, const std::vector<std::string> &messages)
+{
+    for (size_t i = 0; i < channel.getClients().size(); i++)
+    {
+        Client *member = _findClientByFd(channel.getClients()[i]);
+        
+        for (size_t j = 0; j < messages.size(); j++)
+        {
+            _sendMessage(*member, messages[j]);
+        }
+    }
+}
 
 void Server::_checkGhostClients()
-{
+{ 
     time_t now = time(NULL);
     std::map<int, Client>::iterator it = this->_clients.begin();
 
     while (it != this->_clients.end())
     {
-        if (!it->second.getAuthentication() && (now - it->second.getStartTime()) > TIMEOUT)
+        if ((!it->second.getAuthentication() || !it->second.getRegistration()) && (now - it->second.getStartTime()) > TIMEOUT)
         {
             int fd = it->second.getFd();
             std::cout << "[~DEBUG]: Disconnecting ghost client on fd " << fd
                       << " (registration timeout)" << std::endl;
             close(fd);
 
-            // Remove FD from poll list
+            // Remove fd from poll list
             for (std::vector<struct pollfd>::iterator pollIt = _pollFds.begin(); pollIt != _pollFds.end(); ++pollIt)
             {
                 if (pollIt->fd == fd)
                 {
                     _pollFds.erase(pollIt);
-                    break; // Exit after erasing to avoid invalid iterators
+                    break;
                 }
             }
 
@@ -454,12 +433,6 @@ void	Server::_removeClient(int clientFd)
 		_sendMessage(this->_clients[clientFd], INF_CLIENTQUIT(this->_serverName, this->_clients[clientFd].getNickname()));
 	}
 			  
-	/* TO_DO ***************************************************************** */
-	/*                                                                         */
-	/*	broadcastToChannels() // Notify client quitting to its active channels */
-	/*                                                                         */
-	/* *********************************************************************** */
-
 	// 1. Close the client's socket
 	close(clientFd); 
 
@@ -488,7 +461,7 @@ void Server::_removeAllClients()
 	
     while (!this->_clients.empty()) 
     {
-        this->_removeClient(this->_clients.begin()->first); // Always remove the first element
+        this->_removeClient(this->_clients.begin()->first);
     }
 }
 

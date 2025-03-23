@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 02:00:16 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 00:11:31 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,6 +201,15 @@ void	Client::addChannel(std::string &channel, bool isChanOp)
 // {
 //     this->_clientBuffer += buffer;
 // }
+
+bool	Client::isSubscriber(const std::string &channelName)
+{
+	std::map<std::string, bool>::iterator it = this->_channels.find(channelName);
+
+	if (it != this->_channels.end())
+		return (true);
+	return (false);
+}
 
 bool	Client::unsubscribe(std::string channelName)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/20 21:51:51 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/23 01:43:51 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,33 +25,24 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 	std::string channelName = msgTokens.parameters[0];
 
 	Channel *channel = _findChannelByName(channelName);
-	// If channel doesn't exist, throw 403: ERR_NOSUCHCHANNEL
+
 	if (!channel)
 	{
 		_sendMessage(client, ERR_NOSUCHCHANNEL(_serverName, client.getNickname(), channelName));
 		return;
 	}
 
-	std::map<std::string, bool> &subscriptions = client.getChannels();
-	std::map<std::string, bool>::iterator it;
-
-	it = subscriptions.find(channelName);
-	// if channel exists but kicker client is not a member, throw 442: ERR_NOTONCHANNEL
-    if (it == subscriptions.end())
+	if (!channel->isMember(client.getFd()))
 	{
-		_sendMessage(client, ERR_NOTONCHANNEL(this->_serverName, client.getNickname(), channelName));
-		return ;
+		_sendMessage(client, ERR_NOTONCHANNEL(_serverName, client.getNickname(), channelName));
+		return ;			
 	}
 
-	bool isOperator = it->second;
-	if (!isOperator)
+	if (!client.isOperator(channelName))
 	{
-		// std::cout << client.getNickname() << " is NOT operator in " << channelName << "(482: ERR_CHANOPRIVSNEEDED)" << std::endl;
-		_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
-		/* ********************************************************************************************************** */
-		/* HAIG DE CONSTRUIR UNA NOTIFICACIO PERQUE QUAN IRSSi REP "ERR_CHANOPRIVSNEEDED" TANCA LA FINESTRA DEL CANAL */
-		/* ********************************************************************************************************** */
+		// Alternative to ERR_CHANOPRIVSNEEDED (see footnote [1])
 		//_sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n");
+		_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
 		return ;
 	}
 
@@ -63,45 +54,29 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 
 		if (!kickedClient)
 		{
-			_sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, nicks[i]));
+			_sendMessage(client, ERR_NOSUCHNICK(this->_serverName, client.getNickname(), nicks[i]));
 			continue;
 		}
-		// if (_isClientInChannel(*channel, *kickedClient))
+
 		if (_onChannel(*kickedClient, channelName))
 		{
-			// std::string message = INF_KICKEDFROMCHANNEL(this->_serverName, msgTokens.command, channel->getName(), member->getNickname());
-			// std::string message = kickedClient->getNickname() + " has been kicked from " + channel->getName() + "\r\n";
-			// std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
-			// 					  " " + channelName + " " + kickedClient->getNickname() +
-			// 					  " :" + client.getNickname();
-			// std::cout << message << std::endl;
-			
-// this->_sendToChannel(client, *channel, msgTokens);
+			// Broadcast message to channel
+			std::vector<std::string>	messages;
  			std::string message = ":" + client.getHostMask() + " " + msgTokens.command + 
 								  " " + channelName + " " + kickedClient->getNickname() + 
 								  " " + msgTokens.trailing + "\r\n";
-			std::cout << message << std::endl;
-			// this->_sendToChannel(client, *channel, msgTokens);
+			messages.push_back(message);
 
-			// BROADCAST message to channel
-			for (size_t i = 0; i < channel->getClients().size(); i++)
-			{
-				Client *member = _findClientByFd(channel->getClients()[i]);
-				
-				if (member && member->getFd() != client.getFd()) // Don't send to sender
-					_sendMessage(*member, message);
-			}
+			_broadcastToChannel(*channel, messages);
 
-			channel->removeMember(kickedClient->getFd());
-			kickedClient->unsubscribe(channelName);
+			channel->removeMember(kickedClient->getFd()); // In the channel, remove the client from the channel's members
+			kickedClient->unsubscribe(channelName); 	  // In the client, remove subscription to the channel
 		}
 		else
 		{
-// std::cout << "_kick(): " << kickedClient->getNickname() << " is not a member of " << channel->getName() << std::endl;
  			this->_sendMessage(client, ERR_USERNOTINCHANNEL(this->_serverName, nicks[i], channelName));
 			 continue ;
 		}
-		// continue ;
 	}
 }
 
@@ -139,14 +114,13 @@ Client *Server::_findClientByFd(const int fd)
 	return (NULL);
 }
 
-// bool Server::_isClientInChannel(Channel &channel, Client &client)
-// {
-// 	std::vector<int>::iterator it;
-
-// 	for (it = channel.getClients().begin(); it != channel.getClients().end(); it++)
-// 	{
-// 		if (*it == client.getFd())
-// 			return (true);
-// 	}
-// 	return (false);
-// }
+/* 
+ *	[1]	ERR_CHANOPRIVSNEEDED should be built like this:
+ *
+ *	_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
+ *
+ *		However, for some reason when an IRSSI client receives the message it closes
+ *		the channel window unexpectedly. I overcame the issue building and sending my
+ *		own message, making it clear that in the message that its not the standard 
+ *		reply but a customized notice of our own.
+ */

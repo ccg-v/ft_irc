@@ -183,7 +183,7 @@ std::string	Channel::getTopic()
 	return (this->_topic);
 }
 
-void	Channel::setWhoSetTopic(const std::string & nickname)
+void	Channel::setTopicAuthor(const std::string & nickname)
 {
 	this->_whoSetTopic = nickname;
 }
@@ -191,6 +191,16 @@ void	Channel::setWhoSetTopic(const std::string & nickname)
 std::string	Channel::getWhoSetTopic()
 {
 	return (_whoSetTopic);
+}
+
+bool	Channel::isMember(int fd)
+{	
+	for (size_t i = 0; i < this->_clients.size(); ++i)
+	{
+		if (this->_clients[i] == fd)
+			return (true);
+	}
+	return (false);
 }
 
 bool	Channel::removeMember(int fd)

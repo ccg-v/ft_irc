@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 00:42:41 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 02:48:59 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@
 
 /* --- KICK command --------------------------------------------------------- */
 //	ERR_NEEDMOREPARAMS()
+//	ERR_CHANOPRIVSNEEDED()
+//	ERR_NOTONCHANNEL()
 #define ERR_NOSUCHCHANNEL(serverName, client, channel) \
 	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
 #define ERR_NOSUCHNICK(serverName, client, nick) \
@@ -99,26 +101,17 @@
 /* --- PRIVMSG command ------------------------------------------------------ */
 //	ERR_NEEDMOREPARAMS()
 //	ERR_USERNOTINCHANNEL()
+//	ERR_NOSUCHNICK()
+//	ERR_NOSUCHCHANNEL()
 #define ERR_NOTREGISTERED(serverName, client) \
 	(":" + serverName + " 451 " + client + " :You have not registered\r\n")
 #define ERR_NOTEXTTOSEND(serverName, client) \
 	(":" + serverName + " 412 " + client + " :No text to send\r\n")
-#define ERR_USERNOTINCHANNEL(serverName, client, channel) \
-	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n") 
-#define ERR_NOSUCHCHANNEL(serverName, client, channel) \
-	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
-#define ERR_NOSUCHNICK(serverName, client, nick) \
-	(":" + serverName + " 401 " + client + " " + nick + " :No such nick\r\n")
+#define ERR_INPUTTOOLONG(serverName, client) \
+	(":" + serverName + " 417 " + client + " :Input line was too long\r\n")
+
 // #define ERR_NORECIPIENT(serverName, client, command)
 // 	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
-
-/* --- KICK command --------------------------------------------------------- */
-//	ERR_NEEDMOREPARAMS()
-//	ERR_NOSUCHCHANNEL()
-//	ERR_NOTONCHANNEL()
-//	ERR_CHANOPRIVSNEEDED()
-//	ERR_ERRONEUSNICKNAME()
-//	ERR_USERNOTINCHANNEL()
 	
 /* --- NOTICES -------------------------------------------------------------- */
 #define NTC_USERMISSING(serverName, nick) \

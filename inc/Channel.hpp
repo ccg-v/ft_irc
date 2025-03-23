@@ -43,11 +43,12 @@ class Channel
 		std::vector<int>	getInvited(void);
 		void				setTopic(const std::string & topic);
 		std::string			getTopic();
-		void				setWhoSetTopic(const std::string & nickname);
+		void				setTopicAuthor(const std::string & nickname);
 		std::string			getWhoSetTopic();
 		void				addClient(const int &fd);
 		//void _sendMessage(const std::string& message) const;
 		bool				removeMember(int fd);
+		bool				isMember(int fd);
 
 	private:
 		std::string			_name;

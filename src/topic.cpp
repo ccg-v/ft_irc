@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 23:57:21 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 23:55:04 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 01:43:42 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,25 +30,18 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
 		return;
 	}
 
-	std::map<std::string, bool> &subscriptions = client.getChannels();
-	std::map<std::string, bool>::iterator it;
-
-	it = subscriptions.find(channelName);
-
-    if (it == subscriptions.end())
+	if (!channel->isMember(client.getFd()))
 	{
-		_sendMessage(client, ERR_NOTONCHANNEL(this->_serverName, client.getNickname(), channelName));
-		return ;
+		_sendMessage(client, ERR_NOTONCHANNEL(_serverName, client.getNickname(), channelName));
+		return ;			
 	}
 
-	bool 		isOperator = it->second;
 	std::string oldTopic = channel->getTopic();
 	std::string	newTopic = msgTokens.trailing;
 	std::string	wasSetAt = timeToString(std::time(0));
 	
 	if (newTopic.empty())
 	{
-		std::string message;
 		if (oldTopic.empty())
 			_sendMessage(client, RPL_NOTOPIC(this->_serverName, client.getNickname(), channelName));
 		else
@@ -61,22 +54,17 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
 
 	if (oldTopic != newTopic || !msgTokens.trailing.empty()) 
 	{
-		if (!channel->getTmode() || isOperator)
+		if (!channel->getTmode() || client.isOperator(channelName))
 		{
 			channel->setTopic(msgTokens.trailing);
-			channel->setWhoSetTopic(client.getNickname());
+			channel->setTopicAuthor(client.getNickname());
 
-			// BROADCAST message to channel		
-			std::string rpl_topic = RPL_TOPIC(this->_serverName, client.getNickname(), channelName, newTopic);
-			std::string rpl_topicwhotime = RPL_TOPICWHOTIME(this->_serverName, client.getNickname(), channelName, channel->getWhoSetTopic(), wasSetAt);
+			// Broadcast messages to channel	
+			std::vector<std::string>	messages;
+			messages.push_back(RPL_TOPIC(this->_serverName, client.getNickname(), channelName, newTopic));
+			messages.push_back(RPL_TOPICWHOTIME(this->_serverName, client.getNickname(), channelName, channel->getWhoSetTopic(), wasSetAt));
 
-			for (size_t i = 0; i < channel->getClients().size(); i++)
-			{
-				Client *member = _findClientByFd(channel->getClients()[i]);
-			
-				_sendMessage(*member, rpl_topic);
-				_sendMessage(*member, rpl_topicwhotime);
-			}
+			_broadcastToChannel(*channel, messages);
 		}
 		else
 		{
@@ -86,7 +74,6 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
 		}
 	}
 }
-
 
 /* 
  *	[1]	ERR_CHANOPRIVSNEEDED should be built like this:
@@ -99,41 +86,3 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
  *		reply but a customized notice of our own.
  */
  
-/*
-// _TMODE TRUE -> RESTRINGIT
-	bool isOperator = it->second;
-
-	std::string oldTopic = channel->getTopic();
-	std::string	newTopic = msgTokens.trailing;
-
-	if (newTopic.empty() || isOnlySpaces(newTopic))
-	{
-		_sendMessage(client, RPL_NOTOPIC(this->_serverName, client.getNickname(), channelName));
-		return ;
-	}
-
-	if (oldTopic != newTopic) 
-	{
-		if (!channel->getTmode() || isOperator)
-		{
-			channel->setTopic(msgTokens.trailing);
-
-			// BROADCAST message to channel		
-			std::string message = RPL_TOPIC(this->_serverName, client.getNickname(), channelName, newTopic);
-
-			for (size_t i = 0; i < channel->getClients().size(); i++)
-			{
-				Client *member = _findClientByFd(channel->getClients()[i]);
-			
-				_sendMessage(*member, message);
-			}
-		}
-		else
-		{
-			// Alternative to ERR_CHANOPRIVSNEEDED (see footnote [1])
-			// _sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n"); // [1]
-			_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
-		}
-	}
-
-*/

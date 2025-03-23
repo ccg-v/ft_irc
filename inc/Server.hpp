@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/22 02:40:01 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 01:29:34 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ class	Server
 		void						_sendMessage_fd(int fd, const std::string &message);
 		void						_removeFromChannel(Channel &channel, int clientFd);
 		void						_checkGhostClients();
+		void						_broadcastToChannel(Channel &channel, const std::vector<std::string> &message);
 		void						_removeClient(int clientFd);
 		void						_removeAllClients();
 		void						_closeSockets();

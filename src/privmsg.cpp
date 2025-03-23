@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/19 00:17:26 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/23 02:52:59 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,12 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 	if (msgTokens.trailing.empty())
 	{
 		_sendMessage(client, ERR_NOTEXTTOSEND(this->_serverName, client.getNickname()));
+		return;
+	}
+
+	if (msgTokens.trailing.size() > 512)
+	{
+		_sendMessage(client, ERR_INPUTTOOLONG(this->_serverName, client.getNickname()));
 		return;
 	}
 	
