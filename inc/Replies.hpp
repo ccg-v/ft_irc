@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Replies.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/22 03:23:26 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 19:51:39 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 22:54:08 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 	(":" + serverName + " 462 " + " :You may not reregister\r\n")
 
 /* --- NICK command --------------------------------------------------------- */
-//	ERR_PASSWDMISMATCH()
 #define ERR_NONICKNAMEGIVEN(serverName) \
 	(":" + serverName + " 431" + " :No nickname given\r\n")
 #define ERR_ERRONEUSNICKNAME(serverName, nick) \
@@ -31,8 +30,7 @@
     (":" + serverName + " 433 " + nick + " " + newNick + " :Nickname is already in use\r\n")
 
 /* --- USER command --------------------------------------------------------- */
-//	ERR_PASSWDMISMATCH()
-//	ERR_ALREADYREGISTERED()
+
 #define ERR_NEEDMOREPARAMS(serverName, command) \
 	(":" + serverName + " 461 " + command + " :Not enough parameters\r\n")
 #define ERR_INVALIDUSERNAME(serverName, user) \
@@ -54,12 +52,6 @@
 	(":" + serverName + " 471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_KEYSET(serverName, nick, channel) \
 	(":" + serverName + " 467 " + nick + " " + channel + " :Channel key must be 2-32 chars long and contain only alphanumeric chars or $%&'()*+-.@\r\n")
-//#define RPL_NAMREPLY(serverName, joinernick, channel, prefix, membernick) 
-//	(":" + serverName + " 353 " + joinernick + " = " + channel + " :" + prefix + membernick + "\r\n")
-// #define RPL_NAMREPLY(serverName, joinernick, channel, namesList) 
-// 	(":" + serverName + " 353 " + joinernick + " = " + channel + " :" + namesList + "\r\n")
-// #define RPL_ENDOFNAMES(serverName, client, channel) 
-// 	(":" + serverName + " 366 " + client + " " + channel + " :End of /NAMES list\r\n")
 
 /* --- MODE command --------------------------------------------------------- */
 #define ERR_NOTONCHANNEL(serverName, client, channel) \
@@ -76,9 +68,6 @@
 	(":" + serverName + " " + command + " " + mode + " :Available modes: +k -k +i -i +o -o +t -t +l -l\r\n")
 
 /* --- KICK command --------------------------------------------------------- */
-//	ERR_NEEDMOREPARAMS()
-//	ERR_CHANOPRIVSNEEDED()
-//	ERR_NOTONCHANNEL()
 #define ERR_NOSUCHCHANNEL(serverName, client, channel) \
 	(":" + serverName + " 403 " + client + " " + channel + " :No such channel\r\n")
 #define ERR_NOSUCHNICK(serverName, client, nick) \
@@ -87,10 +76,6 @@
 	(":" + serverName + " 441 " + client + " " + channel + " :Not on that channel\r\n")
 
 /* --- TOPIC command -------------------------------------------------------- */
-//	ERR_NEEDMOREPARAMS()
-//	ERR_NOSUCHCHANNEL()
-//	ERR_NOTONCHANNEL()
-//	ERR_CHANOPRIVSNEEDED()
 #define RPL_NOTOPIC(serverName, client, channel) \
 	(":" + serverName + " 331 " + client + " " + channel + " :No topic is set\r\n")
 #define RPL_TOPIC(serverName, client, channel, topic) \
@@ -99,24 +84,12 @@
 	(":" + serverName + " 333 " + client + " " + channel + " " + whoSetNick + " " + wasSetAt + "\r\n")
 
 /* --- PRIVMSG command ------------------------------------------------------ */
-//	ERR_NEEDMOREPARAMS()
-//	ERR_USERNOTINCHANNEL()
-//	ERR_NOSUCHNICK()
-//	ERR_NOSUCHCHANNEL()
 #define ERR_NOTREGISTERED(serverName, client) \
 	(":" + serverName + " 451 " + client + " :You have not registered\r\n")
 #define ERR_NOTEXTTOSEND(serverName, client) \
 	(":" + serverName + " 412 " + client + " :No text to send\r\n")
 #define ERR_INPUTTOOLONG(serverName, client) \
 	(":" + serverName + " 417 " + client + " :Input line was too long\r\n")
-
-// #define ERR_NORECIPIENT(serverName, client, command)
-// 	(":" + serverName + " 411 " " :No recipient given (" + command + ")\r\n")
-
-/* --- PART command -----------------------------------------------'''------- */
-//	ERR_NEEDMOREPARAMS()
-//	ERR_NOSUCHCHANNEL()
-//	ERR_NOTONCHANNEL()
 	
 /* --- NOTICES -------------------------------------------------------------- */
 #define NTC_USERMISSING(serverName, nick) \
@@ -125,6 +98,20 @@
 	(":" + serverName + " NOTICE * :Enter nickname to complete register\r\n")
 #define NTC_SERVERSHUTDOWN(serverName, nick) \
 	(":" + serverName + " NOTICE * :Server shutting down\r\n")
+#define NTC_MODEUNCHANGED(serverName, nick, channel, mode) \
+    (":" + serverName + " NOTICE " + nick + " :Channel " + channel + " is already " + mode + "\r\n")
+#define NTC_KEYUNCHANGED(serverName, nick, channel) \
+    (":" + serverName + " NOTICE " + nick + " :Channel " + channel + " already has this key set\r\n")
+#define NTC_LIMITUNCHANGED(serverName, nick, channel) \
+    (":" + serverName + " NOTICE " + nick + " :Channel " + channel + " already has this user limit\r\n")
+#define NTC_ALREADYOP(serverName, nick, channel, targetNick) \
+    (":" + serverName + " NOTICE " + nick + " :User " + targetNick + " is already an operator in " + channel + "\r\n")
+#define NTC_NOTOP(serverName, nick, channel, targetNick) \
+    (":" + serverName + " NOTICE " + nick + " :User " + targetNick + " is not an operator in " + channel + "\r\n")
+#define NTC_INVITATIONRECEIVED(serverName, nick, targetnick, channel) \
+    (":" + serverName + " NOTICE " + targetnick + ":User " + nick + " has invited you to join channel " + channel + "\r\n")
+#define NTC_INVITATIONSUCCESS(serverName, inviter, targetnick, channel) \
+    (":" + serverName + " NOTICE " + inviter + " :You have invited " + targetnick + " to join channel " + channel + "\r\n")
 
 /* --- Custom messages------------------------------------------------------- */	
 #define INF_NICKCHANGED(oldNick, user, clientIp, newNick) \

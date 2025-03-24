@@ -3,16 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   nick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:52:25 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 21:26:55 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 23:26:46 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// TO-DO:
-// 	-	when a client changes his nick within a channel, all connected clients
-//		should be noticed
 
 /* See RFC 2812, Section 3.1.2 */
 
@@ -96,7 +92,6 @@ void 	Server::_nick(Client &client, const t_tokens msgTokens)
  *
  *	(see RFC 2812, Section 2.3.1)
  */
-
 bool Server::_isNickValid(const std::string &nick)
 {
 	if (nick.length() > 9) // Adjust max length per server rules
@@ -130,4 +125,3 @@ bool	Server::_nickExists(const std::string &nick)
 	}
 	return (false);
 }
-

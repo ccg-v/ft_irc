@@ -85,4 +85,3 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
  *		own message, making it clear that in the message that its not the standard 
  *		reply but a customized notice of our own.
  */
- 

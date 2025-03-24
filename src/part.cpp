@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   part.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 19:14:04 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 13:29:57 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 23:26:53 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,3 @@ void	Server::_part(Client &client, const t_tokens msgTokens)
 		client.unsubscribe(partingChannels[i]);	// In the client, remove subscription to the channel
 	}
 }
-
-
-
-

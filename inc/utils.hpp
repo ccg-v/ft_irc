@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 20:29:36 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 22:48:37 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 23:24:05 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,5 @@ std::string					getCurrentDate();
 std::vector<std::string>	splitByComma(const std::string &str);
 bool						validKey(const std::string &key);
 std::string 				timeToString(time_t timestamp);
-// bool						isOnlySpaces(const std::string &str);
 
 #endif

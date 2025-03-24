@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 01:29:34 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 22:51:30 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@
 
 #define BUFFER_SIZE 512	// Max buffer size for recv() [1]
 #define BACKLOG 4		// Max number of pending connections queue will hold
-#define MAXCHAN 3		// Max number of channels a client can join
-#define TIMEOUT 15		// Max seconds allowed to complete registration (to prevent ghost clients)
+#define MAXCHAN 5		// Max number of channels a client can join
+#define TIMEOUT 20		// Max seconds allowed to complete registration (to prevent ghost clients)
 
 typedef struct s_tokens
 {
@@ -96,6 +96,7 @@ class	Server
 		void						_closeSockets();
 		void						_sendNames(const std::vector<int> &fds, std::string &ch_name, Client &joiner);
 		bool						_badModeSyntax(const t_tokens *ms, Client &client);
+		bool						_modeAlreadySet(Channel *channel, const std::vector<std::string> &params);
 		
 		//* --- Connection operations --------------------------------------- */
 		void 		_cap(Client &client, const t_tokens msgTokens);
@@ -109,8 +110,7 @@ class	Server
 		void 		_pong(Client &client, const t_tokens msgTokens);
 		void 		_privmsg(Client &client, const t_tokens msgTokens);		
         void		_kick(Client &client, const t_tokens msgTokens);
-        // void _invite();
-        // void _topic(int& i, std::vector<std::string> &args);
+        void		_invite(Client &client, const t_tokens msg);
         void		_mode(Client &client, const t_tokens msgTokens);
 		void		_topic(Client &client, const t_tokens msgTokens);
 		void		_part(Client &client, const t_tokens msgTokens);
@@ -143,6 +143,8 @@ class	Server
 		Client 		*_findClientByNick(const std::string &nickname);
 		Client		*_findClientByFd(const int fd);
 		bool		_isClientInChannel(Channel &channel, Client &client);
+
+		/* --- Invite --------------------------------------------------------- */
 
 		/* --- Debug -------------------------------------------------------- */		
 		void		_debugListClients();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/23 13:16:43 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 22:55:43 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,7 @@ Client::Client(int fd) // Parameterized constructor
 	  _passErrSent(false),
 	  _clientBuffer(""),
 	  _startTime(std::time(0))
-//	  _maxChannels(MAXCHAN)
 {
-//	std::cout << "\n[~DEBUG]: client created with sockefd: " << _fd << " and maxChannels: " << _maxChannels << std::endl;
 }
 
 Client::Client(const Client &source)
@@ -51,7 +49,6 @@ Client &Client::operator=(const Client &source)
 		_isRegistered = source._isRegistered;
 		_passErrSent = source._passErrSent;
 		_clientBuffer = source._clientBuffer;
-	//	_maxChannels = source._maxChannels;
 		_channels = source._channels;
 		_startTime = source._startTime;
     }
@@ -171,7 +168,7 @@ time_t	Client::getStartTime()
 
 // OTHER METHODS
 
-bool	Client::isOperator(std::string &ch_name)
+bool	Client::isOperator(const std::string &ch_name)
 {
 	if (this->_channels[ch_name] == true)
 		return (true);
@@ -181,26 +178,7 @@ bool	Client::isOperator(std::string &ch_name)
 void	Client::addChannel(std::string &channel, bool isChanOp)
 {
     this->_channels[channel] = isChanOp; // [1]
-	// for (std::map<std::string, bool>::const_iterator it = _channels.begin(); it != _channels.end(); ++it)
-	// {
-    // 	std::cout << "[~DEBUG]: one channel is: " << it->first << std::endl;
-	// }
 }
-
-// void Client::_sendMessage(const std::string &message) const
-// {
-//     std::string msg = message + "\r\n";
-//     send(this->_fd, msg.c_str(), msg.length(), 0);
-// }
-// void Client::setBuffer(std::string buffer)
-// {
-//     this->_clientBuffer = buffer;
-// }
-
-// void Client::addBuffer(std::string& buffer)
-// {
-//     this->_clientBuffer += buffer;
-// }
 
 bool	Client::isSubscriber(const std::string &channelName)
 {
@@ -220,11 +198,3 @@ void	Client::unsubscribe(std::string channelName)
 		this->_channels.erase(it);
 	}
 }
-
-/*	[1] You can add items to a std::map<Key, Value> using these methods:
-	1. Using operator[] (Creates or Updates)
-
-	std::map<std::string, int> myMap;
-	myMap["apple"] = 5;  // Inserts ("apple", 5)
-	myMap["banana"] = 10; // Inserts ("banana", 10)
-*/

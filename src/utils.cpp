@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 20:22:33 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/21 22:48:24 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 23:28:01 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,14 +80,3 @@ std::string timeToString(time_t timestamp) {
     ss << timestamp;
     return ss.str();
 }
-
-
-// bool	isOnlySpaces(const std::string &str)
-// {
-//     return (str.find_first_not_of(" \t\n\v\f\r") == std::string::npos);
-// }
-
-/*	[1] If str is "key1,", the returned std::vector<std::string> will have two elements:
-		- "key1"
-		- "" (empty string, because there's a trailing comma)
-*/

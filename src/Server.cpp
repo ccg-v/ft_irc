@@ -6,7 +6,7 @@
 /*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 00:13:58 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/24 19:45:53 by ccarrace         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ Server::Server(const std::string &port, const std::string &password)
 	_commandMap["PONG"] = &Server::_pong;
 	_commandMap["PRIVMSG"] = &Server::_privmsg;
 	_commandMap["KICK"] = &Server::_kick;
+	_commandMap["INVITE"] = &Server::_invite;
 	_commandMap["TOPIC"] = &Server::_topic;
 	_commandMap["PART"] = &Server::_part;
 	_commandMap["QUIT"] = &Server::_quit;
@@ -258,18 +259,15 @@ void	Server::_receiveRawData(Client &currentClient, size_t &i) // Pass 'i' by re
 
 	std::string &clientBuffer = currentClient.getBuffer(); // REFERENCE!!
 
-	// Enforce a reasonable buffer limit to avoid oversized messages
 	if (clientBuffer.size() + bytesReceived > 512) 
 	{
-		_sendMessage(currentClient, "Server.cpp: " + ERR_INPUTTOOLONG(this->_serverName, currentClient.getNickname()));
+		_sendMessage(currentClient, ERR_INPUTTOOLONG(this->_serverName, currentClient.getNickname()));
 		clientBuffer.clear(); // Clear the buffer to prevent partial overflowed messages
 		return;
 	}
 
     // Append received data to client's buffer
     clientBuffer.append(buffer, bytesReceived);
-
-
 
 	// Extract full messages, leaving incomplete ones in clientBuffer
 	// We send a REFERENCE!! of clientBuffer, not a copy, to ensure it reflects changes
@@ -362,7 +360,7 @@ void Server::_processMessage(Client &currentClient, std::string message)
 	{
 		(this->*(it->second))(currentClient, msgTokens);  // Call the correct handler function
 	}
-	else
+	else if (!msgTokens.command.empty())
 	{
 		_sendMessage(currentClient, ERR_UNKNOWNCOMMAND(this->_serverName, msgTokens.command));
 	}

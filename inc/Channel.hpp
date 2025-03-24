@@ -21,32 +21,31 @@ class Channel
 		Channel	&operator=(const Channel &);
 
 		/* -------- SETTERS ------------------*/
-		//void setName(std::string name); //VOLS DIR QUE TE SENTIT? NO ES POT CREAR SI NO ES AMB EL NOM
-		//  void setTopic(std::string topic);
 		void	setKey(std::string key);
-	//	void	setMode(char mode, bool status); // to use only after checking that mode exists!
 		void	setLimit(int limit);
 		void 	setIonly(bool status);
 		void 	setTmode(bool status);
+		void	setTopic(const std::string & topic);
+
 
 		/* -------- GETTERS ------------------*/
 		std::string			getName(void) const;
 		std::string			getTopic(void) const;
 		std::string			getKey(void) const;
 		int					getLimit(void) const;
-	//	bool				getMode(char mode) const; // to use only after checking that mode exists!  - erosas: ????
 		bool 				getIonly() const;
 		bool 				getTmode() const;
 		std::vector<int>	getClients(void) const;
 		std::vector<int>	&getClientsByRef();
 		void				setClients(const std::vector<int>& newClients);
-		std::vector<int>	getInvited(void);
-		void				setTopic(const std::string & topic);
+		std::vector<int>	&getInvited(void);
 		std::string			getTopic();
 		void				setTopicAuthor(const std::string & nickname);
 		std::string			getWhoSetTopic();
+
+		/* -------- OTHER METHODS ------------------*/
 		void				addClient(const int &fd);
-		//void _sendMessage(const std::string& message) const;
+		void				addInvite(const int fd);
 		void				removeMember(int fd);
 		bool				isMember(int fd);
 
@@ -61,7 +60,6 @@ class Channel
 
 		std::vector<int>	_clients; // fds of clients
 		std::vector<int>	_invited; // fds of clients that have been invited to the channel
-		//std::map<char, bool>	_modes; // key is one of the modes: i, t, k, o, l		
 };
 
 #endif

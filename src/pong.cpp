@@ -20,8 +20,8 @@ void	Server::_pong(Client &client, const t_tokens msgTokens)
 	std::cout << "[~DEBUG]: " << getCurrentDate() << " :PONG sent to client " 
 			  << client.getFd() << ": " << client.getNickname() << std::endl;
 
-	// _debugListClients();
-	// _debugListChannels();
+	_debugListClients();
+	_debugListChannels();
 	
 	_sendMessage(client, "PONG " + serverName + "\r\n");
 }
