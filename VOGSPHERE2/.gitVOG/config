@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = git@vogsphere.42barcelona.com:vogsphere/intra-uuid-dfd562ae-99c1-4d87-8fa1-47d50ce01b45-6434499-erosas-c
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
