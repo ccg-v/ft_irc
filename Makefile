@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+         #
+#    By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/27 20:47:37 by erosas-c          #+#    #+#              #
-#    Updated: 2025/03/24 23:23:52 by erosas-c         ###   ########.fr        #
+#    Updated: 2025/03/25 01:04:38 by ccarrace         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME 		= ircserv
 
 CC 			= c++
 RM 			= rm -rf
-FLAGS		= -Wall -Wextra -Werror -std=c++98 -pedantic #-fsanitize=address
+FLAGS		= -Wall -Wextra -Werror -std=c++98 -pedantic -fsanitize=address
 
 # --- Folders ---------------------------------------------------------------- #
 
