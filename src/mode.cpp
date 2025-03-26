@@ -3,21 +3,20 @@
 void Server::_mode(Client &client, const t_tokens msg)
 {
 	const t_tokens *ms = &msg;
-	//quan hi ha un parametre més del que creiem es pq des de la finestra del canal IRSSI sol ja envia el canal com a parameter[0]
 	if (_badModeSyntax(ms, client))
 		return ;
-	if (!_chanExists(msg.parameters[0])) //channel does not exist
+	std::string ch_name = toLowerStr(msg.parameters[0]);
+	if (!_chanExists(ch_name))
 	{
 		if (ms->parameters[0][0] == '#' || ms->parameters[0][0] == '&') // protecting MODE sent automatically by IRSSI upon connection
-			this->_sendMessage(client, ERR_NOSUCHCHANNEL(this->_serverName, client.getNickname(), msg.parameters[0]));
+			this->_sendMessage(client, ERR_NOSUCHCHANNEL(this->_serverName, client.getNickname(), ch_name));
 		return ;
 	}
 
 	char	mode = msg.parameters[1][1];
-	Channel *channel = _getChannel(msg.parameters[0]);	//copy the channel to an easier parameter "channel"
+	Channel *channel = _getChannel(ch_name);
 	std::string &server = this->_serverName;
 	const std::string &nick = client.getNickname();
-	const std::string &ch_name = channel->getName();
 	
 	//0. CHECK IF client is on that channel
 	if (!_onChannel(client, channel->getName()))
@@ -32,7 +31,8 @@ void Server::_mode(Client &client, const t_tokens msg)
     	this->_sendMessage(client, ERR_CHANOPRIVSNEEDED(server, nick, ch_name));
     	return ;
 	}
-	if (msg.parameters.size() == 2)
+	if (msg.parameters[1] == "+i" || msg.parameters[1] == "-i" || msg.parameters[1] == "-k" || msg.parameters[1] == "-l"
+		|| msg.parameters[1] == "+t" || msg.parameters[1] == "-t")
 	{
 		if (_modeAlreadySet(channel, ms->parameters)) //only to sender bc NO CHANGE has been made
 		{
@@ -68,14 +68,14 @@ void Server::_mode(Client &client, const t_tokens msg)
 				this->_sendMessage(client, NTC_KEYUNCHANGED(_serverName, nick, ch_name));
     			return ;
 			}
-			if (!validKey(msg.parameters[2]))
+			if (!validKey(msg.parameters[2], 2))
 			{
 				this->_sendMessage(client, ERR_KEYSET(server, nick, ch_name));
 				return ; 
 			}
 			channel->setKey(msg.parameters[2]);
 			//Send message KEY CHANGED TO ALL CHANNEL
-			std::string text = ":" + nick + " MODE " + ch_name + " " + msg.parameters[1] + msg.parameters[2] + "\r\n";
+			std::string text = ":" + nick + " MODE " + ch_name + " " + msg.parameters[1] + " " + msg.parameters[2] + "\r\n";
 			std::vector<int> chanClients = channel->getClients();
 			for (std::vector<int>::iterator it = chanClients.begin(); it != chanClients.end(); ++it)
 			{
@@ -152,7 +152,7 @@ void Server::_mode(Client &client, const t_tokens msg)
 			{
 				target->getChannels()[channel->getName()] = newstatus;
 				//Send message ABOUT THE CHANGE TO ALL CHANNEL
-				std::string message = ":" + nick + " MODE " + ch_name + " " + msg.parameters[1] + msg.parameters[2] + "\r\n";
+				std::string message = ":" + nick + " MODE " + ch_name + " " + msg.parameters[1] + " " + msg.parameters[2] + "\r\n";
 				std::vector<int> chanClients = channel->getClients();
 				for (std::vector<int>::iterator it = chanClients.begin(); it != chanClients.end(); ++it)
 				{
@@ -205,12 +205,11 @@ bool	Server::_badModeSyntax(const t_tokens *ms, Client &client)
 	std::string validModes = "iklto";
 	std::string signs = "-+";
 	
-	//He passat aquest al principi perquè si no quan passem /mode WHATEVER diu que no hi ha prou paràmetres
 	//mode has to be 2+ chars long, and be sign + validMode (Basic tests OK), if >2, 3rd and further are dismissed by most servers
 	if (ms->parameters.size() > 1 && (ms->parameters[1].length() != 2 || signs.find(ms->parameters[1][0]) == std::string::npos
 		|| validModes.find(ms->parameters[1][1]) == std::string::npos))
 		this->_sendMessage(client, ERR_MODEERROR(this->_serverName, ms->parameters[0], ms->parameters[1]));
-	//less than 2 params, need 2 at least: mode + channel (WORKING OK)
+	//less than 2 params, need 2 at least: mode + channel
 	else if (ms->parameters.size() < 2 || (ms->parameters.size() < 3 &&
 		(ms->parameters[1] == "+o" || ms->parameters[1] == "-o" || ms->parameters[1] == "+k" || ms->parameters[1] == "+l")))
 		this->_sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, ms->parameters[0]));

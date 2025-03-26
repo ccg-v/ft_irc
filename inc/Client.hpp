@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:22:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 22:52:55 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/26 19:07:48 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ class	Client
 		bool						getPassErrSent();
 		time_t						getStartTime();
 		std::map<std::string, bool>	&getChannels();
+		void						setNickValid(bool status);
+		bool						getNickValid();
 	
 		/* --- Other public methods ----------------------------------------- */
 		void						addChannel(std::string &channel, bool isChanOp);
@@ -73,6 +75,7 @@ class	Client
 		std::string					_topic;
 		time_t						_startTime;
 		std::map<std::string, bool> _channels; // key = channel name, bool: whether the client is operator (chanop / admin) of that channel OR NOT
+		bool						_nickValid;
 };
 
 #endif

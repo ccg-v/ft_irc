@@ -2,6 +2,7 @@
 
 void Server::_invite(Client &client, const t_tokens msg)
 {
+	std::string ch_name = toLowerStr(msg.parameters[1]);
 	const t_tokens *ms = &msg;
 	if (ms->parameters.size() < 2) // check syntax
 	{
@@ -17,7 +18,6 @@ void Server::_invite(Client &client, const t_tokens msg)
 		_sendMessage(client, ERR_NOSUCHNICK(server, nick, targetnick));
 		return ;
 	}
-	const std::string &ch_name = msg.parameters[1];
 	//1. CHECK IF the channel exists
 	if (!_chanExists(ch_name)) //channel does not exist
 	{
@@ -51,7 +51,6 @@ void Server::_invite(Client &client, const t_tokens msg)
      	return ;
 	}
 	//5. CHECK if the channel is invite-only (otherwise the server should do nothing)
-	//i després de l'IF crear ja la invitació EFECTIVAMENT
 	if (targetCl && channel->getIonly() == true)
 	{
 		channel->addInvite(targetCl->getFd());

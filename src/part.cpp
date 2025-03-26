@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 19:14:04 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 23:26:53 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/25 20:09:58 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	Server::_part(Client &client, const t_tokens msgTokens)
 		return ;
 	}
 
-	std::vector<std::string> partingChannels = splitByComma(msgTokens.parameters[0]);
+	std::vector<std::string> partingChannels = splitByComma(toLowerStr(msgTokens.parameters[0]));
 
 	for (size_t i = 0; i < partingChannels.size(); ++i)
 	{

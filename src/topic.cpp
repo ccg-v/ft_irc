@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 23:57:21 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/25 00:50:47 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/26 20:16:13 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
 		return ;
 	}
 
-	std::string channelName = msgTokens.parameters[0];
+	std::string channelName = toLowerStr(msgTokens.parameters[0]);
 
 	Channel *channel = _findChannelByName(channelName);
 
@@ -67,11 +67,7 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
 			_broadcastToChannel(*channel, messages);
 		}
 		else
-		{
-			// Alternative to ERR_CHANOPRIVSNEEDED (see footnote [1])
-			// _sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n"); // [1]
-			_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
-		}
+			_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName)); // [1]
 	}
 }
 
@@ -84,4 +80,10 @@ void	Server::_topic(Client &client, const t_tokens msgTokens)
  *		the channel window unexpectedly. I overcame the issue building and sending my
  *		own message, making it clear that in the message that its not the standard 
  *		reply but a customized notice of our own.
+ *		
+ *		Alternative to ERR_CHANOPRIVSNEEDED:
+ 
+ *	_sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + \
+ *   channelName + " :You're not channel operator\r\n");
+ *
  */

@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:53 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 22:51:30 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/26 18:54:30 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 #define BUFFER_SIZE 512	// Max buffer size for recv() [1]
 #define BACKLOG 4		// Max number of pending connections queue will hold
 #define MAXCHAN 5		// Max number of channels a client can join
-#define TIMEOUT 20		// Max seconds allowed to complete registration (to prevent ghost clients)
+#define TIMEOUT 30		// Max seconds allowed to complete registration (to prevent ghost clients)
 
 typedef struct s_tokens
 {
@@ -73,7 +73,7 @@ class	Server
     	std::vector<struct pollfd> 		_pollFds;  		// Polling sockets
     	std::map<int, Client> 			_clients;  		// Map of descriptors (key) and clients
 		std::map<std::string, Channel>	_channels; // key in the map is a channel's name
-		// int								_numClients;
+		bool							_nickValid;
 
 		std::map<std::string, void (Server::*)(Client&, t_tokens)> _commandMap; // [2]
 		
@@ -143,8 +143,6 @@ class	Server
 		Client 		*_findClientByNick(const std::string &nickname);
 		Client		*_findClientByFd(const int fd);
 		bool		_isClientInChannel(Channel &channel, Client &client);
-
-		/* --- Invite --------------------------------------------------------- */
 
 		/* --- Debug -------------------------------------------------------- */		
 		void		_debugListClients();

@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/01 19:02:42 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 23:27:23 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/26 20:06:55 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,6 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 		return;
 	}
 
-	// if (msgTokens.trailing.size() > 512)
-	// {
-	// 	_sendMessage(client, "privmsg.cpp: " + ERR_INPUTTOOLONG(this->_serverName, client.getNickname()));
-	// 	return;
-	// }
-	
 	std::vector<std::string> targets = splitByComma(msgTokens.parameters[0]);
 
 	for (size_t i = 0; i < targets.size(); i++)
@@ -47,6 +41,7 @@ void	Server::_privmsg(Client &client, const t_tokens msgTokens)
 
 		if (target[0] == '#' || target[0] == '&')
 		{
+			target = toLowerStr(target);
 			// If it's a valid channel name, we search if channel exists
 			Channel *channel = _findChannelByName(target);
 			if (channel) 

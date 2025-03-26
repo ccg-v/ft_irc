@@ -6,7 +6,7 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
     std::vector<std::string>	keys;	// if there are several channels with several keys
 	bool somekey = msg.parameters.size() > 1 ? true : false; //true if >1 parameters; means client sent some key to some channel
 
-    if (msg.parameters.size() < 1)
+	if (msg.parameters.size() < 1)
 	{
 		this->_sendMessage(client, ERR_NEEDMOREPARAMS(this->_serverName, msg.command));
 		return ;
@@ -17,10 +17,15 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 	size_t n = chs2join.size();
 	for (size_t i = 0; i < n; i++)
 	{
-		std::string ch_name = chs2join[i];
+		std::string ch_name = toLowerStr(chs2join[i]);
 		std::string	key = "";
 		if (somekey && i < keys.size() && keys[i] != "x")
 			key = keys[i];
+		if (key != "" && !validKey(key, 2))
+		{
+			this->_sendMessage(client, ERR_KEYSET(_serverName, client.getNickname(), ch_name));
+			continue ;
+		}
 		if (client.getChannels().size() >= MAXCHAN)
 		{
 			this->_sendMessage(client, ERR_TOOMANYCHANNELS(this->_serverName, client.getNickname(), ch_name));
@@ -51,10 +56,8 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 			if (this->_onChannel(client, ch_name)) //NOT SHOWING ON IRSSI (which manages that itself)
 				this->_sendMessage(client, ERR_USERONCHANNEL(this->_serverName, client.getNickname(), ch_name));
 		    // Check that channel is NOT inviteOnly OR user has an invitation to it in case it is iOnly
-			// [TODO] TEST SECOND CONDITION - PENDING MERGE with new PART function
 			else if (channel.getIonly() && !_isInvited(channel, client.getFd()))
                 this->_sendMessage(client, ERR_INVITEONLYCHAN(this->_serverName, client.getNickname(), ch_name));
-			// PENDING COMPLEX TESTS > OK IN PRINCIPLE (irssi Mac)
 			else if (channel.getKey() != "" && key != channel.getKey())
 				this->_sendMessage(client, ERR_BADCHANNELKEY(this->_serverName, client.getNickname(), ch_name));
 			else if (channel.getLimit() && channel.getClients().size() == static_cast<size_t>(channel.getLimit()))
@@ -71,8 +74,6 @@ void Server::_join(Client &client, const t_tokens msg) //[1]
 				// invite disappears when client joins
 				if (_isInvited(channel, client.getFd()))
 				{
-					//std::cout << "[DEBUG]: go remove invite when joining" << std::endl;
-					//_removeInvite(channel, client.getFd());
 					std::vector<int> &invited = channel.getInvited();
 					invited.erase(std::remove(invited.begin(), invited.end(), client.getFd()), invited.end());
 				}
@@ -114,7 +115,7 @@ bool	Server::_chanExists(const std::string &name)
     std::map<std::string, Channel>::iterator it;
     for (it = this->_channels.begin(); it != this->_channels.end(); ++it)
     {
-        if (it->first == name)
+        if (toLowerStr(it->first) == toLowerStr(name))
             return (true);
     }
     return (false);
@@ -125,7 +126,6 @@ bool Server::_validChannelName(std::string &name)
     // Check if the name is empty or if it doesn't start with either '#' or '&'
     if (name.empty() || (name[0] != '#' && name[0] != '&'))
         return false;
-
     // Check if the name contains spaces or commas, or ASCII 07 (bell)
     for (std::string::size_type i = 1; i < name.length(); ++i) // skip 0 position == & || #
 	{

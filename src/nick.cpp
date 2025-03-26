@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 01:52:25 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 23:26:46 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/26 19:11:50 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void 	Server::_nick(Client &client, const t_tokens msgTokens)
 	if (!_isNickValid(newNick))
 	{
 		_sendMessage(client, ERR_ERRONEUSNICKNAME(this->_serverName, newNick));
+		close(client.getFd());
 		return;
 	}
 
@@ -65,6 +66,7 @@ void 	Server::_nick(Client &client, const t_tokens msgTokens)
 	}
 
 	client.setNickname(newNick);
+	client.setNickValid(true);
 	client.setHostMask();
 
 	// If the username is missing, notify the client
@@ -76,7 +78,6 @@ void 	Server::_nick(Client &client, const t_tokens msgTokens)
 	
 	// Complete registration and send welcome messages
 	client.setRegistration(true);
-	// _sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getUsername(), client.getClientIp()));
 	_sendMessage(client, RPL_WELCOME(this->_serverName, client.getNickname(), client.getHostMask()));	
 	_sendMessage(client, RPL_YOURHOST(this->_serverName, client.getNickname()));
 	_sendMessage(client, RPL_CREATED(this->_serverName, client.getNickname()));

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccarrace <ccarrace@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 23:42:08 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 19:45:53 by ccarrace         ###   ########.fr       */
+/*   Updated: 2025/03/26 20:13:40 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ Server::Server(const std::string &port, const std::string &password)
 	_password = password;
 	_serverName = "42ft_irc";
 	_creationTime = getCurrentDate();
-	// _numClients = 0;
 
 	_commandMap["CAP"] = &Server::_cap;
     _commandMap["PASS"] = &Server::_pass;
@@ -50,6 +49,7 @@ Server::Server(const std::string &port, const std::string &password)
 	_commandMap["PART"] = &Server::_part;
 	_commandMap["QUIT"] = &Server::_quit;
 	_commandMap["DEBUG"] = &Server::_debug;
+	_commandMap["NOTICE"] = &Server::_privmsg;
 
     struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -65,9 +65,6 @@ Server::Server(const std::string &port, const std::string &password)
 	{
         throw std::runtime_error("[SERVER]: Error: getaddrinfo() failed");
     }
-
-    // Loop through ALL the results and bind to the first we can
-	// I use a copy of servinfo pointer to keep reference to the list's head
 
 	std::string lastError;
 
@@ -144,7 +141,6 @@ void	Server::startPoll()
 {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGQUIT, signalHandler);
-	// int 	numClients = 0;
 
     while (!signalCaught)
     {
@@ -170,7 +166,6 @@ void	Server::startPoll()
 					}
 					else
 					{
-						// int	refusedClient = accept(this->_serverSocket, NULL, NULL);
 						int	refusedClient = accept(this->_serverSocket, NULL, NULL);
 						std::string message = INF_SERVERISFULL(this->_serverName);
 						send(refusedClient, message.c_str(), message.size(), 0);
@@ -324,7 +319,6 @@ t_tokens	Server::_tokenizeMsg(const std::string &message)
 		tokenizedMsg.parameters.push_back(token); // Add parameter to vector
 	}
 
-	// std::getline() extracts the line until it finds a '\n'. We must remove the remaining '\r'.
 	if (!tokenizedMsg.trailing.empty() && tokenizedMsg.trailing[tokenizedMsg.trailing.size() - 1] == '\r')
 		tokenizedMsg.trailing.erase(tokenizedMsg.trailing.size() - 1);
 
@@ -337,8 +331,6 @@ void Server::_processMessage(Client &currentClient, std::string message)
 	std::map<std::string, void (Server::*)(Client&, t_tokens)>::iterator it = _commandMap.find(msgTokens.command);
 
 	/* DEBUG PRINTINGS ------------------------------------------------------ */
-	// for (size_t i = 0; i < msgTokens.trailing.size(); i++)
-	// 	std::cout << std::hex << (int)(unsigned char)msgTokens.trailing[i] << " ";
 	std::cout << std::endl;	
 
 	std::cout << "[~DEBUG]: " << message;

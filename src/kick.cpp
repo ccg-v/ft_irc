@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 21:43:10 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 23:25:47 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/25 22:39:03 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 		return ;
 	}
 
-	std::string channelName = msgTokens.parameters[0];
+	std::string channelName = toLowerStr(msgTokens.parameters[0]);
 
 	Channel *channel = _findChannelByName(channelName);
 
@@ -40,8 +40,6 @@ void	Server::_kick(Client &client, const t_tokens msgTokens)
 
 	if (!client.isOperator(channelName))
 	{
-		// Alternative to ERR_CHANOPRIVSNEEDED (see footnote [1])
-		//_sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + " " + channelName + " :You're not channel operator\r\n");
 		_sendMessage(client, ERR_CHANOPRIVSNEEDED(this->_serverName, client.getNickname(), channelName));
 		return ;
 	}
@@ -123,4 +121,8 @@ Client *Server::_findClientByFd(const int fd)
  *		the channel window unexpectedly. I overcame the issue building and sending my
  *		own message, making it clear that in the message that its not the standard 
  *		reply but a customized notice of our own.
+ *
+ * 	Alternative to ERR_CHANOPRIVSNEEDED
+ * 		_sendMessage(client, ":" + this->_serverName + " NOTICE " + client.getNickname() + \
+ * 		" " + channelName + " :You're not channel operator\r\n");
  */

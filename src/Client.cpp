@@ -6,7 +6,7 @@
 /*   By: erosas-c <erosas-c@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/13 16:48:49 by ccarrace          #+#    #+#             */
-/*   Updated: 2025/03/24 22:55:43 by erosas-c         ###   ########.fr       */
+/*   Updated: 2025/03/26 19:06:05 by erosas-c         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ Client::Client(int fd) // Parameterized constructor
 	  _isRegistered(false),
 	  _passErrSent(false),
 	  _clientBuffer(""),
-	  _startTime(std::time(0))
+	  _startTime(std::time(0)),
+	  _nickValid(false)
 {
 }
 
@@ -197,4 +198,14 @@ void	Client::unsubscribe(std::string channelName)
 	{
 		this->_channels.erase(it);
 	}
+}
+
+void	Client::setNickValid(bool status)
+{
+	this->_nickValid = status;
+}
+
+bool	Client::getNickValid()
+{
+	return (this->_nickValid);
 }
