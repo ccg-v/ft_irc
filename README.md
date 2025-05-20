@@ -99,4 +99,4 @@ USER <user_name> 0 * :<real_name>
 	+ `k`: Set password to join channel: `MODE -k <#channel_name> <password>`
 	+ `l`: Set limited number of channel users: `MODE -l <#channel_name> <limit>`
 
-Here's a brief [command cheatsheet](#https://dl.icdst.org/pdfs/files3/01a99ce6eac6a0c1b18303941c088446.pdf)
+Here's a brief [command cheatsheet](https://dl.icdst.org/pdfs/files3/01a99ce6eac6a0c1b18303941c088446.pdf)
